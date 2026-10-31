@@ -1,17 +1,15 @@
 [build]
-  # Nếu deploy cả repo, Netlify sẽ lấy giao diện từ thư mục frontend/
   base = "frontend"
   publish = "frontend"
   command = ""
 
 # ==============================================================================
 # 1. API PROXY REWRITE: Chuyển tiếp toàn bộ yêu cầu /api/* sang Server Render
-# HƯỚNG DẪN: Thay thế URL bên dưới bằng URL Render của bạn
-# (Ví dụ: https://giftspace-backend.onrender.com/api/:splat)
+# Backend URL: https://giftspace-o7bq.onrender.com
 # ==============================================================================
 [[redirects]]
   from = "/api/*"
-  to = "https://YOUR_BACKEND_URL.onrender.com/api/:splat"
+  to = "https://giftspace-o7bq.onrender.com/api/:splat"
   status = 200
   force = true
 
