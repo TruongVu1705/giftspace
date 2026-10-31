@@ -326,45 +326,31 @@ app.get('/api/admin/tables/:name', (req, res) => {
 });
 
 
-// Serve static frontend files (if frontend folder is available nearby)
-const candidateStaticDirs = [
-    path.join(__dirname, '../frontend'),
-    path.join(__dirname, 'public'),
-    path.join(__dirname, 'frontend')
-];
-
-let staticServed = false;
-for (const dir of candidateStaticDirs) {
-    if (fs.existsSync(dir)) {
-        app.use(express.static(dir));
-        app.use((req, res, next) => {
-            if (req.path.startsWith('/api')) return next();
-            const targetFile = path.join(dir, req.path.endsWith('.html') ? req.path : 'index.html');
-            if (fs.existsSync(targetFile)) {
-                return res.sendFile(targetFile);
-            }
-            res.sendFile(path.join(dir, 'index.html'));
-        });
-        staticServed = true;
-        break;
-    }
-}
-
-// Standalone backend root message if no frontend directory exists
-if (!staticServed) {
-    app.get('/', (req, res) => {
-        res.json({
-            status: "online",
-            service: "GiftSpace Backend API",
-            uptime: process.uptime(),
-            endpoints: {
-                health: "/api/health",
-                assets: "/api/assets",
-                login: "/api/users/login"
-            }
-        });
+// ==========================================
+// PURE BACKEND API MODE (No static frontend)
+// ==========================================
+app.get('/', (req, res) => {
+    res.json({
+        status: "online",
+        service: "GiftSpace Backend API",
+        message: "Backend API is running successfully. Frontend is hosted on Netlify.",
+        uptime: Math.round(process.uptime()),
+        timestamp: new Date().toISOString(),
+        endpoints: {
+            health: "/api/health",
+            assets: "/api/assets",
+            login: "/api/users/login"
+        }
     });
-}
+});
+
+// 404 handler for unmatched routes
+app.use((req, res) => {
+    res.status(404).json({
+        error: "Not Found",
+        message: `Endpoint ${req.method} ${req.originalUrl} not found on GiftSpace Backend API.`
+    });
+});
 
 app.listen(PORT, () => {
     console.log(`Backend API Server running on http://localhost:${PORT}`);
