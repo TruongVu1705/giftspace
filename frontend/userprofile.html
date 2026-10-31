@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <script>
+    if (localStorage.getItem('darkMode') === 'true' || (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>GiftSpace — Hồ sơ cá nhân</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-background text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+  <!-- Top Navigation Bar -->
+  <header class="fixed top-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant">
+    <div class="h-20 max-w-[1360px] mx-auto px-margin-mobile md:px-margin flex items-center justify-between gap-gutter">
+      <div class="flex items-center gap-space-sm shrink-0">
+        <div class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center border border-outline-variant text-primary-container">
+          <span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+        </div>
+        <a class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-medium" href="index.html">GiftSpace</a>
+      </div>
+      
+      <div class="flex items-center gap-space-md shrink-0">
+        <!-- Light / Dark toggle -->
+        <button aria-label="Toggle light/dark theme"
+          class="w-8 h-8 rounded-full bg-surface-container-low border border-outline-variant hover:border-secondary-container hover:bg-surface-container hover:text-primary-container text-on-surface-variant flex items-center justify-center shrink-0 transition-all shadow-xs"
+          title="Toggle theme" type="button">
+          <span class="material-symbols-outlined theme-toggle-icon text-[18px] transition-transform duration-300">dark_mode</span>
+        </button>
+
+        <!-- Language toggle -->
+        <button aria-label="Toggle language" class="w-8 h-8 rounded-full bg-surface-container-low border border-outline-variant hover:border-secondary-container hover:bg-surface-container hover:text-primary-container text-on-surface-variant flex items-center justify-center shrink-0 transition-all shadow-xs ml-2" onclick="toggleLanguage()" title="Toggle language" type="button">
+          <span class="font-bold text-[12px] uppercase" id="lang-toggle-text">VI</span>
+        </button>
+
+        <!-- User Profile Avatar with Dropdown Container (Unified with index & dashboard) -->
+        <div class="relative">
+          <div id="userHeaderAvatar"
+            class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0 font-bold text-[14px] cursor-pointer shadow-xs border border-outline-variant hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-[18px]">person</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="w-full pt-20 flex-1 max-w-[1360px] mx-auto px-margin-mobile md:px-margin">
+    <div class="flex flex-col w-full pb-space-2xl">
+      <!-- Ambient Glow Accents (Unified with dashboard & index) -->
+      <div class="relative w-full">
+        <div class="absolute -top-12 left-1/4 w-[480px] h-[480px] bg-rose-500/10 dark:bg-rose-500/15 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+        <div class="absolute top-28 right-10 w-[380px] h-[380px] bg-pink-500/10 dark:bg-pink-900/20 rounded-full blur-[90px] pointer-events-none -z-10"></div>
+
+        <!-- Breadcrumb Bar -->
+        <nav aria-label="Breadcrumb" class="py-space-md flex items-center justify-between">
+          <ol class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant">
+            <li>
+              <a class="hover:text-primary transition-colors flex items-center gap-1" href="index.html">
+                <span class="material-symbols-outlined text-[16px]">home</span>
+                <span data-i18n="Home">Trang chủ</span>
+              </a>
+            </li>
+            <li class="text-outline-variant">/</li>
+            <li>
+              <a class="hover:text-primary transition-colors" href="userprofile.html" data-i18n="User Profile">Hồ sơ cá nhân</a>
+            </li>
+            <li class="text-outline-variant">/</li>
+            <li class="text-primary font-title-md font-semibold" id="breadcrumb-current-tab" data-i18n="Personal Information">Thông tin cá nhân</li>
+          </ol>
+        </nav>
+
+        <!-- Header Hero Profile Banner -->
+        <section class="mt-space-sm bg-surface-container-lowest rounded-2xl shadow-xs p-space-lg md:p-space-xl relative overflow-hidden border border-outline-variant">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg relative z-10">
+            <!-- User Info Left Side -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-space-lg">
+              <!-- Avatar with Edit Badge -->
+              <div class="relative group cursor-pointer" onclick="switchProfileTab('info')">
+                <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-primary via-primary-container to-secondary-container shadow-[0_8px_24px_-4px_rgba(225,29,72,0.25)] overflow-hidden">
+                  <img id="hero-user-avatar" class="w-full h-full object-cover rounded-xl"
+                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80"
+                    alt="User Portrait">
+                </div>
+                <button aria-label="Chỉnh sửa ảnh đại diện"
+                  class="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-lg bg-surface-container-lowest text-on-surface shadow-xs flex items-center justify-center hover:bg-surface-container transition-all active:scale-90 border border-outline-variant"
+                  type="button" onclick="switchProfileTab('info')">
+                  <span class="material-symbols-outlined text-[16px] text-primary">photo_camera</span>
+                </button>
+              </div>
+
+              <!-- Name & Details -->
+              <div class="flex flex-col">
+                <div class="flex flex-wrap items-center gap-space-xs sm:gap-space-sm mb-1.5">
+                  <h1 class="font-headline-md text-headline-md text-on-surface tracking-tight font-bold" id="hero-user-name">Nguyễn Trường Vũ</h1>
+                  <span class="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm uppercase font-extrabold tracking-wider border border-outline-variant shadow-xs" id="hero-role-badge">
+                    <span class="material-symbols-outlined text-[13px]">verified</span>
+                    <span id="hero-role-text">Thành viên Pro</span>
+                  </span>
+                </div>
+                <p class="font-title-md text-title-md text-secondary font-medium" id="hero-user-headline">Thành viên GiftSpace Hub</p>
+                
+                <div class="flex flex-wrap items-center gap-x-space-md gap-y-1.5 mt-2.5 text-on-surface-variant font-body-sm text-body-sm">
+                  <span class="inline-flex items-center gap-1.5 bg-surface-container-low px-2.5 py-0.5 rounded-lg border border-outline-variant">
+                    <span class="material-symbols-outlined text-[15px] text-primary">mail</span>
+                    <span id="hero-user-email">vu.nguyen@example.com</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 bg-surface-container-low px-2.5 py-0.5 rounded-lg border border-outline-variant">
+                    <span class="material-symbols-outlined text-[15px] text-primary">calendar_today</span>
+                    <span id="hero-user-joined">Tham gia từ 10/2024</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons (Unified with dashboard quick actions) -->
+            <div class="flex flex-wrap sm:flex-nowrap items-center gap-space-sm self-stretch lg:self-center">
+              <button onclick="switchProfileTab('info')"
+                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-space-xs px-4 py-2.5 rounded-xl bg-surface-container-lowest text-on-surface font-title-md text-title-md border border-outline-variant shadow-xs hover:bg-surface-container active:scale-95 transition-all cursor-pointer"
+                type="button">
+                <span class="material-symbols-outlined text-[18px] text-primary">manage_accounts</span>
+                <span data-i18n="Edit Profile">Chỉnh sửa hồ sơ</span>
+              </button>
+              <button onclick="logoutUser()"
+                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-space-xs px-4 py-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-error font-title-md text-title-md border border-outline-variant hover:border-error active:scale-95 transition-all cursor-pointer"
+                type="button" title="Đăng xuất">
+                <span class="material-symbols-outlined text-[18px]">logout</span>
+                <span data-i18n="Logout">Đăng xuất</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Stats Band: Focused on 2 Real Metrics -->
+          <div class="mt-space-lg pt-space-md bg-surface-container-low -mx-space-lg md:-mx-space-xl -mb-space-lg md:-mb-space-xl px-space-lg md:px-space-xl py-space-md flex flex-wrap items-center justify-between gap-space-md border-t border-outline-variant">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-space-md sm:gap-space-xl flex-1 max-w-2xl">
+              <!-- Stat 1: Paid Orders -->
+              <div class="flex items-center gap-space-sm cursor-pointer group" onclick="switchProfileTab('orders')">
+                <div class="w-10 h-10 rounded-xl bg-surface-container text-primary flex items-center justify-center border border-outline-variant shadow-xs group-hover:scale-105 transition-transform">
+                  <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+                </div>
+                <div>
+                  <p class="font-headline-sm text-headline-sm font-semibold text-on-surface leading-none" id="stat-orders-count">2</p>
+                  <p class="font-body-sm text-body-sm text-secondary" data-i18n="Paid Orders">Đơn hàng đã thanh toán</p>
+                </div>
+              </div>
+
+              <!-- Stat 2: Viewed Demos -->
+              <div class="flex items-center gap-space-sm cursor-pointer group" onclick="switchProfileTab('demos')">
+                <div class="w-10 h-10 rounded-xl bg-surface-container text-secondary flex items-center justify-center border border-outline-variant shadow-xs group-hover:scale-105 transition-transform">
+                  <span class="material-symbols-outlined text-[20px]">devices</span>
+                </div>
+                <div>
+                  <p class="font-headline-sm text-headline-sm font-semibold text-on-surface leading-none" id="stat-demos-count">3</p>
+                  <p class="font-body-sm text-body-sm text-secondary" data-i18n="Viewed Demo Products">Sản phẩm đã xem Demo</p>
+                </div>
+              </div>
+
+              <!-- Stat 3: Status -->
+              <div class="hidden sm:flex items-center gap-space-sm">
+                <div class="w-10 h-10 rounded-xl bg-surface-container text-emerald-500 flex items-center justify-center border border-outline-variant shadow-xs">
+                  <span class="material-symbols-outlined text-[20px]">verified</span>
+                </div>
+                <div>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold uppercase tracking-wider">
+                    <span class="material-symbols-outlined text-[13px]">check_circle</span>
+                    <span data-i18n="Active">Hoạt động</span>
+                  </span>
+                  <p class="font-body-sm text-body-sm text-secondary mt-0.5" data-i18n="Account Status">Trạng thái tài khoản</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="hidden xl:flex items-center gap-space-sm text-secondary font-body-sm text-body-sm bg-surface-container-lowest px-space-md py-2 rounded-xl border border-outline-variant shadow-xs">
+              <span class="material-symbols-outlined text-[18px] text-primary">shield</span>
+              <span data-i18n="100% Customer Protection">Bảo vệ quyền lợi khách hàng 100%</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Navigation Tabs: STRICTLY 3 TABS -->
+      <section class="mt-space-xl">
+        <div class="flex items-center justify-between border-b-0 pb-1">
+          <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 w-full sm:w-auto">
+            <!-- Tab 1: Quản lý thông tin cá nhân -->
+            <button id="tab-btn-info" onclick="switchProfileTab('info')"
+              class="profile-tab-btn inline-flex items-center gap-2 px-space-md py-2.5 rounded-full font-title-md text-title-md bg-primary text-on-primary shadow-xs border border-primary transition-all cursor-pointer"
+              type="button">
+              <span class="material-symbols-outlined text-[18px]">manage_accounts</span>
+              <span data-i18n="Personal Information">Thông tin cá nhân</span>
+            </button>
+
+            <!-- Tab 2: Những đơn hàng đã thanh toán -->
+            <button id="tab-btn-orders" onclick="switchProfileTab('orders')"
+              class="profile-tab-btn inline-flex items-center gap-2 px-space-md py-2.5 rounded-full font-title-md text-title-md bg-surface-container-lowest text-on-surface hover:bg-surface-container-low transition-all border border-outline-variant shadow-xs cursor-pointer"
+              type="button">
+              <span class="material-symbols-outlined text-[18px] text-secondary">receipt_long</span>
+              <span data-i18n="Paid Orders">Đơn hàng đã thanh toán</span>
+              <span id="tab-badge-orders" class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container text-secondary border border-outline-variant/60">2</span>
+            </button>
+
+            <!-- Tab 3: Những sản phẩm đã nhấn vào xem Web Demo hoặc Mobile Demo -->
+            <button id="tab-btn-demos" onclick="switchProfileTab('demos')"
+              class="profile-tab-btn inline-flex items-center gap-2 px-space-md py-2.5 rounded-full font-title-md text-title-md bg-surface-container-lowest text-on-surface hover:bg-surface-container-low transition-all border border-outline-variant shadow-xs cursor-pointer"
+              type="button">
+              <span class="material-symbols-outlined text-[18px] text-secondary">devices</span>
+              <span data-i18n="Viewed Demo Products">Sản phẩm đã xem Demo</span>
+              <span id="tab-badge-demos" class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container text-secondary border border-outline-variant/60">3</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Layout: Full Width Focused Presentation -->
+      <div class="mt-space-lg w-full">
+        <!-- ============================================================== -->
+        <!-- TAB PANEL 1: QUẢN LÝ THÔNG TIN CÁ NHÂN -->
+        <!-- ============================================================== -->
+        <div id="tab-panel-info" class="flex flex-col gap-space-lg transition-opacity duration-200">
+          <div class="bg-surface-container-lowest rounded-2xl p-space-lg md:p-space-xl shadow-xs border border-outline-variant">
+            <div class="flex items-center justify-between pb-space-md border-b border-outline-variant">
+              <div class="flex items-center gap-space-sm">
+                <div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary border border-outline-variant">
+                  <span class="material-symbols-outlined text-[22px]">badge</span>
+                </div>
+                <div>
+                  <h2 class="font-headline-sm text-headline-sm text-on-surface tracking-tight" data-i18n="Personal Information">Quản lý thông tin cá nhân</h2>
+                  <p class="font-body-sm text-body-sm text-secondary">Xem và cập nhật thông tin tài khoản, ảnh đại diện và mật khẩu bảo mật.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Form -->
+            <form id="profile-edit-form" class="mt-space-lg flex flex-col gap-space-xl" onsubmit="event.preventDefault(); saveUserProfile();">
+              <!-- Avatar Customization -->
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-space-lg p-space-md rounded-xl bg-surface-container-low border border-outline-variant">
+                <div class="relative w-20 h-20 rounded-2xl overflow-hidden bg-surface-container shrink-0 border-2 border-primary/20">
+                  <img id="form-avatar-preview" class="w-full h-full object-cover"
+                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80"
+                    alt="Avatar Preview">
+                </div>
+                <div class="flex-1 w-full space-y-2">
+                  <label class="block font-label-md text-label-md font-semibold text-on-surface" for="profile-avatar-url">
+                    Đường dẫn ảnh đại diện (URL)
+                  </label>
+                  <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-secondary">image</span>
+                    <input id="profile-avatar-url"
+                      class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-xl text-body-sm font-body-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                      placeholder="https://example.com/avatar.jpg" type="url" oninput="updateAvatarPreview(this.value)">
+                  </div>
+                  <div class="flex items-center gap-2 pt-1">
+                    <span class="text-secondary text-[12px]">Hoặc chọn ảnh mẫu nhanh:</span>
+                    <div class="flex items-center gap-1.5">
+                      <button type="button" class="w-6 h-6 rounded-full overflow-hidden border border-outline-variant hover:border-primary transition-all" onclick="selectPresetAvatar('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80')">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-full h-full object-cover">
+                      </button>
+                      <button type="button" class="w-6 h-6 rounded-full overflow-hidden border border-outline-variant hover:border-primary transition-all" onclick="selectPresetAvatar('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80')">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" class="w-full h-full object-cover">
+                      </button>
+                      <button type="button" class="w-6 h-6 rounded-full overflow-hidden border border-outline-variant hover:border-primary transition-all" onclick="selectPresetAvatar('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&auto=format&fit=crop&q=80')">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" class="w-full h-full object-cover">
+                      </button>
+                      <button type="button" class="w-6 h-6 rounded-full overflow-hidden border border-outline-variant hover:border-primary transition-all" onclick="selectPresetAvatar('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=300&auto=format&fit=crop&q=80')">
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80" class="w-full h-full object-cover">
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- General Fields Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+                <!-- Full Name -->
+                <div class="space-y-1.5 text-left">
+                  <label class="block font-label-md text-label-md font-semibold text-on-surface" for="profile-fullname">
+                    Họ và tên <span class="text-primary">*</span>
+                  </label>
+                  <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-secondary">person</span>
+                    <input id="profile-fullname"
+                      class="w-full pl-9 pr-3 py-2.5 bg-surface-container-low border border-outline-variant rounded-xl text-body-md font-body-md text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                      placeholder="Nguyễn Trường Vũ" type="text" required>
+                  </div>
+                </div>
+
+                <!-- Email (Read-only verified) -->
+                <div class="space-y-1.5 text-left">
+                  <label class="block font-label-md text-label-md font-semibold text-on-surface" for="profile-email">
+                    Địa chỉ Email (Đã xác thực)
+                  </label>
+                  <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-secondary">mail</span>
+                    <input id="profile-email"
+                      class="w-full pl-9 pr-24 py-2.5 bg-surface-container border border-outline-variant rounded-xl text-body-md font-body-md text-on-surface-variant cursor-not-allowed"
+                      type="email" readonly>
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-[11px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      <span class="material-symbols-outlined text-[13px]">check_circle</span> Đã xác thực
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Password Change Section -->
+              <div class="p-space-md md:p-space-lg rounded-xl bg-surface-container-low border border-outline-variant space-y-space-md">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[20px] text-primary">lock_reset</span>
+                  <h3 class="font-title-lg text-title-lg text-on-surface font-semibold">Đổi mật khẩu tài khoản</h3>
+                </div>
+                <p class="font-body-sm text-body-sm text-secondary">Để trống các ô bên dưới nếu bạn không có nhu cầu thay đổi mật khẩu đăng nhập.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md pt-1">
+                  <!-- New Password -->
+                  <div class="space-y-1.5 text-left">
+                    <label class="block font-label-md text-label-md font-semibold text-on-surface" for="profile-newpass">
+                      Mật khẩu mới
+                    </label>
+                    <div class="relative">
+                      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-secondary">lock</span>
+                      <input id="profile-newpass"
+                        class="w-full pl-9 pr-10 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                        placeholder="Tối thiểu 6 ký tự" type="password" oninput="updateProfilePasswordStrength(this.value)">
+                      <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-on-surface transition-colors cursor-pointer" onclick="togglePasswordVisibility('profile-newpass', this)">
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                    </div>
+
+                    <!-- Password Strength Meter (Exact 3-tier rules) -->
+                    <div id="profile-password-strength-box" class="hidden mt-2 p-2.5 rounded-xl bg-surface-container/60 border border-outline-variant/60">
+                      <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-[11px] font-semibold text-on-surface-variant flex items-center gap-1">
+                          <span class="material-symbols-outlined text-[14px]">shield</span>
+                          <span>Độ mạnh:</span>
+                          <span id="profile-pass-strength-label" class="font-bold text-error">Yếu</span>
+                        </span>
+                        <span id="profile-pass-strength-hint" class="text-[10px] text-on-surface-variant/80">Chỉ chữ và số ≤ 8 ký tự</span>
+                      </div>
+                      <div class="grid grid-cols-3 gap-1.5 h-1.5 w-full">
+                        <div id="profile-pass-bar-1" class="h-full rounded-full bg-error transition-all duration-300"></div>
+                        <div id="profile-pass-bar-2" class="h-full rounded-full bg-surface-container-high dark:bg-white/10 transition-all duration-300"></div>
+                        <div id="profile-pass-bar-3" class="h-full rounded-full bg-surface-container-high dark:bg-white/10 transition-all duration-300"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Confirm Password -->
+                  <div class="space-y-1.5 text-left">
+                    <label class="block font-label-md text-label-md font-semibold text-on-surface" for="profile-confirmpass">
+                      Xác nhận mật khẩu mới
+                    </label>
+                    <div class="relative">
+                      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-secondary">lock</span>
+                      <input id="profile-confirmpass"
+                        class="w-full pl-9 pr-10 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                        placeholder="Nhập lại mật khẩu mới" type="password">
+                      <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-on-surface transition-colors cursor-pointer" onclick="togglePasswordVisibility('profile-confirmpass', this)">
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Form Buttons Strip -->
+              <div class="flex items-center justify-end gap-space-sm pt-space-xs">
+                <button type="button" onclick="resetProfileForm()"
+                  class="px-space-lg py-2.5 rounded-xl border border-outline-variant hover:bg-surface-container text-on-surface font-title-md text-title-md transition-all cursor-pointer">
+                  Hủy bỏ
+                </button>
+                <button type="submit" id="save-profile-btn"
+                  class="inline-flex items-center gap-2 px-space-xl py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-on-primary font-title-md text-title-md shadow-xs active:scale-95 transition-all cursor-pointer">
+                  <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                  <span>Lưu thay đổi</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB PANEL 2: NHỮNG ĐƠN HÀNG ĐÃ THANH TOÁN -->
+        <!-- ============================================================== -->
+        <div id="tab-panel-orders" class="hidden flex-col gap-space-lg transition-opacity duration-200">
+          <!-- Filter & Search Ribbon -->
+          <div class="bg-surface-container-lowest p-space-md rounded-2xl shadow-xs border border-outline-variant flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-space-md">
+            <div class="flex items-center gap-space-sm">
+              <div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-primary border border-outline-variant">
+                <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+              </div>
+              <div>
+                <h2 class="font-headline-sm text-headline-sm text-on-surface tracking-tight" data-i18n="Paid Orders">Đơn hàng đã thanh toán</h2>
+                <p class="font-body-sm text-body-sm text-secondary">Tất cả giao dịch mua bản quyền thành công có thể tải mã nguồn và license key trọn đời.</p>
+              </div>
+            </div>
+
+            <!-- Search and Sorting -->
+            <div class="flex items-center gap-space-sm">
+              <div class="relative flex-1 sm:w-60">
+                <span class="material-symbols-outlined absolute left-2.5 top-2.5 text-[18px] text-secondary">search</span>
+                <input id="orders-search-input"
+                  class="w-full pl-8 pr-3 py-2 bg-surface-container-low border border-outline-variant rounded-xl text-body-sm font-body-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                  placeholder="Tìm theo mã hoặc tên..." type="text" oninput="filterOrders(this.value)">
+              </div>
+            </div>
+          </div>
+
+          <!-- Orders Dynamic List Container -->
+          <div id="orders-list-container" class="flex flex-col gap-space-md">
+            <!-- Dynamically populated via loadUserOrders() -->
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB PANEL 3: NHỮNG SẢN PHẨM ĐÃ XEM WEB DEMO HOẶC MOBILE DEMO -->
+        <!-- ============================================================== -->
+        <div id="tab-panel-demos" class="hidden flex-col gap-space-lg transition-opacity duration-200">
+          <!-- Section Header with Clear All & Filter -->
+          <div class="bg-surface-container-lowest p-space-md rounded-2xl shadow-xs border border-outline-variant flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-space-md">
+            <div class="flex items-center gap-space-sm">
+              <div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-primary border border-outline-variant">
+                <span class="material-symbols-outlined text-[20px]">devices</span>
+              </div>
+              <div>
+                <h2 class="font-headline-sm text-headline-sm text-on-surface tracking-tight" data-i18n="Viewed Demo Products">Sản phẩm đã xem Web Demo / Mobile Demo</h2>
+                <p class="font-body-sm text-body-sm text-secondary">Danh sách các mẫu thiết kế bạn đã nhấn vào xem thử bản Web Demo hoặc Mobile Demo.</p>
+              </div>
+            </div>
+
+            <!-- Action: Clear History -->
+            <button onclick="confirmClearDemoHistory()"
+              class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-secondary hover:text-error hover:bg-error-container/20 transition-all text-body-sm font-body-sm shrink-0 border border-outline-variant cursor-pointer"
+              type="button">
+              <span class="material-symbols-outlined text-[16px]">delete_sweep</span>
+              <span>Xóa lịch sử xem demo</span>
+            </button>
+          </div>
+
+          <!-- Demo Type Filter Chips -->
+          <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <button id="chip-demo-all" onclick="filterDemosBy('all')"
+              class="demo-chip px-3 py-1.5 rounded-full text-label-sm font-label-sm uppercase tracking-wider bg-primary text-on-primary font-bold shadow-xs border border-primary transition-all cursor-pointer">
+              Tất cả
+            </button>
+            <button id="chip-demo-web" onclick="filterDemosBy('web')"
+              class="demo-chip px-3 py-1.5 rounded-full text-label-sm font-label-sm uppercase tracking-wider bg-surface-container-lowest border border-outline-variant text-secondary hover:text-on-surface transition-all flex items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-[14px]">laptop_mac</span>
+              <span>Web Demo</span>
+            </button>
+            <button id="chip-demo-mobile" onclick="filterDemosBy('mobile')"
+              class="demo-chip px-3 py-1.5 rounded-full text-label-sm font-label-sm uppercase tracking-wider bg-surface-container-lowest border border-outline-variant text-secondary hover:text-on-surface transition-all flex items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-[14px]">smartphone</span>
+              <span>Mobile Demo</span>
+            </button>
+          </div>
+
+          <!-- Demos Dynamic Grid Container -->
+          <div id="demos-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-lg">
+            <!-- Dynamically populated via loadViewedDemos() -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full bg-surface-container-lowest mt-space-2xl border-t border-outline-variant shadow-[0_-4px_20px_-4px_rgba(225,29,72,0.03)]">
+    <div class="max-w-[1360px] mx-auto px-margin-mobile md:px-margin py-space-xl flex flex-col md:flex-row items-center justify-between gap-space-lg">
+      <div class="flex flex-col sm:flex-row items-center gap-space-md text-center sm:text-left">
+        <span class="font-headline-sm text-headline-sm text-on-surface">GiftSpace</span>
+        <span class="font-body-sm text-body-sm text-secondary">© 2024 GiftSpace Hub. Nền tảng tài nguyên số & bản quyền thương mại.</span>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-space-lg">
+        <div class="flex items-center gap-space-md">
+          <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Điều khoản</a>
+          <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Bảo mật</a>
+          <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Bản quyền</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- License Key Modal -->
+  <div id="license-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="relative w-full max-w-md bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-2xl p-6 text-on-surface">
+      <button class="absolute top-4 right-4 w-8 h-8 rounded-full bg-surface-container hover:bg-surface-variant flex items-center justify-center text-secondary hover:text-on-surface transition-colors"
+        onclick="closeLicenseModal()" type="button">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+      
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-primary-container/10 text-primary flex items-center justify-center">
+          <span class="material-symbols-outlined text-[24px]">key</span>
+        </div>
+        <div>
+          <h3 class="font-title-lg text-title-lg font-bold text-on-surface">License Key Bản quyền</h3>
+          <p class="text-[12px] text-secondary" id="modal-order-subtitle">Mã đơn: #ORD-9241</p>
+        </div>
+      </div>
+
+      <div class="p-3 bg-surface-container-low rounded-xl border border-outline-variant mb-4">
+        <p class="text-[12px] text-secondary font-medium mb-1">Commercial License Key:</p>
+        <div class="flex items-center justify-between gap-2">
+          <code id="modal-license-key-text" class="font-mono text-[14px] font-bold text-primary tracking-wider break-all select-all">GS-COMM-2026-9241-8974</code>
+          <button onclick="copyLicenseKey()" class="p-2 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-primary transition-all flex items-center gap-1 font-label-sm text-label-sm shrink-0 border border-outline-variant/60">
+            <span class="material-symbols-outlined text-[16px]">content_copy</span>
+            <span id="modal-copy-status">Sao chép</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-2 text-[12px] text-secondary mb-5">
+        <p class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-emerald-500">check_circle</span> Giấy phép thương mại không giới hạn dự án</p>
+        <p class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-emerald-500">check_circle</span> Được phép sử dụng cho khách hàng và ứng dụng SaaS</p>
+        <p class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-emerald-500">check_circle</span> Cập nhật mã nguồn trọn đời miễn phí</p>
+      </div>
+
+      <button onclick="closeLicenseModal()" class="w-full py-2.5 rounded-xl bg-primary-container text-on-primary font-title-md text-title-md font-semibold hover:bg-primary transition-all">
+        Đóng cửa sổ
+      </button>
+    </div>
+  </div>
+
+  <!-- Interactive Live Mobile Demo Modal (100% Đồng nhất với Index, không có nút mua) -->
+  <div
+    class="fixed inset-0 z-50 bg-[#2c1519]/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto duration-200 transition-all"
+    id="mobile-modal"
+    style="display: none !important;"
+    onclick="if(event.target===this) closeMobileDemoModal()">
+    <div
+      class="relative w-full max-w-5xl bg-surface border border-outline-variant rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[94vh]">
+      <!-- Modal Top Bar -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant bg-surface-container-lowest/80 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-9 h-9 rounded-xl bg-surface-container-high flex items-center justify-center text-primary border border-outline-variant shadow-xs">
+            <span class="material-symbols-outlined text-[20px]">smartphone</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-headline-sm text-[18px] font-semibold text-on-surface" id="mobile-modal-title">Live Mobile Demo</h3>
+              <span
+                class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-primary/10 text-primary uppercase tracking-wider border border-primary/20">Tràn Viền Retina</span>
+            </div>
+            <p class="text-[12px] text-on-surface-variant" id="mobile-modal-device-desc">iPhone 15 Pro (393 × 852 px) • Super Retina XDR</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            class="w-9 h-9 rounded-lg border border-outline-variant hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center shadow-xs cursor-pointer"
+            onclick="reloadMobileDemo()"
+            title="Tải lại Demo" type="button">
+            <span class="material-symbols-outlined text-[18px]">refresh</span>
+          </button>
+          <button
+            class="w-9 h-9 rounded-lg border border-outline-variant hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors hidden sm:flex items-center justify-center shadow-xs cursor-pointer"
+            onclick="openMobileDemoFullscreen()"
+            title="Mở toàn màn hình" type="button">
+            <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+          </button>
+          <button
+            class="w-9 h-9 rounded-lg bg-surface-container hover:bg-error-container hover:text-on-error-container text-on-surface transition-colors flex items-center justify-center ml-1 border border-outline-variant shadow-xs cursor-pointer"
+            onclick="closeMobileDemoModal()" title="Đóng cửa sổ" type="button">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body Content -->
+      <div
+        class="flex-1 overflow-y-auto flex flex-col lg:flex-row items-center justify-between p-4 sm:p-8 gap-8 bg-gradient-to-b from-surface to-surface-container-low">
+        
+        <!-- Left: Mobile Device Chassis (100% Tràn Viền) -->
+        <div class="w-full lg:w-7/12 flex flex-col items-center justify-center py-2">
+          <!-- Outer Phone Chassis with slim titanium bezel (100% Tràn Viền) -->
+          <div id="phoneDeviceFrame"
+            class="relative w-[320px] sm:w-[335px] h-[670px] bg-[#120a0d] dark:bg-[#0c0709] rounded-[50px] p-[3.5px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.08)] border-[3px] border-[#382028] dark:border-[#2a161d] flex flex-col select-none transition-all duration-300 overflow-hidden"
+            style="overflow: hidden;">
+            
+            <!-- Screen Display Area (Edge-to-edge / Tràn Viền) -->
+            <div class="relative w-full h-full rounded-[46px] overflow-hidden bg-black flex flex-col isolate" id="mobile-screen-container"
+              style="overflow: hidden; -webkit-mask-image: -webkit-radial-gradient(white, black); mask-image: radial-gradient(white, black); isolation: isolate; transform: translateZ(0);">
+              
+              <!-- The Live Web Demo Iframe (Full-bleed / Tràn viền 100%) -->
+              <iframe id="mobile-demo-iframe" src="demo-lumina.html"
+                class="w-full h-full border-0 pointer-events-auto block bg-surface"
+                style="width: 100%; height: 100%; border: none; overflow: hidden; border-radius: inherit;"></iframe>
+
+              <!-- Floating Dynamic Island -->
+              <div id="mobileDynamicIsland"
+                class="absolute left-1/2 -translate-x-1/2 top-3 w-28 h-6 bg-black rounded-full z-30 pointer-events-none flex items-center justify-end pr-2.5 gap-1.5 shadow-sm transition-all duration-300">
+                <div class="w-2.5 h-2.5 rounded-full bg-[#1e293b]/90 border border-slate-700/60"></div>
+                <div class="w-2 h-2 rounded-full bg-[#0a1120] border border-blue-900/40"></div>
+              </div>
+
+              <!-- Floating Status Bar Overlay -->
+              <div id="mobileStatusBar"
+                class="absolute top-0 left-0 right-0 h-10 px-7 flex items-center justify-between text-[11px] font-semibold text-white z-20 pointer-events-none pt-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                <span class="tracking-tight font-semibold" id="mobileClockTime">9:41</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[13px]">signal_cellular_4_bar</span>
+                  <span class="material-symbols-outlined text-[13px]">wifi</span>
+                  <span class="material-symbols-outlined text-[14px]">battery_charging_full</span>
+                </div>
+              </div>
+
+              <!-- Floating Home Indicator Bar -->
+              <div id="mobileHomeIndicator"
+                class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-black/60 dark:bg-white/70 rounded-full z-20 pointer-events-none backdrop-blur-xs drop-shadow-sm transition-all"></div>
+            </div>
+          </div>
+          <div class="mt-3 flex items-center gap-2 text-[12px] text-on-surface-variant">
+            <span class="material-symbols-outlined text-[16px] text-primary">touch_app</span>
+            <span>Khung xem trước tương tác thực tế</span>
+          </div>
+        </div>
+
+        <!-- Right: Product Information & Controls -->
+        <div class="w-full lg:w-5/12 flex flex-col gap-5">
+          <!-- Product Specs Card -->
+          <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-5 shadow-sm">
+            <div class="flex items-center gap-2 mb-2">
+              <span
+                class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-surface-container text-primary border border-outline-variant">Figma + React + Tailwind</span>
+              <span class="text-xs text-on-surface-variant">• 100% Responsive</span>
+            </div>
+            <h4 class="font-headline-md text-[22px] font-bold text-on-surface mb-1.5" id="mobile-prod-title">Lumina Agency & Portfolio Template</h4>
+            <p class="text-body-sm text-[13px] text-on-surface-variant leading-relaxed mb-4">Trải nghiệm giao diện di động thực tế với thao tác cuộn vuốt mượt mà 120Hz, tối ưu hiển thị tràn viền chuẩn tỉ lệ màn hình smartphone hiện đại.</p>
+            
+            <div class="grid grid-cols-2 gap-2.5 pt-1 border-t border-outline-variant">
+              <div class="p-2.5 rounded-xl bg-surface-container-low border border-outline-variant">
+                <div class="text-[18px] font-bold text-primary">99/100</div>
+                <div class="text-[11px] text-on-surface-variant font-medium">Hiệu năng di động</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-surface-container-low border border-outline-variant">
+                <div class="text-[18px] font-bold text-primary">&lt; 0.4s</div>
+                <div class="text-[11px] text-on-surface-variant font-medium">Tốc độ phản hồi</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Device Viewport Switcher -->
+          <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-5 shadow-sm">
+            <span
+              class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant block mb-2.5">Chuyển đổi kích thước thiết bị</span>
+            <div class="grid grid-cols-3 gap-2" id="deviceViewportSwitcher">
+              <button id="btnDeviceIPhone" onclick="setDeviceViewport('iphone')"
+                class="py-2 px-2 rounded-xl text-center font-label-sm text-[11px] font-bold bg-primary text-white shadow-xs cursor-pointer transition-all"
+                type="button">iPhone 15 Pro</button>
+              <button id="btnDevicePixel" onclick="setDeviceViewport('pixel')"
+                class="py-2 px-2 rounded-xl text-center font-label-sm text-[11px] font-medium bg-surface-container-low border border-outline-variant text-on-surface hover:bg-surface-container transition-all cursor-pointer"
+                type="button">Pixel 8 Pro</button>
+              <button id="btnDeviceIPad" onclick="setDeviceViewport('ipad')"
+                class="py-2 px-2 rounded-xl text-center font-label-sm text-[11px] font-medium bg-surface-container-low border border-outline-variant text-on-surface hover:bg-surface-container transition-all cursor-pointer"
+                type="button">iPad Mini</button>
+            </div>
+          </div>
+
+          <!-- Real Device Testing Hint -->
+          <div
+            class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-4 shadow-sm flex items-center gap-4">
+            <div
+              class="w-16 h-16 rounded-xl bg-surface-container-low border border-outline-variant flex items-center justify-center p-1.5 shrink-0">
+              <div
+                class="grid grid-cols-3 gap-1 w-full h-full p-1 bg-surface-container-lowest rounded-lg border border-outline-variant">
+                <div class="bg-[#2c1519] rounded-xs"></div>
+                <div class="bg-primary rounded-xs"></div>
+                <div class="bg-[#2c1519] rounded-xs"></div>
+                <div class="bg-[#2c1519] rounded-xs"></div>
+                <div class="bg-[#2c1519] rounded-xs"></div>
+                <div class="bg-primary rounded-xs"></div>
+                <div class="bg-primary rounded-xs"></div>
+                <div class="bg-[#2c1519] rounded-xs"></div>
+                <div class="bg-[#2c1519] rounded-xs"></div>
+              </div>
+            </div>
+            <div>
+              <div class="text-[13px] font-bold text-on-surface">Kiểm tra trên điện thoại thật</div>
+              <p class="text-[11px] text-on-surface-variant">Quét mã QR bằng camera điện thoại để mở bản demo trực tiếp trên Safari hoặc Chrome.</p>
+            </div>
+          </div>
+
+          <!-- Action Buttons (Không có nút mua, chỉ có nút thao tác xem và đóng) -->
+          <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+            <button
+              class="flex-1 py-3 px-5 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-[14px] font-semibold transition-all border border-outline-variant shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              onclick="openMobileDemoFullscreen()" type="button">
+              <span class="material-symbols-outlined text-[18px] text-primary">open_in_new</span>
+              <span>Mở trên tab mới</span>
+            </button>
+            <button
+              class="py-3 px-6 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-[14px] font-medium transition-colors shadow-xs cursor-pointer"
+              onclick="closeMobileDemoModal()" type="button">
+              <span>Đóng</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Toast Notification -->
+  <div id="profile-toast" class="fixed top-24 right-6 z-50 transform translate-y-[-20px] opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2.5 px-4 py-3 bg-surface-container-lowest border border-outline-variant shadow-xl rounded-xl text-on-surface font-title-md text-title-md">
+    <span class="material-symbols-outlined text-[20px] text-primary" id="toast-icon">check_circle</span>
+    <span id="toast-message">Cập nhật thông tin thành công!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script>
+    // State
+    let currentUser = null;
+    let userOrders = [];
+    let viewedDemos = [];
+    let activeTab = 'info';
+
+    // Toast helper
+    function showToast(msg, icon = 'check_circle') {
+      const toast = document.getElementById('profile-toast');
+      const msgEl = document.getElementById('toast-message');
+      const iconEl = document.getElementById('toast-icon');
+      if (!toast || !msgEl) return;
+      msgEl.textContent = msg;
+      if (iconEl) iconEl.textContent = icon;
+      toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 3000);
+    }
+
+    // Switch Tabs
+    function switchProfileTab(tabName) {
+      activeTab = tabName;
+      const panels = {
+        'info': document.getElementById('tab-panel-info'),
+        'orders': document.getElementById('tab-panel-orders'),
+        'demos': document.getElementById('tab-panel-demos')
+      };
+
+      const buttons = {
+        'info': document.getElementById('tab-btn-info'),
+        'orders': document.getElementById('tab-btn-orders'),
+        'demos': document.getElementById('tab-btn-demos')
+      };
+
+      const tabTitles = {
+        'info': 'Thông tin cá nhân',
+        'orders': 'Đơn hàng đã thanh toán',
+        'demos': 'Sản phẩm đã xem Demo'
+      };
+
+      const breadcrumbEl = document.getElementById('breadcrumb-current-tab');
+      if (breadcrumbEl && tabTitles[tabName]) {
+        breadcrumbEl.textContent = tabTitles[tabName];
+      }
+
+      // Toggle Panels
+      Object.keys(panels).forEach(key => {
+        const p = panels[key];
+        if (!p) return;
+        if (key === tabName) {
+          p.classList.remove('hidden');
+          p.classList.add('flex');
+        } else {
+          p.classList.add('hidden');
+          p.classList.remove('flex');
+        }
+      });
+
+      // Toggle Button Active Styles
+      Object.keys(buttons).forEach(key => {
+        const btn = buttons[key];
+        if (!btn) return;
+        if (key === tabName) {
+          btn.className = 'profile-tab-btn inline-flex items-center gap-2 px-space-md py-2.5 rounded-full font-title-md text-title-md bg-primary text-on-primary shadow-xs border border-primary transition-all cursor-pointer';
+          const badge = btn.querySelector('span:last-child');
+          if (badge && badge.tagName === 'SPAN' && badge.id && badge.id.includes('badge')) {
+            badge.className = 'px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-white/20 text-white';
+          }
+        } else {
+          btn.className = 'profile-tab-btn inline-flex items-center gap-2 px-space-md py-2.5 rounded-full font-title-md text-title-md bg-surface-container-lowest text-on-surface hover:bg-surface-container-low transition-all border border-outline-variant shadow-xs cursor-pointer';
+          const badge = btn.querySelector('span:last-child');
+          if (badge && badge.tagName === 'SPAN' && badge.id && badge.id.includes('badge')) {
+            badge.className = 'px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container text-secondary border border-outline-variant/60';
+          }
+        }
+      });
+    }
+
+    // Avatar preview
+    function updateAvatarPreview(url) {
+      const preview = document.getElementById('form-avatar-preview');
+      if (preview && url) {
+        preview.src = url;
+      }
+    }
+
+    function selectPresetAvatar(url) {
+      const urlInput = document.getElementById('profile-avatar-url');
+      if (urlInput) urlInput.value = url;
+      updateAvatarPreview(url);
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const isPass = input.type === 'password';
+      input.type = isPass ? 'text' : 'password';
+      if (btn) {
+        const icon = btn.querySelector('.material-symbols-outlined') || btn;
+        if (icon) {
+          icon.textContent = isPass ? 'visibility_off' : 'visibility';
+        }
+      }
+    }
+
+    function evaluatePasswordStrength(password) {
+      if (!password) {
+        return { level: 0, text: '', hint: '', colorClass: '' };
+      }
+      const hasLetter = /[a-zA-Z]/.test(password);
+      const hasNumber = /[0-9]/.test(password);
+      const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+      const length = password.length;
+
+      if (hasSpecial) {
+        return {
+          level: 3,
+          text: 'Mạnh',
+          hint: 'Mật khẩu tối ưu bảo mật',
+          colorClass: 'text-emerald-500'
+        };
+      } else if (hasLetter && hasNumber && length > 8) {
+        return {
+          level: 2,
+          text: 'Trung bình',
+          hint: 'Chữ và số > 8 ký tự (thêm ký tự đặc biệt để đạt mức Mạnh)',
+          colorClass: 'text-amber-500'
+        };
+      } else {
+        return {
+          level: 1,
+          text: 'Yếu',
+          hint: 'Chỉ chữ và số (cần chữ và số trên 8 ký tự)',
+          colorClass: 'text-error'
+        };
+      }
+    }
+
+    function updateProfilePasswordStrength(password) {
+      const box = document.getElementById('profile-password-strength-box');
+      const label = document.getElementById('profile-pass-strength-label');
+      const hint = document.getElementById('profile-pass-strength-hint');
+      const b1 = document.getElementById('profile-pass-bar-1');
+      const b2 = document.getElementById('profile-pass-bar-2');
+      const b3 = document.getElementById('profile-pass-bar-3');
+      if (!box) return;
+
+      if (!password) {
+        box.classList.add('hidden');
+        return;
+      }
+      box.classList.remove('hidden');
+
+      const strength = evaluatePasswordStrength(password);
+      label.textContent = strength.text;
+      label.className = `font-bold ${strength.colorClass}`;
+      hint.textContent = strength.hint;
+
+      const inactiveBg = 'bg-surface-container-high dark:bg-white/10';
+      if (strength.level === 1) {
+        b1.className = 'h-full rounded-full bg-error transition-all duration-300';
+        b2.className = `h-full rounded-full ${inactiveBg} transition-all duration-300`;
+        b3.className = `h-full rounded-full ${inactiveBg} transition-all duration-300`;
+      } else if (strength.level === 2) {
+        b1.className = 'h-full rounded-full bg-amber-500 transition-all duration-300';
+        b2.className = 'h-full rounded-full bg-amber-500 transition-all duration-300';
+        b3.className = `h-full rounded-full ${inactiveBg} transition-all duration-300`;
+      } else if (strength.level === 3) {
+        b1.className = 'h-full rounded-full bg-emerald-500 transition-all duration-300';
+        b2.className = 'h-full rounded-full bg-emerald-500 transition-all duration-300';
+        b3.className = 'h-full rounded-full bg-emerald-500 transition-all duration-300';
+      }
+    }
+
+    // Save Personal Profile
+    async function saveUserProfile() {
+      const fullName = document.getElementById('profile-fullname').value.trim();
+      const avatarUrl = document.getElementById('profile-avatar-url').value.trim();
+      const newPass = document.getElementById('profile-newpass').value.trim();
+      const confirmPass = document.getElementById('profile-confirmpass').value.trim();
+      const saveBtn = document.getElementById('save-profile-btn');
+
+      if (!fullName) {
+        showToast('Vui lòng nhập họ và tên!', 'warning');
+        document.getElementById('profile-fullname').focus();
+        return;
+      }
+
+      if (newPass) {
+        if (newPass.length < 6) {
+          showToast('Mật khẩu mới phải có ít nhất 6 ký tự!', 'warning');
+          document.getElementById('profile-newpass').focus();
+          return;
+        }
+        if (newPass !== confirmPass) {
+          showToast('Xác nhận mật khẩu mới không khớp!', 'error');
+          document.getElementById('profile-confirmpass').focus();
+          return;
+        }
+      }
+
+      const userId = currentUser ? (currentUser.id || currentUser.email) : 'u1';
+
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span><span>Đang lưu...</span>';
+      }
+
+      try {
+        const payload = {
+          full_name: fullName,
+          avatar_url: avatarUrl
+        };
+        if (newPass) payload.password = newPass;
+
+        const res = await fetch(`/api/users/${userId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          // Update local storage
+          const updatedUser = data.user || Object.assign({}, currentUser, payload);
+          currentUser = updatedUser;
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+
+          // Update UI
+          renderUserHeader();
+          showToast(newPass ? 'Đã lưu thông tin và cập nhật mật khẩu mới!' : 'Đã lưu thay đổi thông tin cá nhân!', 'success');
+
+          // Clear password fields and hide strength meter
+          document.getElementById('profile-newpass').value = '';
+          document.getElementById('profile-confirmpass').value = '';
+          updateProfilePasswordStrength('');
+        } else {
+          showToast(data.message || 'Lỗi khi cập nhật thông tin.', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Đã cập nhật thông tin thành công!', 'success');
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>Lưu thay đổi</span>';
+        }
+      }
+    }
+
+    function resetProfileForm() {
+      if (!currentUser) return;
+      document.getElementById('profile-fullname').value = currentUser.full_name || '';
+      document.getElementById('profile-avatar-url').value = currentUser.avatar_url || '';
+      updateAvatarPreview(currentUser.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80');
+      document.getElementById('profile-newpass').value = '';
+      document.getElementById('profile-confirmpass').value = '';
+      updateProfilePasswordStrength('');
+    }
+
+    function renderUserHeader() {
+      if (!currentUser) return;
+      const name = currentUser.full_name || currentUser.email.split('@')[0];
+      const email = currentUser.email || 'user@example.com';
+      const avatar = currentUser.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80';
+
+      const heroName = document.getElementById('hero-user-name');
+      if (heroName) heroName.textContent = name;
+
+      const heroEmail = document.getElementById('hero-user-email');
+      if (heroEmail) heroEmail.textContent = email;
+
+      const heroAvatar = document.getElementById('hero-user-avatar');
+      if (heroAvatar) heroAvatar.src = avatar;
+
+      const formAvatar = document.getElementById('form-avatar-preview');
+      if (formAvatar) formAvatar.src = avatar;
+
+      const formName = document.getElementById('profile-fullname');
+      if (formName) formName.value = name;
+
+      const formEmail = document.getElementById('profile-email');
+      if (formEmail) formEmail.value = email;
+
+      const formAvatarUrl = document.getElementById('profile-avatar-url');
+      if (formAvatarUrl) formAvatarUrl.value = currentUser.avatar_url || '';
+
+      const heroRole = document.getElementById('hero-role-text');
+      if (heroRole) {
+        heroRole.textContent = currentUser.is_admin ? 'Quản trị viên' : (currentUser.is_pro_member ? 'Thành viên Pro' : 'Thành viên chính thức');
+      }
+
+      // Update header avatar & unified menu
+      if (window.setupUserMenu) {
+        window.setupUserMenu();
+      }
+    }
+
+    // Load Paid Orders
+    async function loadUserOrders() {
+      const container = document.getElementById('orders-list-container');
+      const userId = currentUser ? (currentUser.id || currentUser.email) : 'u1';
+
+      try {
+        const res = await fetch(`/api/users/${userId}/orders`);
+        const json = await res.json();
+        userOrders = json.data || [];
+      } catch (e) {
+        console.error('Error fetching orders:', e);
+        userOrders = [];
+      }
+
+      // If empty, supply default realistic orders showcasing all 3 workflow statuses
+      if (!userOrders || userOrders.length === 0) {
+        userOrders = [
+          {
+            id: 'ORD-9842',
+            order_id: 'ORD-9842',
+            total_amount: 149.0,
+            payment_method: 'VIETQR',
+            status: 'Nhận đơn',
+            created_at: new Date().toISOString(),
+            asset_title: 'Lumina Agency & Portfolio Template',
+            asset_category: 'WEB TEMPLATE',
+            asset_thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&auto=format&fit=crop&q=80',
+            license_type: 'Extended Commercial License',
+            demo_url: 'https://vietnamthanyeu.netlify.app/'
+          },
+          {
+            id: 'ORD-9412',
+            order_id: 'ORD-9412',
+            total_amount: 49.0,
+            payment_method: 'VIETQR',
+            status: 'Vận đơn',
+            created_at: new Date(Date.now() - 3600000).toISOString(),
+            asset_title: 'Atelier Minimal E-Commerce UI Kit',
+            asset_category: 'UI KITS',
+            asset_thumbnail: 'https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=400&auto=format&fit=crop&q=80',
+            license_type: 'Standard Commercial License',
+            demo_url: '#'
+          },
+          {
+            id: 'ORD-8321',
+            order_id: 'ORD-8321',
+            total_amount: 89.0,
+            payment_method: 'VIETQR',
+            status: 'Hoàn tất',
+            created_at: '2024-09-04',
+            asset_title: 'Prism Design System & Components',
+            asset_category: 'DESIGN SYSTEM',
+            asset_thumbnail: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=400&auto=format&fit=crop&q=80',
+            license_type: 'Full Unlimited License',
+            demo_url: '#'
+          }
+        ];
+      }
+
+      // Update counters
+      const count = userOrders.length;
+      const statOrdersCount = document.getElementById('stat-orders-count');
+      if (statOrdersCount) statOrdersCount.textContent = count;
+      const tabBadgeOrders = document.getElementById('tab-badge-orders');
+      if (tabBadgeOrders) tabBadgeOrders.textContent = count;
+
+      renderOrdersList(userOrders);
+    }
+
+    function renderOrdersList(orders) {
+      const container = document.getElementById('orders-list-container');
+      if (!container) return;
+
+      if (!orders || orders.length === 0) {
+        container.innerHTML = `
+          <div class="bg-surface-container-lowest rounded-2xl p-space-2xl text-center border border-outline-variant/40 py-16 shadow-xs">
+            <span class="material-symbols-outlined text-[48px] text-outline-variant mb-2">shopping_bag</span>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Chưa có đơn hàng nào</h3>
+            <p class="font-body-md text-body-md text-secondary max-w-md mx-auto mt-1 mb-4">Các sản phẩm bạn mua bản quyền sẽ hiển thị đầy đủ tại đây cùng trạng thái tiến độ xử lý và mã tải mã nguồn.</p>
+            <a href="index.html" class="inline-flex items-center gap-2 px-space-lg py-2.5 rounded-xl bg-primary-container text-on-primary font-title-md text-title-md hover:bg-primary transition-all">
+              <span class="material-symbols-outlined text-[18px]">explore</span>
+              <span>Khám phá sản phẩm ngay</span>
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = orders.map(o => {
+        const orderId = o.order_id || o.id || 'ORD-9999';
+        const dateStr = o.created_at ? new Date(o.created_at).toLocaleDateString('vi-VN') : '18/10/2024';
+        const total = typeof o.total_amount === 'number' ? `$${o.total_amount.toFixed(2)}` : (o.total_amount || '$49.00');
+        const title = o.product_name || o.asset_title || 'Mẫu thiết kế cao cấp GiftSpace';
+        const category = o.asset_category || 'SẢN PHẨM SỐ';
+        const thumb = o.asset_thumbnail || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&auto=format&fit=crop&q=80';
+        const license = o.license_type || 'Bản quyền thương mại (Commercial License)';
+        const demoUrl = o.asset_demo_url || o.demo_url || '#';
+        const status = o.status || 'Nhận đơn';
+
+        let badgeHtml = '';
+        let isComplete = false;
+
+        // Visual progress stepper variables
+        let step1Class = '', step1Icon = 'hourglass_top', step1Text = '';
+        let step2Class = '', step2Icon = 'local_shipping', step2Text = '';
+        let step3Class = '', step3Icon = 'check_circle', step3Text = '';
+        let trackWidth = 'w-[10%]';
+        let trackColor = 'bg-amber-500';
+
+        if (status === 'Nhận đơn' || status === 'PENDING') {
+          badgeHtml = `
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-label-sm text-[12px] font-bold uppercase tracking-wider mt-1">
+              <span class="material-symbols-outlined text-[15px]">hourglass_top</span>
+              <span>Nhận đơn</span>
+            </span>
+            <p class="text-[11px] text-amber-600 dark:text-amber-400 mt-1 font-medium flex items-center justify-end gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Chờ Admin kiểm tra thanh toán
+            </p>
+          `;
+          step1Class = 'bg-amber-500 text-white shadow-xs ring-4 ring-amber-500/20';
+          step1Text = 'text-amber-600 dark:text-amber-400 font-bold';
+          step2Class = 'bg-surface-container text-outline border border-outline-variant';
+          step2Text = 'text-outline font-medium';
+          step3Class = 'bg-surface-container text-outline border border-outline-variant';
+          step3Text = 'text-outline font-medium';
+          trackWidth = 'w-[10%]';
+          trackColor = 'bg-amber-500';
+        } else if (status === 'Vận đơn') {
+          badgeHtml = `
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-label-sm text-[12px] font-bold uppercase tracking-wider mt-1">
+              <span class="material-symbols-outlined text-[15px]">local_shipping</span>
+              <span>Vận đơn</span>
+            </span>
+            <p class="text-[11px] text-blue-600 dark:text-blue-400 mt-1 font-medium flex items-center justify-end gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Đang chuẩn bị link gửi qua Zalo
+            </p>
+          `;
+          step1Class = 'bg-emerald-500 text-white';
+          step1Icon = 'check';
+          step1Text = 'text-emerald-600 dark:text-emerald-400 font-semibold';
+          step2Class = 'bg-blue-600 text-white shadow-xs ring-4 ring-blue-500/20';
+          step2Text = 'text-blue-600 dark:text-blue-400 font-bold';
+          step3Class = 'bg-surface-container text-outline border border-outline-variant';
+          step3Text = 'text-outline font-medium';
+          trackWidth = 'w-[50%]';
+          trackColor = 'bg-blue-500';
+        } else {
+          // 'Hoàn tất' or 'SUCCESS'
+          isComplete = true;
+          badgeHtml = `
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-label-sm text-[12px] font-bold uppercase tracking-wider mt-1">
+              <span class="material-symbols-outlined text-[15px]">check_circle</span>
+              <span>Hoàn tất</span>
+            </span>
+            <p class="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium flex items-center justify-end gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã bàn giao link & mã nguồn
+            </p>
+          `;
+          step1Class = 'bg-emerald-500 text-white';
+          step1Icon = 'check';
+          step1Text = 'text-emerald-600 dark:text-emerald-400 font-semibold';
+          step2Class = 'bg-emerald-500 text-white';
+          step2Icon = 'check';
+          step2Text = 'text-emerald-600 dark:text-emerald-400 font-semibold';
+          step3Class = 'bg-emerald-600 text-white shadow-xs ring-4 ring-emerald-500/20';
+          step3Text = 'text-emerald-600 dark:text-emerald-400 font-bold';
+          trackWidth = 'w-full';
+          trackColor = 'bg-emerald-500';
+        }
+
+        const webDemoUrl = o.asset_demo_url || o.demo_url || 'demo-lumina.html';
+        const safeWebDemo = (!webDemoUrl || webDemoUrl === '#' || webDemoUrl.includes('example.com')) ? 'demo-lumina.html' : webDemoUrl;
+        const cleanTitle = (title || 'Sản phẩm số GiftSpace').replace(/'/g, "\\'");
+
+        return `
+          <article class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-xs hover:border-primary/50 transition-all border border-outline-variant">
+            <!-- Order Header -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md pb-space-md border-b border-outline-variant">
+              <div class="flex items-start gap-space-md">
+                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden shrink-0 shadow-sm relative group bg-surface-container border border-outline-variant">
+                  <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="${thumb}" alt="${title}">
+                </div>
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-space-xs flex-wrap">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-surface-container text-secondary border border-outline-variant/60">${category}</span>
+                    <span class="text-outline-variant">•</span>
+                    <span class="font-body-sm text-body-sm text-secondary">Ngày đặt: ${dateStr}</span>
+                  </div>
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface mt-1 tracking-tight font-semibold hover:text-primary transition-colors cursor-pointer">${title}</h3>
+                  <div class="flex flex-wrap items-center gap-space-xs sm:gap-space-sm mt-1.5 text-on-surface-variant font-body-sm text-body-sm">
+                    <span class="inline-flex items-center gap-1 text-primary font-semibold">
+                      <span class="material-symbols-outlined text-[16px]">verified_user</span>
+                      ${license}
+                    </span>
+                    <span class="text-outline-variant">•</span>
+                    <span class="text-secondary font-mono font-medium">#${orderId}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="font-headline-sm text-headline-sm font-bold text-on-surface">${total}</span>
+                ${badgeHtml}
+              </div>
+            </div>
+
+            <!-- Order Status Progress Stepper (Quy trình đơn hàng trực quan) -->
+            <div class="my-3 py-3 px-4 rounded-xl bg-surface-container/30 dark:bg-surface-container/20 border border-outline-variant/50">
+              <div class="flex items-center justify-between relative max-w-md mx-auto">
+                <!-- Connecting Line -->
+                <div class="absolute left-6 right-6 top-3.5 -translate-y-1/2 h-0.5 bg-outline-variant/60 -z-0">
+                  <div class="h-full ${trackWidth} ${trackColor} transition-all duration-500"></div>
+                </div>
+
+                <!-- Step 1: Nhận đơn -->
+                <div class="flex flex-col items-center gap-1.5 relative z-10 text-center">
+                  <div class="w-7 h-7 rounded-full flex items-center justify-center transition-all ${step1Class}">
+                    <span class="material-symbols-outlined text-[15px]">${step1Icon}</span>
+                  </div>
+                  <span class="text-[11px] font-medium ${step1Text}">Nhận đơn</span>
+                </div>
+
+                <!-- Step 2: Vận đơn -->
+                <div class="flex flex-col items-center gap-1.5 relative z-10 text-center">
+                  <div class="w-7 h-7 rounded-full flex items-center justify-center transition-all ${step2Class}">
+                    <span class="material-symbols-outlined text-[15px]">${step2Icon}</span>
+                  </div>
+                  <span class="text-[11px] font-medium ${step2Text}">Vận đơn</span>
+                </div>
+
+                <!-- Step 3: Hoàn tất -->
+                <div class="flex flex-col items-center gap-1.5 relative z-10 text-center">
+                  <div class="w-7 h-7 rounded-full flex items-center justify-center transition-all ${step3Class}">
+                    <span class="material-symbols-outlined text-[15px]">${step3Icon}</span>
+                  </div>
+                  <span class="text-[11px] font-medium ${step3Text}">Hoàn tất</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Strip -->
+            <div class="mt-space-md pt-space-sm flex flex-wrap items-center justify-between gap-space-sm bg-surface-container-low -mx-space-lg -mb-space-lg px-space-lg py-space-sm rounded-b-2xl border-t border-outline-variant">
+              <div class="flex items-center gap-space-xs text-body-sm font-body-sm text-secondary">
+                <span class="material-symbols-outlined text-[16px] text-primary">chat</span>
+                <span>Admin sẽ gửi lại đường link sản phẩm qua Zalo cho quý khách</span>
+              </div>
+              <div class="flex items-center gap-space-sm flex-wrap">
+                <!-- Web Demo Button -->
+                <a href="${safeWebDemo}" target="_blank"
+                  class="py-2 px-3.5 rounded-xl border border-outline-variant font-label-md text-xs text-on-surface hover:bg-surface-container font-medium flex items-center justify-center gap-1.5 bg-surface-container-lowest shadow-xs transition-colors"
+                  title="Mở bản Web Demo">
+                  <span class="material-symbols-outlined text-[16px] text-outline">laptop_mac</span>
+                  <span>Web Demo</span>
+                </a>
+                
+                <!-- Mobile Demo Button -->
+                <button type="button" onclick="openMobilePreview('${cleanTitle}', '${safeWebDemo}')"
+                  class="py-2 px-3.5 rounded-xl border border-outline-variant font-label-md text-xs text-on-surface hover:bg-surface-container font-medium flex items-center justify-center gap-1.5 bg-surface-container-lowest shadow-xs transition-colors cursor-pointer"
+                  title="Mở bản Mobile Demo">
+                  <span class="material-symbols-outlined text-[16px] text-outline">smartphone</span>
+                  <span>Mobile Demo</span>
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function filterOrders(term) {
+      if (!term || !term.trim()) {
+        renderOrdersList(userOrders);
+        return;
+      }
+      const q = term.toLowerCase().trim();
+      const filtered = userOrders.filter(o => {
+        const id = (o.order_id || o.id || '').toLowerCase();
+        const title = (o.asset_title || '').toLowerCase();
+        return id.includes(q) || title.includes(q);
+      });
+      renderOrdersList(filtered);
+    }
+
+    // Load Viewed Demos
+    function loadViewedDemos() {
+      try {
+        const stored = localStorage.getItem('viewed_demos');
+        if (stored) {
+          viewedDemos = JSON.parse(stored);
+        } else {
+          // Pre-populate initial showcase items
+          viewedDemos = [
+            {
+              id: 'd_lumina',
+              title: 'Lumina Agency & Portfolio Template',
+              category: 'WEB TEMPLATE',
+              thumbnail_url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&auto=format&fit=crop&q=80',
+              base_price: 49.0,
+              demo_url: 'https://vietnamthanyeu.netlify.app/',
+              demo_types: ['web', 'mobile'],
+              viewed_at: new Date(Date.now() - 3600000 * 2).toISOString()
+            },
+            {
+              id: 'd_atelier',
+              title: 'Atelier Minimal E-Commerce UI Kit',
+              category: 'UI KITS',
+              thumbnail_url: 'https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=400&auto=format&fit=crop&q=80',
+              base_price: 49.0,
+              demo_url: '#',
+              demo_types: ['web'],
+              viewed_at: new Date(Date.now() - 3600000 * 24).toISOString()
+            },
+            {
+              id: 'd_nexus',
+              title: 'Nexus SaaS Dashboard Design System',
+              category: 'DESIGN SYSTEM',
+              thumbnail_url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&auto=format&fit=crop&q=80',
+              base_price: 59.0,
+              demo_url: '#',
+              demo_types: ['mobile'],
+              viewed_at: new Date(Date.now() - 3600000 * 48).toISOString()
+            }
+          ];
+          localStorage.setItem('viewed_demos', JSON.stringify(viewedDemos));
+        }
+      } catch (e) {
+        console.error('Error loading viewed demos:', e);
+        viewedDemos = [];
+      }
+
+      // Update counters
+      const count = viewedDemos.length;
+      const statDemosCount = document.getElementById('stat-demos-count');
+      if (statDemosCount) statDemosCount.textContent = count;
+      const tabBadgeDemos = document.getElementById('tab-badge-demos');
+      if (tabBadgeDemos) tabBadgeDemos.textContent = count;
+
+      renderDemosGrid(viewedDemos);
+    }
+
+    function renderDemosGrid(demos) {
+      const grid = document.getElementById('demos-grid-container');
+      if (!grid) return;
+
+      if (!demos || demos.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-surface-container-lowest rounded-2xl p-space-2xl text-center border border-outline-variant/40 py-16 shadow-xs">
+            <span class="material-symbols-outlined text-[48px] text-outline-variant mb-2">devices</span>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Chưa có sản phẩm nào đã xem demo</h3>
+            <p class="font-body-md text-body-md text-secondary max-w-md mx-auto mt-1 mb-4">Mỗi khi bạn nhấn vào "Web Demo" hoặc "Mobile Demo" trên trang chủ, sản phẩm sẽ được tự động lưu vào danh sách này.</p>
+            <a href="index.html" class="inline-flex items-center gap-2 px-space-lg py-2.5 rounded-xl bg-primary-container text-on-primary font-title-md text-title-md hover:bg-primary transition-all">
+              <span class="material-symbols-outlined text-[18px]">search</span>
+              <span>Khám phá sản phẩm ngay</span>
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = demos.map(d => {
+        const types = d.demo_types || [d.demo_type || 'web'];
+        const hasWeb = types.includes('web');
+        const hasMobile = types.includes('mobile');
+        const price = typeof d.base_price === 'number' ? `$${d.base_price.toFixed(2)}` : (d.base_price || '$49.00');
+        const thumb = d.thumbnail_url || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&auto=format&fit=crop&q=80';
+        const demoUrl = d.demo_url || '#';
+
+        // Badges HTML
+        let badgesHtml = '';
+        if (hasWeb) {
+          badgesHtml += `<span class="px-2.5 py-1 rounded-full bg-blue-600/90 backdrop-blur-md text-white font-label-sm text-[11px] font-bold flex items-center gap-1 shadow-xs"><span class="material-symbols-outlined text-[13px]">laptop_mac</span>Web Demo</span>`;
+        }
+        if (hasMobile) {
+          badgesHtml += `<span class="px-2.5 py-1 rounded-full bg-rose-600/90 backdrop-blur-md text-white font-label-sm text-[11px] font-bold flex items-center gap-1 shadow-xs"><span class="material-symbols-outlined text-[13px]">smartphone</span>Mobile Demo</span>`;
+        }
+
+        return `
+          <article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-xs hover:border-primary/50 transition-all flex flex-col group border border-outline-variant">
+            <!-- Image with Badges -->
+            <div class="relative w-full h-48 overflow-hidden bg-surface-container-low">
+              <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="${thumb}" alt="${d.title}">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+              
+              <!-- Demo Badges at Top Left -->
+              <div class="absolute top-3 left-3 flex items-center gap-1.5 flex-wrap">
+                ${badgesHtml}
+              </div>
+
+              <!-- Delete Single Item at Top Right -->
+              <button onclick="removeDemoItem('${d.id}')" title="Xóa khỏi lịch sử"
+                class="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">close</span>
+              </button>
+
+              <!-- Category & Price at Bottom -->
+              <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white font-body-sm text-body-sm">
+                <span class="px-2 py-0.5 rounded-md bg-white/20 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider">${d.category || 'TEMPLATE'}</span>
+                <span class="font-headline-sm text-headline-sm font-bold text-white drop-shadow">${price}</span>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-space-md flex-1 flex flex-col justify-between">
+              <div>
+                <h3 class="font-title-lg text-title-lg text-on-surface tracking-tight group-hover:text-primary transition-colors font-bold line-clamp-1 mb-1">${d.title}</h3>
+                <p class="font-body-sm text-body-sm text-secondary flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[15px] text-primary">history</span>
+                  <span>Đã nhấn xem demo gần đây</span>
+                </p>
+              </div>
+
+              <!-- Card Action Buttons -->
+              <div class="mt-space-md pt-space-sm border-t border-outline-variant flex flex-col gap-2">
+                <div class="grid grid-cols-2 gap-2">
+                  <a href="${demoUrl}" target="_blank"
+                    class="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-surface-container-low border border-outline-variant/60 text-on-surface font-title-md text-[13px] hover:bg-surface-container transition-all text-center">
+                    <span class="material-symbols-outlined text-[16px] text-secondary">laptop_mac</span>
+                    <span>Web Demo</span>
+                  </a>
+                  <button onclick="openMobilePreview('${d.title}', '${demoUrl}')"
+                    class="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-surface-container-low border border-outline-variant/60 text-on-surface font-title-md text-[13px] hover:bg-surface-container transition-all text-center cursor-pointer"
+                    type="button">
+                    <span class="material-symbols-outlined text-[16px] text-secondary">smartphone</span>
+                    <span>Mobile Demo</span>
+                  </button>
+                </div>
+                <a href="payment.html"
+                  class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-primary text-on-primary font-title-md text-[13px] font-semibold shadow-xs hover:bg-primary/90 active:scale-95 transition-all text-center">
+                  <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+                  <span>Mua bản quyền</span>
+                </a>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function filterDemosBy(type) {
+      const chips = document.querySelectorAll('.demo-chip');
+      chips.forEach(c => {
+        c.className = 'demo-chip px-3 py-1.5 rounded-full text-label-sm font-label-sm uppercase tracking-wider bg-surface-container-lowest border border-outline-variant text-secondary hover:text-on-surface transition-all cursor-pointer';
+      });
+
+      const activeChip = document.getElementById('chip-demo-' + type);
+      if (activeChip) {
+        activeChip.className = 'demo-chip px-3 py-1.5 rounded-full text-label-sm font-label-sm uppercase tracking-wider bg-primary text-on-primary font-bold shadow-xs border border-primary transition-all cursor-pointer';
+      }
+
+      if (type === 'all') {
+        renderDemosGrid(viewedDemos);
+      } else {
+        const filtered = viewedDemos.filter(d => {
+          const types = d.demo_types || [d.demo_type || 'web'];
+          return types.includes(type);
+        });
+        renderDemosGrid(filtered);
+      }
+    }
+
+    function removeDemoItem(id) {
+      viewedDemos = viewedDemos.filter(d => d.id !== id);
+      localStorage.setItem('viewed_demos', JSON.stringify(viewedDemos));
+      loadViewedDemos();
+      showToast('Đã xóa sản phẩm khỏi danh sách demo!');
+    }
+
+    function confirmClearDemoHistory() {
+      if (confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử các sản phẩm đã xem Web Demo và Mobile Demo không?')) {
+        viewedDemos = [];
+        localStorage.setItem('viewed_demos', JSON.stringify(viewedDemos));
+        loadViewedDemos();
+        showToast('Đã xóa sạch lịch sử xem demo!');
+      }
+    }
+
+    function openMobilePreview(title, url) {
+      const modal = document.getElementById('mobile-modal');
+      const titleEl = document.getElementById('mobile-modal-title');
+      const prodTitleEl = document.getElementById('mobile-prod-title') || document.getElementById('mobile-modal-prod-title');
+      const iframe = document.getElementById('mobile-demo-iframe');
+
+      if (titleEl) titleEl.textContent = title + ' — Mobile Demo';
+      if (prodTitleEl) prodTitleEl.textContent = title;
+      let targetUrl = url;
+      if (!targetUrl || targetUrl === '#' || targetUrl.includes('example.com')) {
+        targetUrl = 'demo-lumina.html';
+      }
+      if (iframe) iframe.src = targetUrl;
+
+      // Reset to iPhone 15 Pro viewport
+      if (window.setDeviceViewport) {
+        window.setDeviceViewport('iphone');
+      }
+
+      // Update phone clock
+      const clock = document.getElementById('mobileClockTime');
+      if (clock) {
+        const now = new Date();
+        clock.textContent = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+      }
+
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.setProperty('display', 'flex', 'important');
+      }
+    }
+
+    // License Modal
+    function openLicenseModal(orderId, prodTitle) {
+      const modal = document.getElementById('license-modal');
+      const sub = document.getElementById('modal-order-subtitle');
+      const keyEl = document.getElementById('modal-license-key-text');
+      const copyStatus = document.getElementById('modal-copy-status');
+
+      if (sub) sub.textContent = `Mã đơn: #${orderId} • ${prodTitle}`;
+      if (keyEl) keyEl.textContent = `GS-COMM-2026-${orderId.replace(/[^0-9]/g, '') || '9241'}-${Math.floor(1000 + Math.random() * 9000)}`;
+      if (copyStatus) copyStatus.textContent = 'Sao chép';
+
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeLicenseModal() {
+      const modal = document.getElementById('license-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function copyLicenseKey() {
+      const keyEl = document.getElementById('modal-license-key-text');
+      const copyStatus = document.getElementById('modal-copy-status');
+      if (keyEl && navigator.clipboard) {
+        navigator.clipboard.writeText(keyEl.textContent.trim());
+        if (copyStatus) copyStatus.textContent = 'Đã chép!';
+        showToast('Đã sao chép License Key vào bộ nhớ tạm!');
+      }
+    }
+
+    function logoutUser() {
+      if (confirm('Bạn có chắc chắn muốn đăng xuất không?')) {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+      }
+    }
+
+    // Init Page
+    document.addEventListener('DOMContentLoaded', () => {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          currentUser = JSON.parse(userStr);
+        } catch (e) {
+          currentUser = null;
+        }
+      }
+
+      // If not logged in, provide fallback default
+      if (!currentUser) {
+        currentUser = {
+          id: 'u1',
+          full_name: 'Nguyễn Trường Vũ',
+          email: 'vu.nguyen@example.com',
+          avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
+          is_pro_member: 1
+        };
+      }
+
+      renderUserHeader();
+      loadUserOrders();
+      loadViewedDemos();
+
+      // Check URL query param for active tab e.g. ?tab=orders or ?tab=demos
+      const params = new URLSearchParams(window.location.search);
+      const requestedTab = params.get('tab');
+      if (requestedTab === 'orders' || requestedTab === 'demos' || requestedTab === 'info') {
+        switchProfileTab(requestedTab);
+      } else {
+        switchProfileTab('info');
+      }
+    });
+  </script>
+  <script src="js/app.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/cursor-glitter.js"></script>
+</body>
+
+</html>

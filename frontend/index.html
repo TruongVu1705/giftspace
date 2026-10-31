@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en" style="">
+
+<head>
+  <script>
+    if (localStorage.getItem('darkMode') === 'true' || (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="web_standard" name="shell-type">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-background font-body-md text-on-surface antialiased">
+  <header
+    class="fixed top-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant">
+    <div class="h-20 max-w-[1360px] mx-auto px-margin-mobile md:px-margin flex items-center justify-between gap-gutter">
+      <div class="flex items-center gap-space-sm shrink-0">
+        <div
+          class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center border border-outline-variant text-primary-container">
+          <span class="material-symbols-outlined text-[20px]">auto_awesome</span></div><a
+          class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-medium" data-path="all-products"
+          href="index.html">GiftSpace</a>
+      </div>
+      <nav class="hidden xl:flex items-center gap-space-lg" data-active-classes="text-primary-container font-semibold">
+      </nav>
+      <div class="flex items-center gap-space-md shrink-0">
+        <div class="relative hidden sm:block w-48 md:w-60"></div><button aria-label="Toggle light/dark theme"
+          class="w-8 h-8 rounded-full bg-surface-container-low border border-outline-variant hover:border-secondary-container hover:bg-surface-container hover:text-primary-container text-on-surface-variant flex items-center justify-center shrink-0 transition-all shadow-xs"
+          onclick="document.documentElement.classList.toggle('dark'); const icon = this.querySelector('.theme-toggle-icon'); if (icon) { icon.textContent = icon.textContent === 'dark_mode' ? 'light_mode' : 'dark_mode'; }"
+          title="Toggle theme" type="button"><span
+            class="material-symbols-outlined theme-toggle-icon text-[18px] transition-transform duration-300">dark_mode</span></button>
+
+<button aria-label="Toggle language" class="w-8 h-8 rounded-full bg-surface-container-low border border-outline-variant hover:border-secondary-container hover:bg-surface-container hover:text-primary-container text-on-surface-variant flex items-center justify-center shrink-0 transition-all shadow-xs ml-2" onclick="toggleLanguage()" title="Toggle language" type="button">
+  <span class="font-bold text-[12px] uppercase" id="lang-toggle-text">VI</span>
+</button>
+
+        <div class="relative">
+          <div id="userHeaderAvatar"
+            class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0 font-bold text-[14px] cursor-pointer shadow-xs border border-outline-variant hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-[18px]">person</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="w-full pt-20 bg-background min-h-screen">
+    <div class="flex flex-col w-full">
+      <!-- Subtle ambient decorative glow behind hero -->
+      <div class="relative w-full overflow-hidden">
+        <div
+          class="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[360px] bg-gradient-to-b from-secondary-container/20 to-transparent blur-3xl pointer-events-none rounded-full">
+        </div>
+        <!-- Hero Section -->
+        <section
+          class="relative max-w-[1360px] mx-auto px-margin-mobile md:px-margin pt-space-xl pb-space-2xl flex flex-col items-center text-center">
+          <!-- Centered Badge -->
+          <div
+            class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-high/60 border border-outline-variant shadow-sm backdrop-blur-sm mb-space-md">
+            <span class="text-primary-container text-body-sm font-semibold tracking-wide flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px] text-primary-container">arrow_back_ios_new</span>
+              Production-Ready Assets &amp; UI Kits
+            </span>
+          </div>
+          <!-- Hero Headline -->
+          <h1
+            class="font-headline-lg text-headline-lg md:text-display-lg text-on-surface font-semibold max-w-4xl tracking-tight leading-tight mb-space-md">
+            Curated Digital Assets &amp; Web Templates
+          </h1>
+          <!-- Hero Subheadline -->
+          <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed mb-space-xl">
+            Explore a hand-crafted library of production-ready web demos, responsive templates, and design system kits
+            built for modern creators and dev teams.
+          </p>
+          <!-- Global Search & Filter Bar -->
+          <div
+            class="w-full max-w-4xl bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-sm p-space-sm md:p-space-md flex flex-col md:flex-row items-center gap-space-sm md:gap-space-md">
+            <!-- Search Input -->
+            <div class="relative flex-1 w-full">
+              <span
+                class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+              <input
+                class="w-full pl-11 pr-space-md py-2.5 bg-transparent border-0 rounded-xl font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:bg-surface-container-low/40 transition-colors"
+                id="searchInput" placeholder="Search templates, components, UI kits..." type="text">
+            </div>
+            <!-- Search CTA Button -->
+            <button
+              class="w-full md:w-auto px-space-xl py-2.5 bg-primary-container hover:bg-primary text-on-primary-container rounded-xl font-label-md text-label-md font-semibold tracking-wide transition-all shadow-sm hover:shadow active:scale-98 shrink-0 flex items-center justify-center gap-space-xs"
+              onclick="filterCards()" type="button">
+              <span class="material-symbols-outlined text-[18px]">manage_search</span>
+              <span class="">Search</span>
+            </button>
+          </div>
+        </section>
+      </div>
+      <!-- Topics / Category Filter Chips & Sort Controls -->
+      <section class="max-w-[1360px] mx-auto px-margin-mobile md:px-margin w-full mb-space-lg">
+        <div
+          class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pb-space-md border-b border-outline-variant">
+          <!-- Horizontal Pill Filter Row -->
+          <div class="flex items-center gap-space-xs overflow-x-auto py-1 scrollbar-none no-scrollbar"
+            id="chipContainer">
+            <button
+              class="category-chip shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-all duration-200 bg-primary-container text-on-primary-container shadow-sm border border-transparent"
+              data-category="all" onclick="selectCategoryChip(this, 'all')">
+              All
+            </button>
+            <button
+              class="category-chip shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-all duration-200 bg-surface-container-lowest text-on-surface border border-outline-variant hover:border-secondary-container"
+              data-category="web-design" onclick="selectCategoryChip(this, 'web-design')">
+              Web Design
+            </button>
+            <button
+              class="category-chip shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-all duration-200 bg-surface-container-lowest text-on-surface border border-outline-variant hover:border-secondary-container"
+              data-category="mobile-apps" onclick="selectCategoryChip(this, 'mobile-apps')">
+              Mobile Apps
+            </button>
+            <button
+              class="category-chip shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-all duration-200 bg-surface-container-lowest text-on-surface border border-outline-variant hover:border-secondary-container"
+              data-category="ecommerce" onclick="selectCategoryChip(this, 'ecommerce')">
+              E-commerce
+            </button>
+            <button
+              class="category-chip shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-all duration-200 bg-surface-container-lowest text-on-surface border border-outline-variant hover:border-secondary-container"
+              data-category="saas" onclick="selectCategoryChip(this, 'saas')">
+              SaaS
+            </button>
+            <button
+              class="category-chip shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-all duration-200 bg-surface-container-lowest text-on-surface border border-outline-variant hover:border-secondary-container"
+              data-category="portfolio" onclick="selectCategoryChip(this, 'portfolio')">
+              Portfolio
+            </button>
+            <button
+              class="category-chip shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-all duration-200 bg-surface-container-lowest text-on-surface border border-outline-variant hover:border-secondary-container"
+              data-category="branding" onclick="selectCategoryChip(this, 'branding')">
+              Branding
+            </button>
+          </div>
+          <!-- Right Side: Items Count & Sort Dropdown -->
+          <div class="flex items-center justify-between lg:justify-end gap-space-lg shrink-0">
+            <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">
+              Showing <span class="text-on-surface font-semibold" id="assetCount">48</span> assets
+            </span>
+
+          </div>
+        </div>
+      </section>
+      <!-- Product Container Grid -->
+      <section class="max-w-[1360px] mx-auto px-margin-mobile md:px-margin w-full mb-space-2xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter" id="productGrid">
+          <!-- Card 1: Lumina -->
+
+          <!-- Card 2: Atelier -->
+
+          <!-- Card 3: Nexus -->
+
+          <!-- Card 4: MonoHaus -->
+
+          <!-- Card 5: Veloce -->
+
+          <!-- Card 6: Solstice -->
+
+          <article
+            class="asset-card group bg-surface-container-lowest border border-outline-variant rounded-2xl p-space-md flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-secondary-container"
+            data-category="mobile-apps web-design" data-downloads="3400" data-platform="figma" data-views="11200">
+            <div>
+              <!-- Thumbnail Container -->
+              <div
+                class="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/60 mb-space-md">
+                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                  data-alt="Comprehensive mobile iOS UI design system spread displaying neatly arranged button sets, bottom sheets, navigation headers, typography scale guide, and responsive card variants in a sleek rose petal color theme."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY5EscwC9bORH5BvKWCklJX7PKuJh6x0aXh5a8hyoVpKKV-7n0ZjVJLFGJWw3bvnNdex7PFNzf7V8ZjqwWVrdP8xid-Hbr5Gxhw-pwZO7xYmyJwYXmcGKcwbeKBx0D_kTk_QB5mRw9FvOzr73uDtIMan_FAvQAhqRb5yd8TcKytUOGnUPc5NcM2_rJM4QehX65VA8prZqWhu0MpTHqXROg3YiTbUv2HjaRie6Ww54I57o3QxfcGSbo">
+
+                <a class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 py-1.5 rounded-lg bg-inverse-surface/85 backdrop-blur-md text-inverse-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm"
+                  href="#">
+                  <span class="material-symbols-outlined text-[14px]">visibility</span>
+                  Quick Look
+                </a>
+              </div>
+              <!-- Card Header & Metadata -->
+              <h2
+                class="font-title-lg text-title-lg text-on-surface font-semibold group-hover:text-primary-container transition-colors line-clamp-1 mb-1">
+                Veloce — Mobile Design System &amp; UI Kit
+              </h2>
+              <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                by <span class="font-medium text-on-surface">HyperType</span> • Updated 2 weeks ago
+              </p>
+              <!-- Engagement Stats Row -->
+
+            </div>
+            <!-- Action Row -->
+            <div class="flex items-center gap-space-sm pt-space-xs">
+              <div class="w-full flex flex-col gap-2">
+                <div class="grid grid-cols-2 gap-2"><a
+                    class="py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1"
+                    href="#"><span class="material-symbols-outlined text-[16px] text-outline">laptop_mac</span><span
+                      class="">Web Demo</span></a><a
+                    class="py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1"
+                    href="#"><span class="material-symbols-outlined text-[16px] text-outline">smartphone</span><span
+                      class="">Mobile Demo</span></a></div><button
+                  class="w-full py-2 px-space-md rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md transition-colors text-center font-medium flex items-center justify-center gap-1.5 shadow-xs"
+                  type="button"><span class="material-symbols-outlined text-[16px]">shopping_bag</span><span
+                    class="">Purchase</span></button>
+              </div>
+            </div>
+          </article>
+          <article
+            class="asset-card group bg-surface-container-lowest border border-outline-variant rounded-2xl p-space-md flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-secondary-container"
+            data-category="saas dashboard" data-downloads="2100" data-platform="react tailwind" data-views="8100">
+            <div>
+              <!-- Thumbnail Container -->
+              <div
+                class="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/60 mb-space-md">
+                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                  data-alt="Modern SaaS analytics and CRM dashboard preview featuring clean metric data widgets, revenue charts, user retention curves, soft rose line-graphs, and structured table UI components on a crisp white backdrop."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKCdNjyZ87SlSOczDzAJKtsDkMUaUzSSK7rRjuplXIXppy5YbRP1gkKlcan3-uWAfGutGHYkGf6JkQV1hgHR97uwfKpAJIHIQgHjnygw7zUsNa7crRbdjjP15MFinxlbL0FQ9UySPV-9ReoxzQzI36kBDtsHP71KSXwl_KQPYJTKZa67UbE4hkdYo8xTsQHFVnkl1Zrqb_BsbVJP6_i9fwhzG-VqA4zZgpJMW6l5Ms49lVE91BR-6M">
+
+                <a class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 py-1.5 rounded-lg bg-inverse-surface/85 backdrop-blur-md text-inverse-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm"
+                  href="#">
+                  <span class="material-symbols-outlined text-[14px]">visibility</span>
+                  Quick Look
+                </a>
+              </div>
+              <!-- Card Header & Metadata -->
+              <h2
+                class="font-title-lg text-title-lg text-on-surface font-semibold group-hover:text-primary-container transition-colors line-clamp-1 mb-1">
+                Nexus — SaaS Analytics &amp; CRM Suite
+              </h2>
+              <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                by <span class="font-medium text-on-surface">PixelForge</span> • Updated 1 week ago
+              </p>
+              <!-- Engagement Stats Row -->
+
+            </div>
+            <!-- Action Row -->
+            <div class="flex items-center gap-space-sm pt-space-xs">
+              <div class="w-full flex flex-col gap-2">
+                <div class="grid grid-cols-2 gap-2"><a
+                    class="py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1"
+                    href="#"><span class="material-symbols-outlined text-[16px] text-outline">laptop_mac</span><span
+                      class="">Web Demo</span></a><a
+                    class="py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1"
+                    href="#"><span class="material-symbols-outlined text-[16px] text-outline">smartphone</span><span
+                      class="">Mobile Demo</span></a></div><button
+                  class="w-full py-2 px-space-md rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md transition-colors text-center font-medium flex items-center justify-center gap-1.5 shadow-xs"
+                  type="button"><span class="material-symbols-outlined text-[16px]">shopping_bag</span><span
+                    class="">Purchase</span></button>
+              </div>
+            </div>
+          </article>
+          <article
+            class="asset-card group bg-surface-container-lowest border border-outline-variant rounded-2xl p-space-md flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-secondary-container"
+            data-category="ecommerce web-design" data-downloads="1400" data-platform="webflow" data-views="6800">
+            <div>
+              <!-- Thumbnail Container -->
+              <div
+                class="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/60 mb-space-md">
+                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                  data-alt="Minimalist luxury e-commerce layout showcasing handcrafted ceramic vases and artisanal perfumes, warm neutral aesthetic with blush rose accents, clean typography, delicate price tags and cart interaction modules."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKTM3QICrKYE_7YGD0xyD0rGDxyMR24e24kd0J_Mc5hsTPB5nNO9SGCGjXjhCvE4utH0sLftwJ5k3ie1AAITgOjPffnNYJrQN0hDkOv9y68PlcEbAQzQP47Lry83liAmhFCeaxVWl5KyqMoxXslqFx757bzxe0_5AXw8czkYkurRYp-MaBfrSyeI6WXT9f1wGcDFKwMKl2oIHNUN2tGQuAJ38y1wTq082dvpdTJnuUkp8-j2o0eSDx">
+
+                <a class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 py-1.5 rounded-lg bg-inverse-surface/85 backdrop-blur-md text-inverse-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm"
+                  href="#">
+                  <span class="material-symbols-outlined text-[14px]">visibility</span>
+                  Quick Look
+                </a>
+              </div>
+              <!-- Card Header & Metadata -->
+              <h2
+                class="font-title-lg text-title-lg text-on-surface font-semibold group-hover:text-primary-container transition-colors line-clamp-1 mb-1">
+                Atelier — Minimalist E-commerce UI Kit
+              </h2>
+              <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                by <span class="font-medium text-on-surface">CraftWorks</span> • Updated 5 days ago
+              </p>
+              <!-- Engagement Stats Row -->
+
+            </div>
+            <!-- Action Row -->
+            <div class="flex items-center gap-space-sm pt-space-xs">
+              <div class="w-full flex flex-col gap-2">
+                <div class="grid grid-cols-2 gap-2"><a
+                    class="py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1"
+                    href="#"><span class="material-symbols-outlined text-[16px] text-outline">laptop_mac</span><span
+                      class="">Web Demo</span></a><a
+                    class="py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1"
+                    href="#"><span class="material-symbols-outlined text-[16px] text-outline">smartphone</span><span
+                      class="">Mobile Demo</span></a></div><button
+                  class="w-full py-2 px-space-md rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md transition-colors text-center font-medium flex items-center justify-center gap-1.5 shadow-xs"
+                  type="button"><span class="material-symbols-outlined text-[16px]">shopping_bag</span><span
+                    class="">Purchase</span></button>
+              </div>
+            </div>
+          </article>
+          <article
+            class="asset-card group bg-surface-container-lowest border border-outline-variant rounded-2xl p-space-md flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-secondary-container"
+            data-category="portfolio web-design branding" data-downloads="980" data-platform="tailwind"
+            data-views="5300">
+            <div>
+              <!-- Thumbnail Container -->
+              <div
+                class="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/60 mb-space-md">
+                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                  data-alt="Editorial magazine-style digital portfolio for a fine-art photographer, full-width high-fashion portraits, delicate serif typography, minimalist captions, and smooth white and rose-toned layout grids."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBe4sEbRxnW1j1qSJsdocKcQv6oxw2-3OD3h7rvxzkSw3d94RSfoGTvs8rIY2umHI-koDOrkiBDhqAmD8zNRMj0AZnTwrjVPPX-OBaBwBn_mI9r2uYmPFDJhrQZLlBsLXL6P63j2mF6nRi6LahAkUsSzsZtmCyQWb9pAAZ_gZGjsWQ6-ZswG1o25ZiQITN3eEhSND77eFYjJx5TZqYi2ucZedzhrUa9wD1A3rYmXPuFXJ1-35FzR7g4">
+
+                <a class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 py-1.5 rounded-lg bg-inverse-surface/85 backdrop-blur-md text-inverse-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm"
+                  href="#">
+                  <span class="material-symbols-outlined text-[14px]">visibility</span>
+                  Quick Look
+                </a>
+              </div>
+              <!-- Card Header & Metadata -->
+              <h2
+                class="font-title-lg text-title-lg text-on-surface font-semibold group-hover:text-primary-container transition-colors line-clamp-1 mb-1">
+                Solstice — Editorial &amp; Personal Portfolio
+              </h2>
+              <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                by <span class="font-medium text-on-surface">Elena Vance</span> • Updated 4 days ago
+              </p>
+              <!-- Engagement Stats Row -->
+
+            </div>
+            <!-- Action Row -->
+            <div class="flex items-center gap-space-sm pt-space-xs">
+              <div class="w-full flex flex-col gap-2">
+                <div class="grid grid-cols-2 gap-2"><a
+                    class="py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1"
+                    href="#"><span class="material-symbols-outlined text-[16px] text-outline">laptop_mac</span><span
+                      class="">Web Demo</span></a><a
+                    class="py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1"
+                    href="#"><span class="material-symbols-outlined text-[16px] text-outline">smartphone</span><span
+                      class="">Mobile Demo</span></a></div><button
+                  class="w-full py-2 px-space-md rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md transition-colors text-center font-medium flex items-center justify-center gap-1.5 shadow-xs"
+                  type="button"><span class="material-symbols-outlined text-[16px]">shopping_bag</span><span
+                    class="">Purchase</span></button>
+              </div>
+            </div>
+          </article>
+          <article
+            class="asset-card group bg-surface-container-lowest border border-outline-variant rounded-2xl p-space-md flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-secondary-container"
+            data-category="agency portfolio web-design" data-downloads="890" data-platform="figma react"
+            data-views="4200">
+            <div>
+              <!-- Thumbnail Container (16:10 aspect ratio) -->
+              <div
+                class="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/60 mb-space-md">
+                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                  data-alt="Editorial agency web design mockup with warm muted terracotta tones, sleek serif typography, layout showing architectural portfolio cases and minimalist interactive grid elements in a soft studio lighting atmosphere."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8">
+                <!-- Badge overlay -->
+
+                <!-- Live Preview pill button overlay on hover -->
+                <a class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 py-1.5 rounded-lg bg-inverse-surface/85 backdrop-blur-md text-inverse-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm"
+                  href="#">
+                  <span class="material-symbols-outlined text-[14px]">visibility</span>
+                  Quick Look
+                </a>
+              </div>
+              <!-- Card Header & Metadata -->
+              <div class="flex items-start justify-between gap-space-xs mb-1">
+                <h2
+                  class="font-title-lg text-title-lg text-on-surface font-semibold group-hover:text-primary-container transition-colors line-clamp-1">
+                  Lumina — Agency Portfolio Template
+                </h2>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                by <span class="font-medium text-on-surface">Studio Aurora</span> • Updated 2 days ago
+              </p>
+              <!-- Engagement Stats Row -->
+
+            </div>
+            <!-- Action Row -->
+            <div class="flex items-center gap-space-sm pt-space-xs">
+              <div class="w-full flex flex-col gap-2">
+                <div class="grid grid-cols-2 gap-2"><a
+                    class="py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1"
+                    href="#"><span class="material-symbols-outlined text-[16px] text-outline">laptop_mac</span><span
+                      class="">Web Demo</span></a><a
+                    class="py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1"
+                    href="#"><span class="material-symbols-outlined text-[16px] text-outline">smartphone</span><span
+                      class="">Mobile Demo</span></a></div><button
+                  class="w-full py-2 px-space-md rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md transition-colors text-center font-medium flex items-center justify-center gap-1.5 shadow-xs"
+                  type="button"><span class="material-symbols-outlined text-[16px]">shopping_bag</span><span
+                    class="">Purchase</span></button>
+              </div>
+            </div>
+          </article>
+          <article
+            class="asset-card group bg-surface-container-lowest border border-outline-variant rounded-2xl p-space-md flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-secondary-container"
+            data-category="portfolio branding" data-downloads="620" data-platform="framer figma" data-views="3500">
+            <div>
+              <!-- Thumbnail Container -->
+              <div
+                class="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/60 mb-space-md">
+                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                  data-alt="Nordic architectural monograph and interior studio website showcase featuring brutalist concrete structures, editorial sans typography, gallery spreads, and asymmetric layout grids bathed in diffused morning sunlight."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcf_-oqG5MQDeFGc__jHFBoCtb9Yy3wM26BDSiJIFAVufRDX5Se7FtSVXzo9woMpQokdDdGMsLiiIkj5fPBumyK0fF2yhP0xYd1gtsXM-igBrHFtWeoy_R-YzuhZWOL-gSyLo19XT08JaabqOfNjO8dPX9xWtWy2i4Q982KXriiivWARIaILb13BRZLkCf_Ml6Rn8WRtluIr8B2dOkk9iNceIpXYjdxEsHutPk1ddZmieuUHG-R2Qn">
+
+                <a class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 py-1.5 rounded-lg bg-inverse-surface/85 backdrop-blur-md text-inverse-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm"
+                  href="#">
+                  <span class="material-symbols-outlined text-[14px]">visibility</span>
+                  Quick Look
+                </a>
+              </div>
+              <!-- Card Header & Metadata -->
+              <h2
+                class="font-title-lg text-title-lg text-on-surface font-semibold group-hover:text-primary-container transition-colors line-clamp-1 mb-1">
+                MonoHaus — Architecture Studio Showcase
+              </h2>
+              <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                by <span class="font-medium text-on-surface">Nord Design</span> • Updated 3 days ago
+              </p>
+              <!-- Engagement Stats Row -->
+
+            </div>
+            <!-- Action Row -->
+            <div class="flex items-center gap-space-sm pt-space-xs">
+              <div class="w-full flex flex-col gap-2">
+                <div class="grid grid-cols-2 gap-2"><a
+                    class="py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1"
+                    href="#"><span class="material-symbols-outlined text-[16px] text-outline">laptop_mac</span><span
+                      class="">Web Demo</span></a><a
+                    class="py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1"
+                    href="#"><span class="material-symbols-outlined text-[16px] text-outline">smartphone</span><span
+                      class="">Mobile Demo</span></a></div><button
+                  class="w-full py-2 px-space-md rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md transition-colors text-center font-medium flex items-center justify-center gap-1.5 shadow-xs"
+                  type="button"><span class="material-symbols-outlined text-[16px]">shopping_bag</span><span
+                    class="">Purchase</span></button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+      <!-- Pagination / Load More Section -->
+      <section
+        class="max-w-[1360px] mx-auto px-margin-mobile md:px-margin w-full pb-space-2xl flex flex-col items-center gap-space-lg">
+        <!-- Load More Button -->
+        <button
+          class="px-8 py-3 rounded-full bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container-low hover:border-secondary-container font-label-md text-label-md font-medium transition-all shadow-sm hover:shadow active:scale-98 flex items-center gap-2 group"
+          id="loadMoreBtn" onclick="handleLoadMore()" type="button">
+          <span
+            class="material-symbols-outlined text-[18px] text-primary-container group-hover:rotate-180 transition-transform duration-500">sync</span>
+          <span class="">Load More Assets</span>
+        </button>
+        <!-- Page Indicators -->
+          <div id="pagination-container" class="flex flex-wrap items-center justify-center gap-2">
+          <button aria-label="Previous Page"
+            class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors">
+            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+          </button>
+          <button
+            class="w-8 h-8 rounded-lg bg-primary-container text-on-primary-container font-label-md text-label-md font-semibold flex items-center justify-center shadow-xs">
+            1
+          </button>
+          <button
+            class="w-8 h-8 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-label-md font-medium hover:bg-surface-container-low transition-colors flex items-center justify-center">
+            2
+          </button>
+          <button
+            class="w-8 h-8 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-label-md font-medium hover:bg-surface-container-low transition-colors flex items-center justify-center">
+            3
+          </button>
+          <span class="text-on-surface-variant px-1 font-body-sm text-body-sm">...</span>
+          <button
+            class="w-8 h-8 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-label-md font-medium hover:bg-surface-container-low transition-colors flex items-center justify-center">
+            8
+          </button>
+          <button aria-label="Next Page"
+            class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors">
+            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+          </button>
+        </div>
+      </section>
+      <!-- Interactive Client-side Scripting -->
+      <script>
+        function selectCategoryChip(button, category) {
+          const chips = document.querySelectorAll('.category-chip');
+          chips.forEach(chip => {
+            chip.className = 'category-chip shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-all duration-200 bg-surface-container-lowest text-on-surface border border-outline-variant hover:border-secondary-container';
+          });
+
+          button.className = 'category-chip shrink-0 px-5 py-2 rounded-full font-label-md text-label-md transition-all duration-200 bg-primary-container text-on-primary-container shadow-sm border border-transparent';
+
+          filterCards(category);
+        }
+
+        function filterCards(forcedCategory) {
+          const searchVal = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+          const platformVal = (document.getElementById('platformSelect')?.value || 'all').toLowerCase();
+          const categoryDropdown = (document.getElementById('categorySelect')?.value || 'all').toLowerCase();
+
+          const activeChip = forcedCategory || document.querySelector('.category-chip.bg-primary-container')?.dataset?.category || 'all';
+
+          const cards = document.querySelectorAll('.asset-card');
+          let visibleCount = 0;
+
+          cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            const cardCat = card.dataset.category || '';
+            const cardPlat = card.dataset.platform || '';
+
+            const matchesSearch = !searchVal || text.includes(searchVal);
+            const matchesPlatform = platformVal === 'all' || cardPlat.includes(platformVal);
+            const matchesDropdownCat = categoryDropdown === 'all' || cardCat.includes(categoryDropdown);
+            const matchesChip = activeChip === 'all' || cardCat.includes(activeChip);
+
+            if (matchesSearch && matchesPlatform && matchesDropdownCat && matchesChip) {
+              card.style.display = 'flex';
+              visibleCount++;
+            } else {
+              card.style.display = 'none';
+            }
+          });
+
+          const countEl = document.getElementById('assetCount');
+          if (countEl) {
+            countEl.textContent = visibleCount > 0 ? (visibleCount * 8).toString() : '0';
+          }
+        }
+
+        function sortCards(criteria) {
+          const grid = document.getElementById('productGrid');
+          const cards = Array.from(grid.querySelectorAll('.asset-card'));
+
+          cards.sort((a, b) => {
+            if (criteria === 'popular') {
+              return parseInt(b.dataset.downloads || 0) - parseInt(a.dataset.downloads || 0);
+            } else if (criteria === 'trending') {
+              return parseInt(b.dataset.views || 0) - parseInt(a.dataset.views || 0);
+            } else {
+              return 0; // Natural/newest sequence
+            }
+          });
+
+          cards.forEach(card => grid.appendChild(card));
+        }
+
+        function handleLoadMore() {
+          const btn = document.getElementById('loadMoreBtn');
+          if (!btn) return;
+          const originalText = btn.innerHTML;
+          btn.innerHTML = `<span class="material-symbols-outlined text-[18px] animate-spin text-primary-container">progress_activity</span><span>Loading more assets...</span>`;
+          btn.disabled = true;
+
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            const countEl = document.getElementById('assetCount');
+            if (countEl) countEl.textContent = '64';
+          }, 700);
+        }
+
+        document.getElementById('searchInput')?.addEventListener('input', () => filterCards());
+        document.getElementById('platformSelect')?.addEventListener('change', () => filterCards());
+        document.getElementById('categorySelect')?.addEventListener('change', () => filterCards());
+      </script>
+    </div>
+  </main>
+  <footer class="w-full bg-surface-container-lowest border-t border-outline-variant">
+    <div
+      class="max-w-[1360px] mx-auto px-margin-mobile md:px-margin py-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md text-center md:text-left">
+      <div class="font-body-sm text-body-sm text-on-surface-variant">© 2025 GiftSpace.</div>
+      <div class="flex flex-wrap justify-center items-center gap-space-md"><a
+          class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary-container transition-colors"
+          data-path="privacy-policy" href="#">Privacy Policy</a><a
+          class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary-container transition-colors"
+          data-path="terms-of-service" href="#">Terms of Service</a><a
+          class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary-container transition-colors"
+          data-path="license-guidelines" href="#">License Guidelines</a><a
+          class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary-container transition-colors"
+          data-path="support" href="#">Support</a></div>
+      <div class="flex items-center gap-space-sm text-on-surface-variant"><a aria-label="Twitter"
+          class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low hover:text-primary-container transition-colors"
+          href="#"><span class="material-symbols-outlined text-[18px]">terminal</span></a><a aria-label="GitHub"
+          class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low hover:text-primary-container transition-colors"
+          href="#"><span class="material-symbols-outlined text-[18px]">code</span></a><a aria-label="Dribbble"
+          class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low hover:text-primary-container transition-colors"
+          href="#"><span class="material-symbols-outlined text-[18px]">palette</span></a><a aria-label="Figma"
+          class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low hover:text-primary-container transition-colors"
+          href="#"><span class="material-symbols-outlined text-[18px]">draw</span></a></div>
+    </div>
+  </footer>
+
+
+
+
+
+
+
+  <div
+    class="fixed bottom-8 right-8 z-50 group flex items-center cursor-pointer transition-all duration-300 hover:scale-105 active:scale-98 select-none"
+    id="chatFab">
+    <div
+      class="relative flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-primary-container to-primary text-on-primary rounded-2xl shadow-xl shadow-primary/25 border border-primary-fixed/30 backdrop-blur-sm">
+      <div
+        class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white/15 border border-white/20 shadow-xs shrink-0">
+        <span class="material-symbols-outlined text-[24px] text-white">forum</span></div>
+      <div class="flex flex-col text-left pr-1"><span
+          class="font-title-md text-[14px] leading-tight font-semibold text-white tracking-tight">Chat với
+          Admin</span><span
+          class="flex items-center gap-1.5 font-body-sm text-[11px] text-white/90 font-normal mt-0.5"><span
+            class="w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-emerald-300/40 inline-block shrink-0"></span>Hỗ trợ
+          trực tuyến 24/7</span></div>
+      <div
+        class="absolute -top-2 -right-2 bg-inverse-surface text-inverse-on-surface text-[11px] font-bold h-5 min-w-[20px] px-1 rounded-full flex items-center justify-center border-2 border-surface shadow-md ring-1 ring-primary/20">
+        3</div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <div id="modals-container">
+    <div
+      class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+      id="login-modal"
+      class="hidden fixed inset-0 z-50 bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center"
+      style="display: none !important;">
+      <div
+        class="relative w-full max-w-[480px] bg-surface-container-lowest rounded-[28px] border border-surface-variant shadow-2xl p-6 sm:p-8 my-8 text-on-surface transition-all">
+        <button
+          class="absolute top-5 right-5 w-8 h-8 rounded-full bg-surface-container-low hover:bg-surface-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
+          onclick="hideAllModals()" type="button" title="Đóng modal"><span
+            class="material-symbols-outlined text-[20px]">close</span></button>
+        <div class="flex flex-col items-center text-center">
+          <div
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high/70 border border-outline-variant text-primary-container text-label-sm font-semibold tracking-wide mb-3">
+            <span class="material-symbols-outlined text-[14px]">lock</span><span class="">Xác thực tài khoản</span>
+          </div>
+          <h2 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-2 tracking-tight">Đăng nhập để
+            tiếp tục</h2>
+          <p class="font-body-sm text-body-sm text-on-surface-variant max-w-sm mb-4 leading-relaxed">Vui lòng đăng nhập
+            hoặc tạo tài khoản GiftSpace để kích hoạt bản quyền, nhận source code và hóa đơn VAT.</p>
+          <div
+            class="w-full flex items-center gap-3 p-3 rounded-xl bg-surface-container-low border border-outline-variant mb-6 text-left">
+            <div
+              class="w-11 h-11 rounded-lg bg-surface-container-high overflow-hidden shrink-0 flex items-center justify-center">
+              <img alt="Lumina Template" class="w-full h-full object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8">
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-label-md text-label-md font-semibold text-on-surface truncate">Lumina — Agency Portfolio
+                Template</p>
+              <p class="font-body-sm text-[12px] text-on-surface-variant flex items-center gap-2"><span class="">Bản
+                  quyền thương mại</span><span class="font-semibold text-primary-container">$49.00</span></p>
+            </div><span
+              class="material-symbols-outlined text-[18px] text-primary-container shrink-0">shopping_bag</span>
+          </div>
+        </div>
+        <div class="space-y-2.5 mb-5"><button
+            class="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-outline-variant hover:border-secondary-container bg-surface-container-lowest hover:bg-surface-container-low font-label-md text-label-md font-medium text-on-surface transition-all shadow-xs"
+            type="button"><svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+              <path
+                d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"
+                fill="#EA4335"></path>
+              <path d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5.1 3.7-8.8z"
+                fill="#4285F4"></path>
+              <path d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z"
+                fill="#FBBC05"></path>
+              <path
+                d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16c1.8 3.7 5.6 7 10.1 7z"
+                fill="#34A853"></path>
+            </svg><span class="">Tiếp tục với Google</span></button><button
+            class="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-outline-variant hover:border-secondary-container bg-surface-container-lowest hover:bg-surface-container-low font-label-md text-label-md font-medium text-on-surface transition-all shadow-xs"
+            type="button"><svg class="w-4 h-4 shrink-0 fill-on-surface" viewBox="0 0 24 24">
+              <path clip-rule="evenodd"
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                fill-rule="evenodd"></path>
+            </svg><span class="">Tiếp tục với GitHub</span></button></div>
+        <div class="relative flex items-center justify-center my-4">
+          <div class="border-t border-outline-variant/60 w-full"></div>
+          <span class="bg-surface-container-lowest px-3 text-[12px] font-medium text-on-surface-variant whitespace-nowrap">hoặc đăng nhập bằng Email</span>
+          <div class="border-t border-outline-variant/60 w-full"></div>
+        </div>
+        <form class="space-y-3.5" onsubmit="event.preventDefault();">
+          <div class="space-y-1 text-left"><label
+              class="block font-label-sm text-label-sm font-semibold text-on-surface">Email của bạn</label>
+            <div class="relative"><span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">mail</span><input
+                id="login-email"
+                class="w-full pl-9 pr-3 py-2 text-body-sm rounded-xl border border-outline-variant bg-surface-container-lowest focus:outline-none focus:border-primary-container text-on-surface placeholder:text-on-surface-variant/40 transition-colors"
+                placeholder="name@example.com (Ví dụ: vu.nguyen@example.com)" type="email" value=""></div>
+          </div>
+          <div class="space-y-1 text-left"><label
+              class="block font-label-sm text-label-sm font-semibold text-on-surface">Mật khẩu</label>
+            <div class="relative"><span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">lock</span><input
+                id="login-password"
+                class="w-full pl-9 pr-10 py-2 text-body-sm rounded-xl border border-outline-variant bg-surface-container-lowest focus:outline-none focus:border-primary-container text-on-surface placeholder:text-on-surface-variant/40 transition-colors"
+                placeholder="•••••••• (Ví dụ: 123456)" type="password" value=""><button
+                class="toggle-password-btn absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface p-1 rounded-lg transition-colors cursor-pointer"
+                type="button" title="Xem/ẩn mật khẩu"><span class="material-symbols-outlined text-[18px]">visibility</span></button></div>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-on-surface-variant/70 bg-surface-container-low/70 px-2.5 py-1.5 rounded-lg border border-outline-variant/40">
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px] opacity-70">info</span> Gợi ý tài khoản:</span>
+            <span class="font-mono text-primary-container font-medium cursor-pointer hover:underline" id="login-quick-fill" title="Bấm để điền thử nghiệm">vu.nguyen@example.com / 123456</span>
+          </div>
+          <div class="flex items-center justify-between pt-1 text-[13px]"><label
+              class="flex items-center gap-2 cursor-pointer"><input checked=""
+                class="accent-primary-container rounded w-4 h-4" type="checkbox"><span
+                class="text-on-surface-variant">Ghi nhớ đăng nhập</span></label><a
+              class="text-primary-container hover:underline font-medium" href="#">Quên mật khẩu?</a></div>
+          <button
+            id="login-submit-btn"
+            class="w-full py-3 px-4 rounded-xl bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 mt-2 cursor-pointer"
+            type="submit"><span class="material-symbols-outlined text-[18px]">login</span><span class="">Đăng nhập &amp;
+              Tiếp tục thanh toán</span></button>
+        </form>
+        <div class="mt-5 pt-4 border-t border-outline-variant/60 text-center">
+          <p class="text-[13px] text-on-surface-variant">Chưa có tài khoản? <a
+              class="font-semibold text-primary-container hover:underline" href="#">Đăng ký ngay</a> <span
+              class="inline-block text-[11px] text-secondary font-medium px-2 py-0.5 rounded-full bg-secondary-fixed/50 ml-1">-10%
+              đơn đầu</span></p>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+    <div
+      class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+      id="register-modal"
+      class="hidden fixed inset-0 z-50 bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center"
+      style="display: none !important;">
+      <div
+        class="relative w-full max-w-[480px] bg-surface-container-lowest rounded-[28px] border border-surface-variant shadow-2xl p-6 sm:p-8 my-8 text-on-surface transition-all">
+        <button
+          class="absolute top-5 right-5 w-8 h-8 rounded-full bg-surface-container-low hover:bg-surface-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
+          onclick="hideAllModals()" type="button" title="Đóng modal"><span
+            class="material-symbols-outlined text-[20px]">close</span></button>
+        <div class="flex flex-col items-center text-center">
+          <div
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high/70 border border-outline-variant text-primary-container text-label-sm font-semibold tracking-wide mb-3">
+            <span class="material-symbols-outlined text-[14px]">person_add</span><span class="">Đăng ký thành
+              viên</span><span
+              class="inline-block text-[11px] text-secondary font-medium px-2 py-0.5 rounded-full bg-secondary-fixed/50 ml-1">-10%
+              đơn đầu</span></div>
+          <h2 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-2 tracking-tight">Tạo tài khoản
+            mới</h2>
+          <p class="font-body-sm text-body-sm text-on-surface-variant max-w-sm mb-4 leading-relaxed">Đăng ký tài khoản
+            GiftSpace để nhận ngay ưu đãi giảm 10% đơn hàng đầu tiên, lưu trữ kho template và quản lý license bản quyền
+            trọn đời.</p>
+          <div
+            class="w-full flex items-center gap-3 p-3 rounded-xl bg-surface-container-low border border-outline-variant mb-6 text-left">
+            <div
+              class="w-11 h-11 rounded-lg bg-surface-container-high overflow-hidden shrink-0 flex items-center justify-center">
+              <img alt="Lumina Template" class="w-full h-full object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8">
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-label-md text-label-md font-semibold text-on-surface truncate">Lumina — Agency Portfolio
+                Template</p>
+              <p class="font-body-sm text-[12px] text-on-surface-variant flex items-center gap-2"><span class="">Bản
+                  quyền thương mại</span><span class="font-semibold text-primary-container">$49.00</span></p>
+            </div><span
+              class="material-symbols-outlined text-[18px] text-primary-container shrink-0">shopping_bag</span>
+          </div>
+        </div>
+        <div class="space-y-2.5 mb-5"><button
+            class="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-outline-variant hover:border-secondary-container bg-surface-container-lowest hover:bg-surface-container-low font-label-md text-label-md font-medium text-on-surface transition-all shadow-xs"
+            type="button"><svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+              <path
+                d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"
+                fill="#EA4335"></path>
+              <path d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5.1 3.7-8.8z"
+                fill="#4285F4"></path>
+              <path d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z"
+                fill="#FBBC05"></path>
+              <path
+                d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16c1.8 3.7 5.6 7 10.1 7z"
+                fill="#34A853"></path>
+            </svg><span class="">Đăng ký nhanh với Google</span></button><button
+            class="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-outline-variant hover:border-secondary-container bg-surface-container-lowest hover:bg-surface-container-low font-label-md text-label-md font-medium text-on-surface transition-all shadow-xs"
+            type="button"><svg class="w-4 h-4 shrink-0 fill-on-surface" viewBox="0 0 24 24">
+              <path clip-rule="evenodd"
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                fill-rule="evenodd"></path>
+            </svg><span class="">Đăng ký với GitHub</span></button></div>
+        <div class="relative flex items-center justify-center my-4">
+          <div class="border-t border-outline-variant/60 w-full"></div><span
+            class="bg-surface-container-lowest px-3 text-[12px] font-medium text-on-surface-variant"
+            style="white-space: nowrap;">hoặc đăng ký bằng Email</span>
+          <div class="border-t border-outline-variant/60 w-full"></div>
+        </div>
+        <form class="space-y-3.5" onsubmit="event.preventDefault();">
+          <div class="space-y-1 text-left"><label
+              class="block font-label-sm text-label-sm font-semibold text-on-surface">Họ và tên</label>
+            <div class="relative"><span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">person</span><input
+                id="register-name"
+                class="w-full pl-9 pr-3 py-2 text-body-sm rounded-xl border border-outline-variant bg-surface-container-lowest focus:outline-none focus:border-primary-container text-on-surface placeholder:text-on-surface-variant/40 transition-colors"
+                placeholder="Ví dụ: Nguyễn Trường Vũ" type="text" value=""></div>
+          </div>
+          <div class="space-y-1 text-left"><label
+              class="block font-label-sm text-label-sm font-semibold text-on-surface">Email của bạn</label>
+            <div class="relative"><span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">mail</span><input
+                id="register-email"
+                class="w-full pl-9 pr-3 py-2 text-body-sm rounded-xl border border-outline-variant bg-surface-container-lowest focus:outline-none focus:border-primary-container text-on-surface placeholder:text-on-surface-variant/40 transition-colors"
+                placeholder="Ví dụ: vu.nguyen@example.com" type="email" value=""></div>
+          </div>
+          <div class="space-y-1 text-left"><label
+              class="block font-label-sm text-label-sm font-semibold text-on-surface">Mật khẩu</label>
+            <div class="relative"><span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">lock</span><input
+                id="register-password"
+                class="w-full pl-9 pr-10 py-2 text-body-sm rounded-xl border border-outline-variant bg-surface-container-lowest focus:outline-none focus:border-primary-container text-on-surface placeholder:text-on-surface-variant/40 transition-colors"
+                placeholder="Nhập mật khẩu" type="password" value=""><button
+                class="toggle-password-btn absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface p-1 rounded-lg transition-colors cursor-pointer"
+                type="button" title="Xem/ẩn mật khẩu"><span class="material-symbols-outlined text-[18px]">visibility</span></button></div>
+            <div class="pt-1.5 space-y-1.5" id="register-password-strength-box">
+              <div class="flex items-center justify-between text-[11px]"><span class="text-on-surface-variant font-medium">Độ mạnh mật khẩu:</span><span id="password-strength-label" class="font-semibold text-on-surface-variant">Chưa nhập</span></div>
+              <div class="grid grid-cols-3 gap-1.5 h-1.5" id="password-strength-bars">
+                <div class="rounded-full bg-outline-variant/40 h-full transition-all duration-300"></div>
+                <div class="rounded-full bg-outline-variant/40 h-full transition-all duration-300"></div>
+                <div class="rounded-full bg-outline-variant/40 h-full transition-all duration-300"></div>
+              </div>
+              <p id="password-strength-hint" class="text-[11px] text-on-surface-variant/70 italic">Yêu cầu: Yếu (chữ &amp; số &le; 8 ký tự), Trung bình (&gt; 8 ký tự), Mạnh (kí tự đặc biệt)</p>
+            </div>
+          </div>
+          <div class="space-y-1 text-left"><label
+              class="block font-label-sm text-label-sm font-semibold text-on-surface">Xác nhận mật khẩu</label>
+            <div class="relative"><span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">lock_reset</span><input
+                id="register-confirm-password"
+                class="w-full pl-9 pr-10 py-2 text-body-sm rounded-xl border border-outline-variant bg-surface-container-lowest focus:outline-none focus:border-primary-container text-on-surface placeholder:text-on-surface-variant/40 transition-colors"
+                placeholder="Nhập lại mật khẩu" type="password" value=""><button
+                class="toggle-password-btn absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface p-1 rounded-lg transition-colors cursor-pointer"
+                type="button" title="Xem/ẩn mật khẩu"><span class="material-symbols-outlined text-[18px]">visibility</span></button></div>
+          </div>
+          <div class="space-y-2 pt-1 text-left"><label class="flex items-start gap-2 cursor-pointer"><input checked=""
+                class="accent-primary-container rounded w-4 h-4 mt-0.5 shrink-0" type="checkbox"><span
+                class="text-[12px] text-on-surface-variant leading-snug">Tôi đồng ý với <a
+                  class="text-primary-container hover:underline font-medium" href="#">Điều khoản dịch vụ</a> và <a
+                  class="text-primary-container hover:underline font-medium" href="#">Chính sách bảo mật</a> của
+                GiftSpace</span></label><label class="flex items-start gap-2 cursor-pointer"><input checked=""
+                class="accent-primary-container rounded w-4 h-4 mt-0.5 shrink-0" type="checkbox"><span
+                class="text-[12px] text-on-surface-variant leading-snug">Nhận thông báo cập nhật template mới và mã giảm
+                giá độc quyền qua email</span></label></div>
+          <button
+            id="register-submit-btn"
+            class="w-full py-3 px-4 rounded-xl bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 mt-2 cursor-pointer"
+            type="submit"><span class="material-symbols-outlined text-[18px]">check_circle</span><span class="">Đăng ký
+              &amp; Tiếp tục thanh toán</span></button>
+        </form>
+        <div class="mt-5 pt-4 border-t border-outline-variant/60 text-center">
+          <p class="text-[13px] text-on-surface-variant">Đã có tài khoản? <a
+              class="font-semibold text-primary-container hover:underline" href="#">Đăng nhập ngay</a></p>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div
+      class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+      id="forgot-modal"
+      class="hidden fixed inset-0 z-50 bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center"
+      style="display: none !important;">
+      <div
+        class="relative w-full max-w-[480px] bg-surface-container-lowest rounded-[28px] border border-surface-variant shadow-2xl p-6 sm:p-8 my-8 text-on-surface transition-all">
+        <button
+          class="absolute top-5 right-5 w-8 h-8 rounded-full bg-surface-container-low hover:bg-surface-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
+          onclick="hideAllModals()" type="button" title="Đóng modal"><span
+            class="material-symbols-outlined text-[20px]">close</span></button>
+        <div class="flex flex-col items-center text-center">
+          <div
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high/70 border border-outline-variant text-primary-container text-label-sm font-semibold tracking-wide mb-3">
+            <span class="material-symbols-outlined text-[15px]">key</span><span class="">Khôi phục tài khoản</span>
+          </div>
+          <h2 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-2 tracking-tight">Quên mật khẩu?
+          </h2>
+          <p class="font-body-sm text-body-sm text-on-surface-variant max-w-sm mb-4 leading-relaxed">Đừng lo lắng, hãy
+            nhập địa chỉ email đã đăng ký của bạn. Chúng tôi sẽ cấp phát và gửi mật khẩu reset mới trực tiếp về hòm thư của bạn.</p>
+          <div
+            class="w-full flex items-center gap-3 p-3 rounded-xl bg-surface-container-low border border-outline-variant mb-5 text-left">
+            <div
+              class="w-9 h-9 rounded-lg bg-surface-container-high overflow-hidden shrink-0 flex items-center justify-center text-primary-container">
+              <span class="material-symbols-outlined text-[18px]">shopping_bag</span></div>
+            <div class="flex-1 min-w-0">
+              <p class="font-label-md text-label-md font-semibold text-on-surface truncate">Lumina — Agency Portfolio
+                Template</p>
+              <p class="font-body-sm text-[12px] text-on-surface-variant">Đơn hàng &amp; giỏ hàng vẫn được lưu an toàn
+                trong quá trình khôi phục.</p>
+            </div>
+          </div>
+        </div>
+        <form class="space-y-4" id="forgot-form" onsubmit="event.preventDefault();">
+          <div class="space-y-1 text-left"><label
+              class="block font-label-sm text-label-sm font-semibold text-on-surface">Email đã đăng ký tài khoản</label>
+            <div class="relative"><span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">mail</span><input
+                id="forgot-email"
+                class="w-full pl-9 pr-3 py-2.5 text-body-sm rounded-xl border border-outline-variant bg-surface-container-lowest focus:outline-none focus:border-primary-container text-on-surface placeholder:text-on-surface-variant/40 transition-colors"
+                placeholder="name@example.com (Ví dụ: vu.nguyen@example.com)" type="email" value=""></div>
+          </div>
+          <div class="text-[11px] text-on-surface-variant/70 flex items-center gap-1.5 bg-surface-container-low/70 px-2.5 py-1.5 rounded-lg border border-outline-variant/40">
+            <span class="material-symbols-outlined text-[14px] text-primary-container">forward_to_inbox</span>
+            <span>Mật khẩu mới sẽ được gửi về email đăng ký và có hiệu lực ngay lập tức.</span>
+          </div>
+          <!-- Result Container for Reset Password Success Notification -->
+          <div id="forgot-result-box" class="hidden p-3.5 rounded-xl border text-left space-y-2.5 transition-all">
+          </div>
+          <button
+            id="forgot-submit-btn"
+            class="w-full py-3 px-4 rounded-xl bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 mt-3 cursor-pointer"
+            type="submit"><span class="material-symbols-outlined text-[18px]">forward_to_inbox</span><span id="forgot-btn-text">Gửi mật khẩu reset về Email</span></button>
+        </form>
+        <div class="mt-5 pt-4 border-t border-outline-variant/60 flex flex-col items-center gap-2 text-center"><a
+            class="inline-flex items-center gap-1.5 font-label-md text-label-md font-semibold text-primary-container hover:underline cursor-pointer"
+            href="#"><span class="material-symbols-outlined text-[16px]">arrow_back</span><span class="">Quay lại Đăng
+              nhập</span></a>
+          <p class="text-[12px] text-on-surface-variant">Không nhận được email? <a
+              class="underline hover:text-primary-container" href="#">Kiểm tra thư mục Spam</a> hoặc <a
+              class="font-medium text-primary-container hover:underline" href="#">Liên hệ hỗ trợ trực tiếp</a></p>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div
+      class="fixed inset-0 z-50 bg-[#2c1519]/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto duration-200 transition-all"
+      id="mobile-modal"
+      style="display: none !important;"
+      onclick="if(event.target===this) closeMobileDemoModal()">
+      <div
+        class="relative w-full max-w-5xl bg-surface border border-outline-variant rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[94vh]">
+        <!-- Modal Top Bar -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant bg-surface-container-lowest/80 backdrop-blur-md">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-9 h-9 rounded-xl bg-surface-container-high flex items-center justify-center text-primary border border-outline-variant shadow-xs">
+              <span class="material-symbols-outlined text-[20px]">smartphone</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="font-headline-sm text-[18px] font-semibold text-on-surface" id="mobile-modal-title">Live Mobile Demo</h3>
+                <span
+                  class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-primary/10 text-primary uppercase tracking-wider border border-primary/20">Tràn Viền Retina</span>
+              </div>
+              <p class="text-[12px] text-on-surface-variant" id="mobile-modal-device-desc">iPhone 15 Pro (393 × 852 px) • Super Retina XDR</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              class="w-9 h-9 rounded-lg border border-outline-variant hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center shadow-xs cursor-pointer"
+              onclick="reloadMobileDemo()"
+              title="Tải lại Demo" type="button">
+              <span class="material-symbols-outlined text-[18px]">refresh</span>
+            </button>
+            <button
+              class="w-9 h-9 rounded-lg border border-outline-variant hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors hidden sm:flex items-center justify-center shadow-xs cursor-pointer"
+              onclick="openMobileDemoFullscreen()"
+              title="Mở toàn màn hình" type="button">
+              <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+            </button>
+            <button
+              class="w-9 h-9 rounded-lg bg-surface-container hover:bg-error-container hover:text-on-error-container text-on-surface transition-colors flex items-center justify-center ml-1 border border-outline-variant shadow-xs cursor-pointer"
+              onclick="closeMobileDemoModal()" title="Đóng cửa sổ" type="button">
+              <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Body Content -->
+        <div
+          class="flex-1 overflow-y-auto flex flex-col lg:flex-row items-center justify-between p-4 sm:p-8 gap-8 bg-gradient-to-b from-surface to-surface-container-low">
+          
+          <!-- Left: Mobile Device Chassis (100% Tràn Viền) -->
+          <div class="w-full lg:w-7/12 flex flex-col items-center justify-center py-2">
+            <!-- Outer Phone Chassis with slim titanium bezel (100% Tràn Viền) -->
+            <div id="phoneDeviceFrame"
+              class="relative w-[320px] sm:w-[335px] h-[670px] bg-[#120a0d] dark:bg-[#0c0709] rounded-[50px] p-[3.5px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.08)] border-[3px] border-[#382028] dark:border-[#2a161d] flex flex-col select-none transition-all duration-300 overflow-hidden"
+              style="overflow: hidden;">
+              
+              <!-- Screen Display Area (Edge-to-edge / Tràn Viền) -->
+              <div class="relative w-full h-full rounded-[46px] overflow-hidden bg-black flex flex-col isolate" id="mobile-screen-container"
+                style="overflow: hidden; -webkit-mask-image: -webkit-radial-gradient(white, black); mask-image: radial-gradient(white, black); isolation: isolate; transform: translateZ(0);">
+                
+                <!-- The Live Web Demo Iframe (Full-bleed / Tràn viền 100%) -->
+                <iframe id="mobile-demo-iframe" src="demo-lumina.html"
+                  class="w-full h-full border-0 pointer-events-auto block bg-surface"
+                  style="width: 100%; height: 100%; border: none; overflow: hidden; border-radius: inherit;"></iframe>
+
+                <!-- Floating Dynamic Island -->
+                <div id="mobileDynamicIsland"
+                  class="absolute left-1/2 -translate-x-1/2 top-3 w-28 h-6 bg-black rounded-full z-30 pointer-events-none flex items-center justify-end pr-2.5 gap-1.5 shadow-sm transition-all duration-300">
+                  <div class="w-2.5 h-2.5 rounded-full bg-[#1e293b]/90 border border-slate-700/60"></div>
+                  <div class="w-2 h-2 rounded-full bg-[#0a1120] border border-blue-900/40"></div>
+                </div>
+
+                <!-- Floating Status Bar Overlay -->
+                <div id="mobileStatusBar"
+                  class="absolute top-0 left-0 right-0 h-10 px-7 flex items-center justify-between text-[11px] font-semibold text-white z-20 pointer-events-none pt-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                  <span class="tracking-tight font-semibold" id="mobileClockTime">9:41</span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[13px]">signal_cellular_4_bar</span>
+                    <span class="material-symbols-outlined text-[13px]">wifi</span>
+                    <span class="material-symbols-outlined text-[14px]">battery_charging_full</span>
+                  </div>
+                </div>
+
+                <!-- Floating Home Indicator Bar -->
+                <div id="mobileHomeIndicator"
+                  class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-black/60 dark:bg-white/70 rounded-full z-20 pointer-events-none backdrop-blur-xs drop-shadow-sm transition-all"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Product Information & Controls -->
+          <div class="w-full lg:w-5/12 flex flex-col gap-5">
+            <!-- Product Specs Card -->
+            <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center gap-2 mb-2">
+                <span
+                  class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-surface-container text-primary border border-outline-variant">Figma + React + Tailwind</span>
+                <span class="text-xs text-on-surface-variant">• 100% Responsive</span>
+              </div>
+              <h4 class="font-headline-md text-[22px] font-bold text-on-surface mb-1.5" id="mobile-prod-title">Lumina Agency & Portfolio Template</h4>
+              <p class="text-body-sm text-[13px] text-on-surface-variant leading-relaxed mb-4">Trải nghiệm giao diện di động thực tế với thao tác cuộn vuốt mượt mà 120Hz, tối ưu hiển thị tràn viền chuẩn tỉ lệ màn hình smartphone hiện đại.</p>
+              
+              <div class="grid grid-cols-2 gap-2.5 pt-1 border-t border-outline-variant">
+                <div class="p-2.5 rounded-xl bg-surface-container-low border border-outline-variant">
+                  <div class="text-[18px] font-bold text-primary">99/100</div>
+                  <div class="text-[11px] text-on-surface-variant font-medium">Hiệu năng di động</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-surface-container-low border border-outline-variant">
+                  <div class="text-[18px] font-bold text-primary">&lt; 0.4s</div>
+                  <div class="text-[11px] text-on-surface-variant font-medium">Tốc độ phản hồi</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Device Viewport Switcher -->
+            <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-5 shadow-sm">
+              <span
+                class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant block mb-2.5">Chuyển đổi kích thước thiết bị</span>
+              <div class="grid grid-cols-3 gap-2" id="deviceViewportSwitcher">
+                <button id="btnDeviceIPhone" onclick="setDeviceViewport('iphone')"
+                  class="py-2 px-2 rounded-xl text-center font-label-sm text-[11px] font-bold bg-primary text-white shadow-xs cursor-pointer transition-all"
+                  type="button">iPhone 15 Pro</button>
+                <button id="btnDevicePixel" onclick="setDeviceViewport('pixel')"
+                  class="py-2 px-2 rounded-xl text-center font-label-sm text-[11px] font-medium bg-surface-container-low border border-outline-variant text-on-surface hover:bg-surface-container transition-all cursor-pointer"
+                  type="button">Pixel 8 Pro</button>
+                <button id="btnDeviceIPad" onclick="setDeviceViewport('ipad')"
+                  class="py-2 px-2 rounded-xl text-center font-label-sm text-[11px] font-medium bg-surface-container-low border border-outline-variant text-on-surface hover:bg-surface-container transition-all cursor-pointer"
+                  type="button">iPad Mini</button>
+              </div>
+            </div>
+
+            <!-- Real Device Testing Hint -->
+            <div
+              class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-4 shadow-sm flex items-center gap-4">
+              <div
+                class="w-16 h-16 rounded-xl bg-surface-container-low border border-outline-variant flex items-center justify-center p-1.5 shrink-0">
+                <div
+                  class="grid grid-cols-3 gap-1 w-full h-full p-1 bg-surface-container-lowest rounded-lg border border-outline-variant">
+                  <div class="bg-[#2c1519] rounded-xs"></div>
+                  <div class="bg-primary rounded-xs"></div>
+                  <div class="bg-[#2c1519] rounded-xs"></div>
+                  <div class="bg-[#2c1519] rounded-xs"></div>
+                  <div class="bg-[#2c1519] rounded-xs"></div>
+                  <div class="bg-primary rounded-xs"></div>
+                  <div class="bg-primary rounded-xs"></div>
+                  <div class="bg-[#2c1519] rounded-xs"></div>
+                  <div class="bg-[#2c1519] rounded-xs"></div>
+                </div>
+              </div>
+              <div>
+                <div class="text-[13px] font-bold text-on-surface">Kiểm tra trên điện thoại thật</div>
+                <p class="text-[11px] text-on-surface-variant">Quét mã QR bằng camera điện thoại để mở bản demo trực tiếp trên Safari hoặc Chrome.</p>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+              <button id="mobile-modal-buy-btn"
+                class="flex-1 py-3 px-5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-[14px] font-semibold transition-all shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer"
+                type="button">
+                <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+                <span>Sở hữu Lumina — $49</span>
+              </button>
+              <button
+                class="py-3 px-5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-[13px] font-medium transition-colors border border-outline-variant cursor-pointer"
+                onclick="closeMobileDemoModal()" type="button">Quay lại</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/cursor-glitter.js"></script>
+</body>
+
+</html>

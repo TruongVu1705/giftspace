@@ -1,0 +1,2160 @@
+<!DOCTYPE html>
+<html lang="vi" class="">
+
+<head>
+  <script>
+    if (localStorage.getItem('darkMode') === 'true' || (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+    // Auth Check
+    const userSession = localStorage.getItem('user');
+    if (!userSession) {
+      window.location.href = 'index.html';
+    } else {
+      try {
+        const u = JSON.parse(userSession);
+        if (u.is_admin !== 1) {
+          window.location.href = 'userprofile.html';
+        }
+      } catch (e) {
+        window.location.href = 'index.html';
+      }
+    }
+  </script>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="web_standard" name="shell-type">
+  <title>Admin Dashboard — GiftSpace Hub</title>
+  <meta name="description" content="Trung tâm điều hành và quản trị hệ thống GiftSpace: quản lý sản phẩm, đơn hàng và tài khoản khách hàng.">
+  
+  <!-- Google Fonts & Material Symbols -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  
+  <!-- Tailwind & Global Styles -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* Custom Smooth Modal Animations */
+    .modal-backdrop {
+      animation: fadeInBackdrop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .modal-card {
+      animation: slideUpScale 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeInBackdrop {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUpScale {
+      from { opacity: 0; transform: translateY(18px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Custom scrollbar for modern feel */
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+      display: block;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: var(--color-outline-variant);
+      border-radius: 9999px;
+    }
+
+    /* Ambient card glow on hover */
+    .kpi-card {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .kpi-card:hover {
+      transform: translateY(-3px);
+    }
+
+    /* ========== Bottom Dock Styles ========== */
+    .dock-wrapper {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      pointer-events: none;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dock-wrapper.dock-collapsed {
+      transform: translateX(-50%) translateY(64px);
+    }
+
+    .bottom-dock {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 8px;
+      border-radius: 18px;
+      background: var(--color-surface-container-lowest, #fffbfe);
+      border: 1px solid var(--color-outline-variant, #c4c0c8);
+      box-shadow:
+        0 4px 24px -4px rgba(0,0,0,0.12),
+        0 2px 10px -2px rgba(0,0,0,0.06);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: auto;
+    }
+    .dark .bottom-dock {
+      background: rgba(30, 25, 30, 0.85);
+      border-color: rgba(255,255,255,0.07);
+      box-shadow:
+        0 4px 24px -4px rgba(0,0,0,0.35),
+        0 2px 10px -2px rgba(0,0,0,0.18);
+    }
+    .bottom-dock.dock-hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.95);
+    }
+
+    .dock-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .dock-item:hover {
+      transform: translateY(-3px) scale(1.08);
+      background: var(--color-surface-container, #f3eef4);
+    }
+    .dark .dock-item:hover {
+      background: rgba(255,255,255,0.06);
+    }
+    .dock-item:active {
+      transform: translateY(-1px) scale(1.02);
+    }
+    .dock-item .dock-icon {
+      font-size: 23px;
+      line-height: 1;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      color: var(--color-on-surface-variant);
+    }
+    .dock-item .dock-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      min-width: 17px;
+      height: 17px;
+      padding: 0 4px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-surface-container-high);
+      color: var(--color-on-surface-variant);
+      border: 1px solid var(--color-outline-variant);
+      transition: all 0.2s;
+    }
+
+    /* Active dock item */
+    .dock-item.dock-active {
+      background: var(--color-primary-container);
+      border-color: transparent;
+      box-shadow: 0 1px 8px -2px rgba(225,29,72,0.15);
+    }
+    .dock-item.dock-active .dock-icon {
+      color: var(--color-on-primary-container);
+    }
+    .dock-item.dock-active .dock-badge {
+      background: rgba(0,0,0,0.2);
+      color: #fff;
+      border-color: transparent;
+    }
+    .dark .dock-item.dock-active {
+      background: var(--color-primary-container);
+    }
+
+    /* Dock divider */
+    .dock-divider {
+      width: 1px;
+      height: 28px;
+      background: var(--color-outline-variant);
+      opacity: 0.3;
+      margin: 0 3px;
+      border-radius: 1px;
+    }
+
+    /* Dock toggle button */
+    .dock-toggle-btn {
+      width: 38px;
+      height: 20px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid var(--color-outline-variant, #c4c0c8);
+      background: var(--color-surface-container-lowest, #fffbfe);
+      color: var(--color-on-surface-variant);
+      box-shadow: 0 2px 8px -2px rgba(0,0,0,0.12);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+      pointer-events: auto;
+      margin-bottom: -4px;
+      z-index: 2;
+    }
+    .dock-toggle-btn:hover {
+      background: var(--color-surface-container, #f3eef4);
+      transform: scale(1.08);
+      color: var(--color-primary);
+    }
+    .dock-toggle-btn:active {
+      transform: scale(0.95);
+    }
+    .dark .dock-toggle-btn {
+      background: rgba(30, 25, 30, 0.85);
+      border-color: rgba(255,255,255,0.07);
+      box-shadow: 0 2px 10px -3px rgba(0,0,0,0.3);
+    }
+    .dark .dock-toggle-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    .dock-toggle-btn .toggle-icon {
+      font-size: 18px;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dock-toggle-btn.dock-is-hidden .toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    /* Transition for main layout adjusting to sidebar */
+    main {
+      transition: margin-left 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  padding-bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* In dock mode, labels are hidden by default */
+    .dock-label {
+      display: none;
+    }
+    .sidebar-only {
+      display: none !important;
+    }
+    .dock-only {
+      display: flex !important;
+    }
+
+    /* ========== Sidebar Mode Active Styles ========== */
+    body.nav-mode-sidebar .sidebar-only {
+      display: flex !important;
+    }
+    body.nav-mode-sidebar .dock-only {
+      display: none !important;
+    }
+
+    body.nav-mode-sidebar .dock-wrapper {
+      position: fixed;
+      top: 80px;
+      left: 0;
+      bottom: 0;
+      width: 250px;
+      height: calc(100vh - 80px);
+      transform: none;
+      z-index: 45;
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Rail mode (collapsed state in sidebar mode) */
+    body.nav-mode-sidebar.sidebar-collapsed .dock-wrapper {
+      width: 72px;
+    }
+
+    body.nav-mode-sidebar .bottom-dock {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      border: none;
+      border-right: 1px solid var(--color-outline-variant, #c4c0c8);
+      padding: 16px 12px;
+      gap: 6px;
+      box-shadow: 4px 0 24px -4px rgba(0,0,0,0.06);
+      overflow-y: auto;
+      overflow-x: hidden;
+      opacity: 1 !important;
+      transform: none !important;
+      pointer-events: auto !important;
+      background: var(--color-surface-container-lowest, #fffbfe);
+    }
+    .dark body.nav-mode-sidebar .bottom-dock {
+      background: rgba(26, 21, 26, 0.95);
+      border-color: rgba(255,255,255,0.08);
+      box-shadow: 4px 0 24px -4px rgba(0,0,0,0.35);
+    }
+
+    /* Sidebar items */
+    body.nav-mode-sidebar .dock-item {
+      width: 100%;
+      height: 44px;
+      padding: 0 12px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      transform: none;
+      color: var(--color-on-surface-variant);
+    }
+    body.nav-mode-sidebar .dock-item:hover {
+      transform: translateX(3px);
+      background: var(--color-surface-container, #f3eef4);
+      color: var(--color-primary);
+    }
+    .dark body.nav-mode-sidebar .dock-item:hover {
+      background: rgba(255,255,255,0.06);
+    }
+    body.nav-mode-sidebar .dock-item .dock-icon {
+      font-size: 21px;
+      flex-shrink: 0;
+    }
+    body.nav-mode-sidebar .dock-label {
+      display: inline-block;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: inherit;
+      white-space: nowrap;
+      flex: 1;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    body.nav-mode-sidebar .dock-item.dock-active {
+      background: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+    }
+    body.nav-mode-sidebar .dock-item.dock-active .dock-label {
+      font-weight: 600;
+      color: var(--color-on-primary-container);
+    }
+    body.nav-mode-sidebar .dock-item .dock-badge {
+      position: static;
+      top: auto;
+      right: auto;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      font-size: 11px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    /* Sidebar Divider */
+    body.nav-mode-sidebar .dock-divider {
+      width: 100%;
+      height: 1px;
+      margin: 6px 0;
+      background: var(--color-outline-variant);
+      opacity: 0.35;
+    }
+
+    /* Distinctive Layout Switcher Button in Bottom Dock */
+    .dock-layout-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      cursor: pointer;
+      border: 1.5px dashed rgba(225, 29, 72, 0.45);
+      background: rgba(225, 29, 72, 0.08);
+      color: var(--color-primary);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      -webkit-user-select: none;
+      flex-shrink: 0;
+    }
+    .dock-layout-btn:hover {
+      transform: translateY(-3px) scale(1.08);
+      border-style: solid;
+      border-color: var(--color-primary);
+      background: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+      box-shadow: 0 4px 16px -2px rgba(225, 29, 72, 0.3);
+    }
+    .dark .dock-layout-btn {
+      border-color: rgba(244, 63, 94, 0.55);
+      background: rgba(225, 29, 72, 0.14);
+      color: #fda4af;
+    }
+    .dark .dock-layout-btn:hover {
+      background: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+      border-color: var(--color-primary);
+    }
+    .dock-layout-btn .dock-layout-icon {
+      font-size: 22px;
+      line-height: 1;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dock-layout-btn:hover .dock-layout-icon {
+      transform: scale(1.1);
+    }
+    .dock-layout-btn .dock-layout-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-primary);
+      color: #ffffff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+      transition: transform 0.25s;
+    }
+    .dock-layout-btn:hover .dock-layout-badge {
+      transform: rotate(180deg);
+    }
+
+    /* Distinctive Accent Divider */
+    .dock-divider-accent {
+      width: 1.5px;
+      height: 28px;
+      background: var(--color-primary);
+      opacity: 0.4;
+      margin: 0 5px;
+    }
+
+    /* In sidebar mode, tabs list stacks vertically */
+    body.nav-mode-sidebar .sidebar-tabs-list {
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* Rail mode (collapsed sidebar) adjustments */
+    body.nav-mode-sidebar.sidebar-collapsed .dock-label,
+    body.nav-mode-sidebar.sidebar-collapsed .sidebar-header-title,
+    body.nav-mode-sidebar.sidebar-collapsed .sidebar-footer-label,
+    body.nav-mode-sidebar.sidebar-collapsed .sidebar-footer-text {
+      display: none !important;
+    }
+    body.nav-mode-sidebar.sidebar-collapsed .sidebar-header {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    body.nav-mode-sidebar.sidebar-collapsed .dock-item {
+      justify-content: center;
+      padding: 0;
+      width: 44px;
+      height: 44px;
+      margin: 0 auto;
+    }
+    body.nav-mode-sidebar.sidebar-collapsed .dock-item:hover {
+      transform: scale(1.05);
+    }
+    body.nav-mode-sidebar.sidebar-collapsed .dock-item .dock-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      margin-left: 0;
+    }
+    body.nav-mode-sidebar.sidebar-collapsed .sidebar-collapse-icon {
+      transform: rotate(180deg);
+    }
+    body.nav-mode-sidebar.sidebar-collapsed .sidebar-layout-btn {
+      justify-content: center;
+      padding: 0;
+      width: 44px;
+      height: 44px;
+      margin: 0 auto;
+      border-radius: 12px;
+    }
+    body.nav-mode-sidebar.sidebar-collapsed .sidebar-layout-btn .w-8 {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      border: none;
+    }
+
+    /* Main Container adjust in Sidebar mode */
+    @media (min-width: 1024px) {
+      body.nav-mode-sidebar main {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+        max-width: calc(1360px + 250px);
+        padding-bottom: 48px;
+      }
+      body.nav-mode-sidebar.sidebar-collapsed main {
+        margin-left: 72px;
+        width: calc(100% - 72px);
+        max-width: calc(1360px + 72px);
+      }
+    }
+
+    /* Mobile off-canvas behavior for sidebar mode */
+    @media (max-width: 1023px) {
+      body.nav-mode-sidebar .dock-wrapper {
+        transform: translateX(-100%);
+        box-shadow: 10px 0 40px rgba(0,0,0,0.25);
+        z-index: 60;
+      }
+      body.nav-mode-sidebar.mobile-sidebar-open .dock-wrapper {
+        transform: translateX(0);
+      }
+      body.nav-mode-sidebar.sidebar-collapsed .dock-wrapper {
+        width: 250px;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-background text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+
+  <!-- ==================== HEADER (Synchronized with index.html & userprofile.html) ==================== -->
+  <header class="fixed top-0 w-full z-50 bg-surface-container-lowest border-b border-outline-variant transition-colors backdrop-blur-md">
+    <div class="h-20 max-w-[1360px] mx-auto px-margin-mobile md:px-margin flex items-center justify-between gap-gutter">
+      
+      <!-- Brand Logo & Admin Badge -->
+      <div class="flex items-center gap-space-sm shrink-0">
+        <a href="index.html" class="flex items-center gap-space-sm group">
+          <div class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center border border-outline-variant text-primary-container shadow-sm group-hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-[22px]">auto_awesome</span>
+          </div>
+          <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-semibold">GiftSpace</span>
+        </a>
+        <div class="hidden sm:inline-flex items-center gap-1 ml-2 px-2.5 py-0.5 rounded-full bg-surface-container border border-outline-variant text-primary text-[11px] font-bold uppercase tracking-wider">
+          <span class="material-symbols-outlined text-[13px]">shield</span>
+          <span data-i18n="Admin Dashboard">Admin Hub</span>
+        </div>
+      </div>
+
+      <!-- Center Search or Quick Link hint -->
+      <nav class="hidden xl:flex items-center gap-space-md text-on-surface-variant font-label-md text-label-md">
+        <a href="index.html" class="hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-surface-container">
+          <span class="material-symbols-outlined text-[18px]">storefront</span>
+          <span data-i18n="Storefront">Cửa hàng</span>
+        </a>
+        <a href="userprofile.html" class="hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-surface-container">
+          <span class="material-symbols-outlined text-[18px]">account_circle</span>
+          <span>Hồ sơ cá nhân</span>
+        </a>
+      </nav>
+
+      <!-- Right Header Actions (Theme, Language, User Dropdown) -->
+      <div class="flex items-center gap-space-sm shrink-0">
+        <!-- Navigation Layout Switcher (Dock <-> Sidebar) -->
+        <button aria-label="Chuyển chế độ điều hướng"
+          id="headerNavLayoutBtn"
+          class="h-8 px-2.5 rounded-full bg-surface-container-low border border-primary/40 hover:border-primary hover:bg-primary/10 text-primary flex items-center gap-1.5 shrink-0 transition-all shadow-2xs group cursor-pointer"
+          onclick="toggleNavLayout()"
+          title="Chuyển sang thanh bên (Sidebar)" type="button">
+          <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:scale-110" id="headerNavLayoutIcon">view_sidebar</span>
+          <span class="text-[11px] font-bold uppercase tracking-wider hidden sm:inline" id="headerNavLayoutLabel">Sidebar</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button aria-label="Toggle light/dark theme"
+          class="w-8 h-8 rounded-full bg-surface-container-low border border-outline-variant hover:border-secondary-container hover:bg-surface-container hover:text-primary-container text-on-surface-variant flex items-center justify-center shrink-0 transition-all shadow-xs"
+          onclick="toggleThemeMode()"
+          title="Toggle theme" type="button">
+          <span class="material-symbols-outlined theme-toggle-icon text-[19px] transition-transform duration-300">dark_mode</span>
+        </button>
+
+        <!-- Language Toggle -->
+        <button aria-label="Toggle language"
+          class="w-8 h-8 rounded-full bg-surface-container-low border border-outline-variant hover:border-secondary-container hover:bg-surface-container hover:text-primary-container text-on-surface-variant flex items-center justify-center shrink-0 transition-all shadow-xs"
+          onclick="toggleLanguage()"
+          title="Toggle language" type="button">
+          <span class="font-bold text-[12px] uppercase tracking-wider" id="lang-toggle-text">VI</span>
+        </button>
+
+        <!-- User Profile Avatar with Dropdown Container -->
+        <div class="relative">
+          <div id="userHeaderAvatar"
+            class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0 font-bold text-[14px] cursor-pointer shadow-xs border border-outline-variant hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-[18px]">person</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Backdrop Overlay for Mobile Sidebar -->
+  <div id="sidebarOverlay" onclick="closeMobileSidebar()" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 transition-opacity opacity-0 pointer-events-none lg:hidden"></div>
+
+  <!-- ==================== MAIN DASHBOARD CONTAINER ==================== -->
+  <main class="w-full pt-24 pb-32 flex-1 max-w-[1360px] mx-auto px-margin-mobile md:px-margin">
+    <div class="flex flex-col w-full gap-space-xl">
+
+      <!-- Ambient Glow Orbs -->
+      <div class="relative w-full">
+        <div class="absolute -top-12 left-1/4 w-[480px] h-[480px] bg-rose-500/10 dark:bg-rose-500/15 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+        <div class="absolute top-28 right-10 w-[380px] h-[380px] bg-pink-500/10 dark:bg-pink-900/20 rounded-full blur-[90px] pointer-events-none -z-10"></div>
+
+        <!-- Breadcrumb Bar -->
+        <nav aria-label="Breadcrumb" class="py-2 flex items-center justify-between">
+          <ol class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant">
+            <li>
+              <a class="hover:text-primary transition-colors flex items-center gap-1.5" href="index.html">
+                <span class="material-symbols-outlined text-[16px]">home</span>
+                <span>Trang chủ</span>
+              </a>
+            </li>
+            <li class="text-outline-variant">/</li>
+            <li class="text-on-surface-variant">Bảng Quản trị</li>
+            <li class="text-outline-variant">/</li>
+            <li class="text-primary font-semibold flex items-center gap-1">
+              <span class="material-symbols-outlined text-[15px]">dashboard</span>
+              <span data-i18n="Admin Dashboard">Bảng điều khiển Quản trị</span>
+            </li>
+          </ol>
+          <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container border border-outline-variant text-xs text-on-surface-variant font-mono">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>REST API Online: <strong>Port 3000</strong></span>
+          </div>
+        </nav>
+
+        <!-- ==================== HERO ADMIN BANNER ==================== -->
+        <section class="mt-space-sm bg-surface-container-lowest rounded-3xl border border-outline-variant shadow-[0_12px_40px_-10px_rgba(225,29,72,0.06),0_2px_8px_-2px_rgba(41,18,22,0.03)] p-space-lg md:p-space-xl relative overflow-hidden">
+          
+          <!-- Modern Background Decorative Pattern -->
+          <div class="absolute top-0 right-0 w-96 h-full opacity-35 pointer-events-none overflow-hidden hidden md:block">
+            <svg class="w-full h-full text-surface-container opacity-40" fill="none" viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="300" cy="50" r="160" stroke="currentColor" stroke-dasharray="6 8" stroke-width="1.5"></circle>
+              <circle cx="300" cy="50" r="90" stroke="currentColor" stroke-width="1.5"></circle>
+              <circle cx="300" cy="50" r="30" fill="currentColor" fill-opacity="0.3"></circle>
+              <path d="M100 190C170 130 220 90 320 70" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 6"></path>
+            </svg>
+          </div>
+
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg relative z-10">
+            <!-- Admin Identity & Profile -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-space-lg">
+              
+              <!-- Avatar with Modern Rose Gradient Ring & Online Dot -->
+              <div class="relative group shrink-0">
+                <div id="adminAvatarContainer"
+                  class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl p-1 bg-gradient-to-tr from-primary via-primary-container to-secondary-container shadow-[0_8px_24px_-4px_rgba(225,29,72,0.25)] flex items-center justify-center transition-transform group-hover:scale-102">
+                  <div class="w-full h-full rounded-xl bg-surface-container-lowest text-primary font-bold text-3xl sm:text-4xl flex items-center justify-center overflow-hidden">
+                    A
+                  </div>
+                </div>
+                <div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-surface-container-lowest border-2 border-surface-container-lowest flex items-center justify-center shadow-sm" title="Online">
+                  <span class="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                </div>
+              </div>
+
+              <!-- Name & Role Credentials -->
+              <div class="flex flex-col">
+                <div class="flex flex-wrap items-center gap-space-xs sm:gap-space-sm mb-1.5">
+                  <h1 id="adminNameDisplay" class="font-headline-md text-headline-md text-on-surface tracking-tight font-bold">
+                    Administrator
+                  </h1>
+                  <span class="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm uppercase font-extrabold tracking-wider border border-outline-variant shadow-xs">
+                    <span class="material-symbols-outlined text-[13px]">verified</span>
+                    Super Admin
+                  </span>
+                </div>
+                <p class="font-title-md text-title-md text-secondary font-medium" data-i18n="System Administrator">
+                  Quản trị viên hệ thống &amp; Điều hành nền tảng
+                </p>
+                <div class="flex flex-wrap items-center gap-x-space-md gap-y-1.5 mt-2.5 text-on-surface-variant font-body-sm text-body-sm">
+                  <span class="inline-flex items-center gap-1.5 bg-surface-container-low px-2.5 py-0.5 rounded-lg border border-outline-variant">
+                    <span class="material-symbols-outlined text-[15px] text-primary">mail</span>
+                    <span id="adminEmailDisplay" class="font-mono text-xs">admin@giftspace.com</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 bg-surface-container-low px-2.5 py-0.5 rounded-lg border border-outline-variant">
+                    <span class="material-symbols-outlined text-[15px] text-emerald-500">lock_open</span>
+                    <span>Quyền hạn: Toàn quyền (Root)</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 bg-surface-container-low px-2.5 py-0.5 rounded-lg border border-outline-variant">
+                    <span class="material-symbols-outlined text-[15px] text-primary">database</span>
+                    <span>SQLite 3 DB</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Header Quick Action CTAs -->
+            <div class="flex flex-wrap sm:flex-nowrap items-center gap-space-sm self-stretch lg:self-center">
+              <button onclick="openAddAssetModal()"
+                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-space-xs px-5 py-2.5 rounded-xl bg-primary-container hover:bg-primary text-on-primary-container font-title-md text-title-md font-semibold shadow-sm hover:shadow active:scale-95 transition-all cursor-pointer"
+                type="button">
+                <span class="material-symbols-outlined text-[20px]">add_circle</span>
+                <span data-i18n="Add Product">Thêm sản phẩm</span>
+              </button>
+              
+              <a href="index.html"
+                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-space-xs px-4 py-2.5 rounded-xl bg-surface-container-lowest text-on-surface font-title-md text-title-md border border-outline-variant shadow-xs hover:bg-surface-container active:scale-95 transition-all">
+                <span class="material-symbols-outlined text-[18px] text-secondary">storefront</span>
+                <span data-i18n="Storefront">Cửa hàng</span>
+              </a>
+              
+              <button onclick="handleAdminLogout()"
+                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-space-xs px-4 py-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-error font-title-md text-title-md border border-outline-variant hover:border-error active:scale-95 transition-all cursor-pointer"
+                type="button" title="Đăng xuất">
+                <span class="material-symbols-outlined text-[18px]">logout</span>
+                <span>Đăng xuất</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== 4 METRICS / KPI CARDS ==================== -->
+        <section class="mt-space-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+          
+          <!-- KPI 1: Products -->
+          <div class="kpi-card bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant shadow-xs hover:border-primary-container hover:shadow-md flex flex-col justify-between transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant font-label-md" data-i18n="Products">Tổng sản phẩm</span>
+              <div class="w-10 h-10 rounded-xl bg-surface-container text-primary flex items-center justify-center border border-outline-variant">
+                <span class="material-symbols-outlined text-[22px]">inventory_2</span>
+              </div>
+            </div>
+            <div>
+              <p id="kpi-total-products" class="font-headline-md text-3xl font-bold text-on-surface leading-tight">--</p>
+              <div class="flex items-center gap-1.5 mt-1.5 text-xs text-on-surface-variant">
+                <span class="material-symbols-outlined text-[14px] text-emerald-500">check_circle</span>
+                <span>Đang mở bán trong kho</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 2: Revenue -->
+          <div class="kpi-card bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant shadow-xs hover:border-primary-container hover:shadow-md flex flex-col justify-between transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant font-label-md" data-i18n="Total Revenue">Tổng doanh thu</span>
+              <div class="w-10 h-10 rounded-xl bg-surface-container text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-outline-variant">
+                <span class="material-symbols-outlined text-[22px]">payments</span>
+              </div>
+            </div>
+            <div>
+              <p id="kpi-total-revenue" class="font-headline-md text-3xl font-bold text-on-surface font-mono leading-tight">--</p>
+              <div class="flex items-center gap-1.5 mt-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                <span class="material-symbols-outlined text-[14px]">trending_up</span>
+                <span>Đơn hàng thanh toán thực tế</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 3: Orders -->
+          <div class="kpi-card bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant shadow-xs hover:border-primary-container hover:shadow-md flex flex-col justify-between transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant font-label-md" data-i18n="Orders">Tổng đơn hàng</span>
+              <div class="w-10 h-10 rounded-xl bg-surface-container text-blue-600 dark:text-blue-400 flex items-center justify-center border border-outline-variant">
+                <span class="material-symbols-outlined text-[22px]">receipt_long</span>
+              </div>
+            </div>
+            <div>
+              <p id="kpi-total-orders" class="font-headline-md text-3xl font-bold text-on-surface leading-tight">--</p>
+              <div class="flex items-center gap-1.5 mt-1.5 text-xs text-on-surface-variant">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span id="kpi-orders-success-tag">-- thành công</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 4: Users -->
+          <div class="kpi-card bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant shadow-xs hover:border-primary-container hover:shadow-md flex flex-col justify-between transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant font-label-md" data-i18n="Users">Người dùng</span>
+              <div class="w-10 h-10 rounded-xl bg-surface-container text-purple-600 dark:text-purple-400 flex items-center justify-center border border-outline-variant">
+                <span class="material-symbols-outlined text-[22px]">group</span>
+              </div>
+            </div>
+            <div>
+              <p id="kpi-total-users" class="font-headline-md text-3xl font-bold text-on-surface leading-tight">--</p>
+              <div class="flex items-center gap-1.5 mt-1.5 text-xs text-on-surface-variant">
+                <span class="material-symbols-outlined text-[14px] text-amber-500">star</span>
+                <span>Bao gồm Quản trị viên &amp; Khách hàng</span>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+
+      <!-- Tab navigation is now in the bottom dock (outside main) -->
+
+      <!-- ==================== TAB CONTENT PANELS ==================== -->
+      <div class="flex flex-col gap-space-lg">
+
+        <!-- ==================== TAB PANEL 1: PRODUCTS ==================== -->
+        <section id="panel-products" class="flex flex-col gap-space-md transition-all duration-200">
+          
+          <!-- Modern Filter & Action Ribbon -->
+          <div class="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            
+            <!-- Category Chips -->
+            <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1 md:pb-0" id="productCatChips">
+              <button onclick="setProductCategory('ALL', this)"
+                class="cat-chip px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-primary-container text-on-primary-container border border-transparent shadow-xs transition-all"
+                type="button">Tất cả</button>
+              <button onclick="setProductCategory('WEB TEMPLATE', this)"
+                class="cat-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline-variant transition-all"
+                type="button">Web Templates</button>
+              <button onclick="setProductCategory('UI KITS', this)"
+                class="cat-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline-variant transition-all"
+                type="button">UI Kits</button>
+              <button onclick="setProductCategory('DESIGN SYSTEM', this)"
+                class="cat-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline-variant transition-all"
+                type="button">Design Systems</button>
+            </div>
+            
+            <input type="hidden" id="productCategoryFilter" value="ALL">
+
+            <!-- Search Bar & Add CTA -->
+            <div class="flex items-center gap-2.5">
+              <div class="relative flex-1 sm:w-64">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant">search</span>
+                <input id="productSearchInput" oninput="filterProducts()"
+                  class="w-full pl-9 pr-3.5 py-2 bg-surface-container-low rounded-xl text-body-sm font-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container border border-outline-variant transition-all"
+                  placeholder="Tìm theo tên hoặc mã..." type="text">
+              </div>
+
+              <button onclick="openAddAssetModal()"
+                class="px-4 py-2 rounded-xl bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer active:scale-95"
+                type="button">
+                <span class="material-symbols-outlined text-[17px]">add</span>
+                <span data-i18n="Add Product">Thêm mới</span>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Products Table Card -->
+          <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xs overflow-hidden">
+            <div class="overflow-x-auto custom-scrollbar">
+              <table class="w-full text-left border-collapse min-w-[760px]">
+                <thead>
+                  <tr class="bg-surface-container-low border-b border-outline-variant text-on-surface-variant font-label-md text-[11px] uppercase tracking-wider">
+                    <th class="py-3.5 px-5">Sản phẩm &amp; ID</th>
+                    <th class="py-3.5 px-4">Tên &amp; Bản Demo</th>
+                    <th class="py-3.5 px-4">Danh mục</th>
+                    <th class="py-3.5 px-4">Giá bán (USD)</th>
+                    <th class="py-3.5 px-4">Tương tác</th>
+                    <th class="py-3.5 px-5 text-right" data-i18n="Actions">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="products-tbody" class="text-on-surface text-sm divide-y divide-outline-variant">
+                  <tr>
+                    <td colspan="6" class="text-center py-12 text-on-surface-variant">
+                      <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-surface-container mb-3 text-primary animate-pulse">
+                        <span class="material-symbols-outlined text-[24px]">sync</span>
+                      </div>
+                      <p class="font-medium text-sm">Đang tải danh sách sản phẩm...</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== TAB PANEL 2: ORDERS ==================== -->
+        <section id="panel-orders" class="hidden flex-col gap-space-md transition-all duration-200">
+          
+          <!-- Filter Ribbon -->
+          <div class="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            
+            <!-- Status Chips -->
+            <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1 md:pb-0" id="orderStatusChips">
+              <button onclick="setOrderStatus('ALL', this)"
+                class="order-chip inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-primary-container text-on-primary-container border border-transparent shadow-xs transition-all cursor-pointer"
+                type="button">Tất cả đơn</button>
+              <button onclick="setOrderStatus('Nhận đơn', this)"
+                class="order-chip inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline-variant transition-all cursor-pointer"
+                type="button">
+                <span class="material-symbols-outlined text-[15px] text-amber-500">hourglass_top</span>
+                <span>Nhận đơn</span>
+              </button>
+              <button onclick="setOrderStatus('Vận đơn', this)"
+                class="order-chip inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline-variant transition-all cursor-pointer"
+                type="button">
+                <span class="material-symbols-outlined text-[15px] text-blue-500">local_shipping</span>
+                <span>Vận đơn</span>
+              </button>
+              <button onclick="setOrderStatus('Hoàn tất', this)"
+                class="order-chip inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline-variant transition-all cursor-pointer"
+                type="button">
+                <span class="material-symbols-outlined text-[15px] text-emerald-500">check_circle</span>
+                <span>Hoàn tất</span>
+              </button>
+            </div>
+            
+            <input type="hidden" id="orderStatusFilter" value="ALL">
+
+            <!-- Search -->
+            <div class="relative flex-1 sm:w-64">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant">search</span>
+              <input id="orderSearchInput" oninput="filterOrders()"
+                class="w-full pl-9 pr-3.5 py-2 bg-surface-container-low rounded-xl text-body-sm font-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container border border-outline-variant transition-all"
+                placeholder="Tìm mã đơn, email, sản phẩm..." type="text">
+            </div>
+
+          </div>
+
+          <!-- Orders Table Card -->
+          <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xs overflow-hidden">
+            <div class="overflow-x-auto custom-scrollbar">
+              <table class="w-full text-left border-collapse min-w-[760px]">
+                <thead>
+                  <tr class="bg-surface-container-low border-b border-outline-variant text-on-surface-variant font-label-md text-[11px] uppercase tracking-wider">
+                    <th class="py-3.5 px-5">Mã đơn hàng</th>
+                    <th class="py-3.5 px-4">Khách hàng & SĐT</th>
+                    <th class="py-3.5 px-4">Sản phẩm số</th>
+                    <th class="py-3.5 px-4">Tổng tiền</th>
+                    <th class="py-3.5 px-4">Thời gian</th>
+                    <th class="py-3.5 px-5 text-right">Chuyển trạng thái (Admin)</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-tbody" class="text-on-surface text-sm divide-y divide-outline-variant">
+                  <tr>
+                    <td colspan="6" class="text-center py-12 text-on-surface-variant">
+                      <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-surface-container mb-3 text-primary animate-pulse">
+                        <span class="material-symbols-outlined text-[24px]">sync</span>
+                      </div>
+                      <p class="font-medium text-sm">Đang tải danh sách đơn hàng...</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== TAB PANEL 3: USERS ==================== -->
+        <section id="panel-users" class="hidden flex-col gap-space-md transition-all duration-200">
+          
+          <!-- Filter Ribbon -->
+          <div class="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            
+            <!-- Role Chips -->
+            <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1 md:pb-0" id="userRoleChips">
+              <button onclick="setUserRole('ALL', this)"
+                class="role-chip px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-primary-container text-on-primary-container border border-transparent shadow-xs transition-all"
+                type="button">Tất cả tài khoản</button>
+              <button onclick="setUserRole('ADMIN', this)"
+                class="role-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline-variant transition-all"
+                type="button">Quản trị viên (Admin)</button>
+              <button onclick="setUserRole('USER', this)"
+                class="role-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline-variant transition-all"
+                type="button">Khách hàng</button>
+            </div>
+            
+            <input type="hidden" id="userRoleFilter" value="ALL">
+
+            <!-- Search -->
+            <div class="relative flex-1 sm:w-64">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant">search</span>
+              <input id="userSearchInput" oninput="filterUsers()"
+                class="w-full pl-9 pr-3.5 py-2 bg-surface-container-low rounded-xl text-body-sm font-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container border border-outline-variant transition-all"
+                placeholder="Tìm theo họ tên, email..." type="text">
+            </div>
+
+          </div>
+
+          <!-- Users Table Card -->
+          <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xs overflow-hidden">
+            <div class="overflow-x-auto custom-scrollbar">
+              <table class="w-full text-left border-collapse min-w-[760px]">
+                <thead>
+                  <tr class="bg-surface-container-low border-b border-outline-variant text-on-surface-variant font-label-md text-[11px] uppercase tracking-wider">
+                    <th class="py-3.5 px-5">Tài khoản &amp; Họ tên</th>
+                    <th class="py-3.5 px-4">Địa chỉ Email</th>
+                    <th class="py-3.5 px-4" data-i18n="Role">Vai trò</th>
+                    <th class="py-3.5 px-4">Cấp độ thành viên</th>
+                    <th class="py-3.5 px-5 text-right">Ngày tham gia</th>
+                  </tr>
+                </thead>
+                <tbody id="users-tbody" class="text-on-surface text-sm divide-y divide-outline-variant">
+                  <tr>
+                    <td colspan="5" class="text-center py-12 text-on-surface-variant">
+                      <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-surface-container mb-3 text-primary animate-pulse">
+                        <span class="material-symbols-outlined text-[24px]">sync</span>
+                      </div>
+                      <p class="font-medium text-sm">Đang tải danh sách tài khoản...</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==================== MODAL: ADD / EDIT PRODUCT ==================== -->
+  <div id="assetModalOverlay" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto hidden modal-backdrop">
+    <div class="modal-card relative w-full max-w-xl bg-surface-container-lowest rounded-3xl border border-outline-variant shadow-2xl p-6 sm:p-8 text-on-surface my-auto">
+      
+      <!-- Close Button -->
+      <button onclick="closeAssetModal()" type="button"
+        class="absolute top-5 right-5 w-9 h-9 rounded-full bg-surface-container-low hover:bg-surface-container border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="flex items-center gap-3.5 mb-6">
+        <div class="w-12 h-12 rounded-2xl bg-surface-container text-primary border border-outline-variant flex items-center justify-center shrink-0">
+          <span id="modalIcon" class="material-symbols-outlined text-[26px]">add_box</span>
+        </div>
+        <div>
+          <h2 id="modalTitle" class="font-headline-sm text-xl font-bold text-on-surface tracking-tight" data-i18n="Add New Product">
+            Thêm sản phẩm mới
+          </h2>
+          <p class="text-xs text-on-surface-variant mt-0.5">Điền thông tin chi tiết để cập nhật trực tiếp vào cơ sở dữ liệu GiftSpace</p>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form id="assetForm" onsubmit="handleAssetFormSubmit(event)" class="space-y-4">
+        <input type="hidden" id="formAssetId" value="">
+
+        <!-- Title Input -->
+        <div class="space-y-1">
+          <label class="block text-xs font-semibold text-on-surface uppercase tracking-wider">Tên sản phẩm *</label>
+          <input type="text" id="formTitle" required placeholder="VD: Lumina Agency Portfolio Template"
+            class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all">
+        </div>
+
+        <!-- Category & Price Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label class="block text-xs font-semibold text-on-surface uppercase tracking-wider">Danh mục *</label>
+            <div class="relative">
+              <select id="formCategory" required
+                class="w-full px-3.5 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-body-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all cursor-pointer appearance-none">
+                <option value="WEB TEMPLATE">WEB TEMPLATE</option>
+                <option value="UI KITS">UI KITS</option>
+                <option value="DESIGN SYSTEM">DESIGN SYSTEM</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-semibold text-on-surface uppercase tracking-wider">Giá bán (USD $) *</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">attach_money</span>
+              <input type="number" id="formPrice" required step="0.01" min="0" placeholder="49.00"
+                class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-body-sm text-on-surface font-mono focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all">
+            </div>
+          </div>
+        </div>
+
+        <!-- Thumbnail URL with Interactive Preview -->
+        <div class="space-y-1">
+          <label class="block text-xs font-semibold text-on-surface uppercase tracking-wider">URL Ảnh thu nhỏ (Thumbnail) *</label>
+          <input type="url" id="formThumb" oninput="updateThumbPreview(this.value)" required placeholder="https://images.unsplash.com/..."
+            class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all">
+          
+          <!-- Live Preview Card -->
+          <div class="mt-2.5 flex items-center gap-3 p-2.5 rounded-2xl bg-surface-container-low border border-outline-variant">
+            <div class="w-16 h-16 rounded-xl bg-surface-container overflow-hidden shrink-0 border border-outline-variant flex items-center justify-center">
+              <img id="formThumbPreview" src="" alt="Preview" class="w-full h-full object-cover hidden">
+              <span id="formThumbPlaceholder" class="material-symbols-outlined text-outline-variant text-[24px]">image</span>
+            </div>
+            <div class="text-xs text-on-surface-variant">
+              <p class="font-semibold text-on-surface">Khung xem trước ảnh</p>
+              <p class="text-[11px] opacity-80">Hình ảnh hiển thị đại diện trên trang chủ và danh sách sản phẩm.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Demo URL -->
+        <div class="space-y-1">
+          <label class="block text-xs font-semibold text-on-surface uppercase tracking-wider">Liên kết Web Demo (URL)</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">link</span>
+            <input type="url" id="formDemoUrl" placeholder="https://example.com"
+              class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-body-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all">
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-outline-variant mt-6">
+          <button type="button" onclick="closeAssetModal()"
+            class="px-5 py-2.5 rounded-xl border border-outline-variant text-sm font-semibold text-on-surface hover:bg-surface-container transition-all cursor-pointer"
+            data-i18n="Cancel">
+            Hủy bỏ
+          </button>
+          <button type="submit" id="formSubmitBtn"
+            class="px-6 py-2.5 rounded-xl bg-primary-container hover:bg-primary text-on-primary-container text-sm font-bold flex items-center gap-2 shadow-md hover:shadow active:scale-95 transition-all cursor-pointer"
+            data-i18n="Save Product">
+            <span class="material-symbols-outlined text-[18px]">save</span>
+            <span>Lưu sản phẩm</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: DELETE CONFIRMATION ==================== -->
+  <div id="deleteModalOverlay" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto hidden modal-backdrop">
+    <div class="modal-card relative w-full max-w-md bg-surface-container-lowest rounded-3xl border border-outline-variant shadow-2xl p-6 sm:p-7 text-on-surface my-auto">
+      
+      <div class="flex items-center gap-3.5 mb-4 text-error">
+        <div class="w-12 h-12 rounded-2xl bg-surface-container text-error border border-outline-variant flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[28px]">delete_forever</span>
+        </div>
+        <div>
+          <h3 class="font-headline-sm text-lg font-bold text-on-surface" data-i18n="Delete Product">Xác nhận xóa sản phẩm</h3>
+          <p class="text-xs text-on-surface-variant">Thao tác này sẽ xóa vĩnh viễn khỏi cơ sở dữ liệu.</p>
+        </div>
+      </div>
+
+      <div id="deleteConfirmMessage" class="text-sm text-on-surface-variant mb-6 bg-surface-container-low p-4 rounded-2xl border border-outline-variant">
+        Bạn có chắc chắn muốn xóa sản phẩm này?
+      </div>
+
+      <div class="flex items-center justify-end gap-3">
+        <button type="button" onclick="closeDeleteModal()"
+          class="px-5 py-2.5 rounded-xl border border-outline-variant text-sm font-semibold hover:bg-surface-container transition-colors cursor-pointer"
+          data-i18n="Cancel">
+          Hủy bỏ
+        </button>
+        <button type="button" id="confirmDeleteBtn"
+          class="px-5 py-2.5 rounded-xl bg-error text-on-error hover:opacity-90 text-sm font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+          data-i18n="Delete">
+          Xóa vĩnh viễn
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATION ==================== -->
+  <div id="toastNotification"
+    class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-inverse-surface text-inverse-on-surface shadow-2xl text-sm font-semibold transition-all transform translate-y-20 opacity-0 pointer-events-none duration-300">
+    <div class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+      <span id="toastIcon" class="material-symbols-outlined text-[18px]">check_circle</span>
+    </div>
+    <span id="toastMessage">Thành công</span>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="w-full bg-surface-container-lowest mt-auto border-t border-outline-variant">
+    <div class="max-w-[1360px] mx-auto px-margin-mobile md:px-margin py-8 flex flex-col md:flex-row items-center justify-between gap-space-md">
+      <div class="flex flex-col sm:flex-row items-center gap-space-md text-center sm:text-left">
+        <span class="font-headline-sm text-lg font-bold text-on-surface">GiftSpace Hub</span>
+        <span class="font-body-sm text-body-sm text-on-surface-variant">© 2026 GiftSpace Admin. Quản trị &amp; phân phối Digital Assets.</span>
+      </div>
+      <div class="flex items-center gap-space-md text-sm text-on-surface-variant">
+        <a class="hover:text-primary transition-colors" href="index.html">Trang chủ</a>
+        <span>•</span>
+        <a class="hover:text-primary transition-colors" href="userprofile.html">Hồ sơ cá nhân</a>
+        <span>•</span>
+        <a class="hover:text-primary transition-colors" href="admin.html">Trình duyệt CSDL</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script src="js/i18n.js"></script>
+
+  <script>
+    // State storage
+    let rawProducts = [];
+    let rawOrders = [];
+    let rawUsers = [];
+    let pendingDeleteId = null;
+
+    // Theme Toggle
+    function toggleThemeMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('darkMode', isDark);
+      const icon = document.querySelector('.theme-toggle-icon');
+      if (icon) {
+        icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+      }
+    }
+
+    // Set correct icon on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      const icon = document.querySelector('.theme-toggle-icon');
+      if (icon) {
+        icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+      }
+    });
+
+    // Toast Messenger
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('toastNotification');
+      const msg = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+      if (!toast) return;
+
+      msg.textContent = message;
+      if (isSuccess) {
+        icon.textContent = 'check_circle';
+        icon.className = 'material-symbols-outlined text-[18px] text-emerald-400';
+      } else {
+        icon.textContent = 'error';
+        icon.className = 'material-symbols-outlined text-[18px] text-rose-400';
+      }
+
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3500);
+    }
+
+    // Logout Helper
+    function handleAdminLogout() {
+      if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi tài khoản Quản trị viên?')) {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+      }
+    }
+
+    // Tab Switching
+    function switchDashboardTab(tabId) {
+      const panels = {
+        products: document.getElementById('panel-products'),
+        orders: document.getElementById('panel-orders'),
+        users: document.getElementById('panel-users')
+      };
+
+      const navBtns = {
+        products: document.getElementById('tab-nav-products'),
+        orders: document.getElementById('tab-nav-orders'),
+        users: document.getElementById('tab-nav-users')
+      };
+
+      Object.keys(panels).forEach(key => {
+        if (!panels[key] || !navBtns[key]) return;
+        if (key === tabId) {
+          panels[key].classList.remove('hidden');
+          navBtns[key].classList.add('dock-active');
+        } else {
+          panels[key].classList.add('hidden');
+          navBtns[key].classList.remove('dock-active');
+        }
+      });
+
+      if (typeof closeMobileSidebar === 'function') {
+        closeMobileSidebar();
+      }
+    }
+
+    // Filter Chips Helpers
+    function setProductCategory(cat, btn) {
+      document.getElementById('productCategoryFilter').value = cat;
+      document.querySelectorAll('#productCatChips .cat-chip').forEach(b => {
+        b.className = 'cat-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline-variant transition-all';
+      });
+      btn.className = 'cat-chip px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-primary-container text-on-primary-container border border-transparent shadow-xs transition-all';
+      filterProducts();
+    }
+
+    function setOrderStatus(status, btn) {
+      document.getElementById('orderStatusFilter').value = status;
+      document.querySelectorAll('#orderStatusChips .order-chip').forEach(b => {
+        b.className = 'order-chip inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline-variant transition-all cursor-pointer';
+      });
+      btn.className = 'order-chip inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-primary-container text-on-primary-container border border-transparent shadow-xs transition-all cursor-pointer';
+      filterOrders();
+    }
+
+    function setUserRole(role, btn) {
+      document.getElementById('userRoleFilter').value = role;
+      document.querySelectorAll('#userRoleChips .role-chip').forEach(b => {
+        b.className = 'role-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline-variant transition-all';
+      });
+      btn.className = 'role-chip px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-primary-container text-on-primary-container border border-transparent shadow-xs transition-all';
+      filterUsers();
+    }
+
+    // Init Page & Load Data
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Setup Admin Profile Info
+      try {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          const nameEl = document.getElementById('adminNameDisplay');
+          const emailEl = document.getElementById('adminEmailDisplay');
+          const avatarContainer = document.getElementById('adminAvatarContainer');
+          
+          if (nameEl) nameEl.textContent = user.full_name || 'Administrator';
+          if (emailEl) emailEl.textContent = user.email || 'admin@giftspace.com';
+          
+          if (avatarContainer) {
+            if (user.avatar_url) {
+              avatarContainer.innerHTML = `<img src="${user.avatar_url}" alt="Avatar" class="w-full h-full object-cover rounded-xl">`;
+            } else {
+              const initial = (user.full_name || user.email || 'A').charAt(0).toUpperCase();
+              avatarContainer.innerHTML = `<div class="w-full h-full rounded-xl bg-surface-container-lowest text-primary font-bold text-3xl sm:text-4xl flex items-center justify-center">${initial}</div>`;
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error parsing user data:', err);
+      }
+
+      await loadAllDashboardData();
+    });
+
+    // Fetch and render data
+    async function loadAllDashboardData() {
+      await Promise.all([
+        loadProducts(),
+        loadOrders(),
+        loadUsers()
+      ]);
+      updateKPIs();
+    }
+
+    // 1. PRODUCTS
+    async function loadProducts() {
+      try {
+        const res = await fetch('/api/assets');
+        const json = await res.json();
+        rawProducts = json.data || [];
+        renderProducts(rawProducts);
+        
+        const countBadge = document.getElementById('badge-count-products');
+        if (countBadge) countBadge.textContent = rawProducts.length;
+      } catch (err) {
+        console.error('Error fetching products:', err);
+      }
+    }
+
+    function renderProducts(products) {
+      const tbody = document.getElementById('products-tbody');
+      if (!tbody) return;
+
+      if (products.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center py-14 text-on-surface-variant">
+              <div class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center mx-auto mb-2.5 text-on-surface-variant">
+                <span class="material-symbols-outlined text-[26px]">inventory_2</span>
+              </div>
+              <p class="font-semibold text-sm">Không tìm thấy sản phẩm nào phù hợp.</p>
+              <p class="text-xs text-on-surface-variant/70 mt-0.5">Thử đổi từ khóa tìm kiếm hoặc lọc theo danh mục khác.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = products.map(p => {
+        const thumbUrl = p.thumbnail_url || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085';
+        const priceFormatted = (p.base_price || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        const escapedProduct = JSON.stringify(p).replace(/'/g, "&apos;");
+
+        // Category Badge Color
+        let catColor = "bg-surface-container text-primary border-outline-variant";
+        if (p.category === 'UI KITS') catColor = "bg-surface-container text-purple-600 dark:text-purple-400 border-outline-variant";
+        if (p.category === 'DESIGN SYSTEM') catColor = "bg-surface-container text-blue-600 dark:text-blue-400 border-outline-variant";
+
+        return `
+          <tr class="hover:bg-surface-container transition-colors group">
+            <!-- Thumbnail & ID -->
+            <td class="py-3.5 px-5">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-surface-container overflow-hidden shrink-0 border border-outline-variant shadow-xs group-hover:scale-105 transition-transform">
+                  <img src="${thumbUrl}" alt="${p.title}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085'">
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-mono text-xs font-semibold text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-md border border-outline-variant">${p.id}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Title & Demo URL -->
+            <td class="py-3.5 px-4 font-medium text-on-surface">
+              <div class="max-w-xs sm:max-w-sm font-semibold truncate text-[14px]" title="${p.title}">${p.title}</div>
+              ${p.demo_url ? `
+                <a href="${p.demo_url}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline mt-1">
+                  <span class="material-symbols-outlined text-[13px]">open_in_new</span>
+                  <span>Xem Web Demo</span>
+                </a>
+              ` : '<span class="text-[11px] text-on-surface-variant/50">Chưa có demo URL</span>'}
+            </td>
+
+            <!-- Category -->
+            <td class="py-3.5 px-4">
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-bold border ${catColor}">
+                ${p.category || 'OTHER'}
+              </span>
+            </td>
+
+            <!-- Price -->
+            <td class="py-3.5 px-4 font-bold text-primary font-mono text-base">
+              ${priceFormatted}
+            </td>
+
+            <!-- Stats -->
+            <td class="py-3.5 px-4 text-xs text-on-surface-variant">
+              <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px] text-secondary">download</span> <span class="font-bold text-on-surface">${p.downloads_count || 0}</span> tải</div>
+              <div class="flex items-center gap-1.5 mt-0.5"><span class="material-symbols-outlined text-[14px] text-secondary">visibility</span> <span class="font-bold text-on-surface">${p.views_count || 0}</span> xem</div>
+            </td>
+
+            <!-- Actions -->
+            <td class="py-3.5 px-5 text-right">
+              <div class="inline-flex items-center gap-2">
+                <button onclick='openEditAssetModal(${escapedProduct})'
+                  class="px-3 py-1.5 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary-container text-on-surface border border-outline-variant text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shadow-xs active:scale-95" title="Chỉnh sửa sản phẩm">
+                  <span class="material-symbols-outlined text-[15px]">edit</span>
+                  <span data-i18n="Edit">Sửa</span>
+                </button>
+                <button onclick="promptDeleteAsset('${p.id}', '${(p.title || '').replace(/'/g, "\\'")}')"
+                  class="px-3 py-1.5 rounded-xl bg-surface-container hover:bg-error hover:text-on-error text-error border border-outline-variant text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shadow-xs active:scale-95" title="Xóa sản phẩm">
+                  <span class="material-symbols-outlined text-[15px]">delete</span>
+                  <span data-i18n="Delete">Xóa</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterProducts() {
+      const query = (document.getElementById('productSearchInput')?.value || '').toLowerCase().trim();
+      const cat = document.getElementById('productCategoryFilter')?.value || 'ALL';
+
+      let filtered = rawProducts.filter(p => {
+        const matchesQuery = !query || (p.title && p.title.toLowerCase().includes(query)) || (p.id && p.id.toLowerCase().includes(query));
+        const matchesCat = cat === 'ALL' || p.category === cat;
+        return matchesQuery && matchesCat;
+      });
+
+      renderProducts(filtered);
+    }
+
+    // 2. ORDERS
+    async function loadOrders() {
+      try {
+        const res = await fetch('/api/admin/tables/orders');
+        if (res.ok) {
+          const json = await res.json();
+          rawOrders = json.data || [];
+          renderOrders(rawOrders);
+
+          const countBadge = document.getElementById('badge-count-orders');
+          if (countBadge) countBadge.textContent = rawOrders.length;
+        }
+      } catch (err) {
+        console.error('Error fetching orders:', err);
+      }
+    }
+
+    function renderOrders(orders) {
+      const tbody = document.getElementById('orders-tbody');
+      if (!tbody) return;
+
+      if (orders.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center py-14 text-on-surface-variant">
+              <div class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center mx-auto mb-2.5 text-on-surface-variant">
+                <span class="material-symbols-outlined text-[26px]">shopping_cart</span>
+              </div>
+              <p class="font-semibold text-sm">Chưa có đơn hàng nào được ghi nhận.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = orders.map(o => {
+        const amountFormatted = (o.total_amount || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        const dateStr = o.created_at ? new Date(o.created_at).toLocaleString('vi-VN') : 'Vừa xong';
+        const orderStatus = o.status || 'Nhận đơn';
+        const customerEmail = o.customer_email || o.user_id || 'Khách vãng lai';
+        const customerPhone = o.customer_phone || '';
+        const productName = o.product_name || o.asset_title || 'Sản phẩm số GiftSpace';
+
+        // Styling based on status
+        let selectClass = "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/40 focus:ring-amber-500";
+        let statusIcon = "hourglass_top";
+        let statusBadgeClass = "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30";
+
+        if (orderStatus === 'Vận đơn') {
+          selectClass = "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/40 focus:ring-blue-500";
+          statusIcon = "local_shipping";
+          statusBadgeClass = "bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30";
+        } else if (orderStatus === 'Hoàn tất' || orderStatus === 'SUCCESS') {
+          selectClass = "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/40 focus:ring-emerald-500";
+          statusIcon = "check_circle";
+          statusBadgeClass = "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30";
+        }
+
+        return `
+          <tr class="hover:bg-surface-container transition-colors">
+            <!-- Order ID -->
+            <td class="py-3.5 px-5">
+              <span class="font-mono font-bold text-on-surface text-xs bg-surface-container px-2.5 py-1 rounded-lg border border-outline-variant">
+                #${o.id}
+              </span>
+            </td>
+
+            <!-- Customer & Phone -->
+            <td class="py-3.5 px-4">
+              <div class="flex flex-col">
+                <span class="font-semibold text-sm text-on-surface flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[15px] text-primary">person</span>
+                  <span class="truncate max-w-[180px]">${customerEmail}</span>
+                </span>
+                ${customerPhone ? `
+                  <span class="flex items-center gap-1 text-[11px] font-mono text-secondary mt-0.5">
+                    <span class="material-symbols-outlined text-[13px] text-secondary">call</span>
+                    <span>${customerPhone}</span>
+                  </span>
+                ` : `
+                  <span class="text-[11px] text-outline-variant italic mt-0.5">Chưa có SĐT</span>
+                `}
+              </div>
+            </td>
+
+            <!-- Product -->
+            <td class="py-3.5 px-4">
+              <div class="flex flex-col max-w-[200px]">
+                <span class="font-semibold text-sm text-on-surface truncate" title="${productName}">
+                  ${productName}
+                </span>
+                <span class="inline-flex items-center gap-1 text-[10px] font-mono font-bold uppercase text-primary tracking-wider mt-0.5">
+                  <span class="material-symbols-outlined text-[12px]">qr_code_2</span>
+                  ${o.payment_method || 'VIETQR'}
+                </span>
+              </div>
+            </td>
+
+            <!-- Total Amount -->
+            <td class="py-3.5 px-4 font-bold text-on-surface font-mono text-base">
+              ${amountFormatted}
+            </td>
+
+            <!-- Created At -->
+            <td class="py-3.5 px-4 text-xs text-on-surface-variant font-mono">
+              ${dateStr}
+            </td>
+
+            <!-- Admin Status Switcher -->
+            <td class="py-3.5 px-5 text-right">
+              <div class="inline-flex items-center justify-end relative">
+                <span class="material-symbols-outlined absolute left-2.5 pointer-events-none text-[15px] z-10">${statusIcon}</span>
+                <select onchange="updateOrderStatus('${o.id}', this.value)"
+                  class="font-semibold text-xs py-1.5 pl-8 pr-7 rounded-xl border transition-all cursor-pointer shadow-xs focus:outline-none focus:ring-2 appearance-none ${selectClass}">
+                  <option value="Nhận đơn" ${(orderStatus === 'Nhận đơn' || orderStatus === 'PENDING') ? 'selected' : ''}>Nhận đơn</option>
+                  <option value="Vận đơn" ${orderStatus === 'Vận đơn' ? 'selected' : ''}>Vận đơn</option>
+                  <option value="Hoàn tất" ${(orderStatus === 'Hoàn tất' || orderStatus === 'SUCCESS') ? 'selected' : ''}>Hoàn tất</option>
+                </select>
+                <span class="material-symbols-outlined absolute right-2 pointer-events-none text-[16px] opacity-70 z-10">expand_more</span>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Admin change order status API call
+    async function updateOrderStatus(orderId, newStatus) {
+      try {
+        const res = await fetch(`/api/orders/${orderId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (window.showToast) {
+            window.showToast(`Đã chuyển đơn #${orderId} sang: "${newStatus}"`, 'success');
+          }
+          const target = rawOrders.find(o => o.id === orderId);
+          if (target) {
+            target.status = newStatus;
+          }
+          filterOrders();
+          updateKPIs();
+        } else {
+          if (window.showToast) {
+            window.showToast(data.message || 'Lỗi cập nhật trạng thái!', 'error');
+          }
+          loadOrders();
+        }
+      } catch (err) {
+        console.error('Error updating status:', err);
+        if (window.showToast) window.showToast('Lỗi máy chủ khi cập nhật đơn hàng!', 'error');
+        loadOrders();
+      }
+    }
+
+    function filterOrders() {
+      const query = (document.getElementById('orderSearchInput')?.value || '').toLowerCase().trim();
+      const status = document.getElementById('orderStatusFilter')?.value || 'ALL';
+
+      let filtered = rawOrders.filter(o => {
+        const matchesQuery = !query ||
+          (o.id && o.id.toLowerCase().includes(query)) ||
+          (o.user_id && o.user_id.toLowerCase().includes(query)) ||
+          (o.customer_email && o.customer_email.toLowerCase().includes(query)) ||
+          (o.customer_phone && o.customer_phone.toLowerCase().includes(query)) ||
+          (o.product_name && o.product_name.toLowerCase().includes(query));
+
+        let matchesStatus = true;
+        if (status !== 'ALL') {
+          if (status === 'Nhận đơn') {
+            matchesStatus = (o.status === 'Nhận đơn' || o.status === 'PENDING');
+          } else if (status === 'Hoàn tất') {
+            matchesStatus = (o.status === 'Hoàn tất' || o.status === 'SUCCESS');
+          } else {
+            matchesStatus = (o.status === status);
+          }
+        }
+        return matchesQuery && matchesStatus;
+      });
+
+      renderOrders(filtered);
+    }
+
+    // 3. USERS
+    async function loadUsers() {
+      try {
+        const res = await fetch('/api/admin/tables/users');
+        if (res.ok) {
+          const json = await res.json();
+          rawUsers = json.data || [];
+          renderUsers(rawUsers);
+
+          const countBadge = document.getElementById('badge-count-users');
+          if (countBadge) countBadge.textContent = rawUsers.length;
+        }
+      } catch (err) {
+        console.error('Error fetching users:', err);
+      }
+    }
+
+    function renderUsers(users) {
+      const tbody = document.getElementById('users-tbody');
+      if (!tbody) return;
+
+      if (users.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center py-14 text-on-surface-variant">
+              <div class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center mx-auto mb-2.5 text-on-surface-variant">
+                <span class="material-symbols-outlined text-[26px]">person_off</span>
+              </div>
+              <p class="font-semibold text-sm">Không có tài khoản nào phù hợp.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = users.map(u => {
+        const initial = (u.full_name || u.email || 'U').charAt(0).toUpperCase();
+        const isAdmin = u.is_admin === 1;
+        const isPro = u.is_pro_member === 1;
+
+        return `
+          <tr class="hover:bg-surface-container transition-colors">
+            <!-- User Info & Avatar -->
+            <td class="py-3.5 px-5">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full ${isAdmin ? 'bg-primary-container text-on-primary-container' : 'bg-surface-container-high text-primary'} flex items-center justify-center font-bold text-sm shrink-0 border border-outline-variant shadow-xs">
+                  ${u.avatar_url ? `<img src="${u.avatar_url}" class="w-full h-full rounded-full object-cover">` : initial}
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-semibold text-on-surface text-sm">${u.full_name || 'Người dùng'}</span>
+                  <span class="text-xs text-on-surface-variant font-mono">ID: ${u.id ? u.id.slice(0, 8) + '...' : 'u-auto'}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Email -->
+            <td class="py-3.5 px-4 font-mono text-xs text-on-surface-variant">
+              ${u.email}
+            </td>
+
+            <!-- Role Badge -->
+            <td class="py-3.5 px-4">
+              <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
+                isAdmin
+                  ? 'bg-primary-container text-on-primary-container border border-transparent'
+                  : 'bg-surface-container text-on-surface-variant border border-outline-variant'
+              }">
+                ${isAdmin ? '<span class="material-symbols-outlined text-[14px]">shield</span> Admin' : '<span class="material-symbols-outlined text-[14px]">person</span> Khách hàng'}
+              </span>
+            </td>
+
+            <!-- Membership -->
+            <td class="py-3.5 px-4">
+              <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
+                isPro
+                  ? 'bg-surface-container text-amber-500 border border-outline-variant'
+                  : 'bg-surface-container-low text-on-surface-variant border border-outline-variant'
+              }">
+                ${isPro ? '⭐ Pro Member' : 'Standard'}
+              </span>
+            </td>
+
+            <!-- Joined Date -->
+            <td class="py-3.5 px-5 text-right text-xs text-on-surface-variant font-mono">
+              ${u.created_at || 'Mới tham gia'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterUsers() {
+      const query = (document.getElementById('userSearchInput')?.value || '').toLowerCase().trim();
+      const role = document.getElementById('userRoleFilter')?.value || 'ALL';
+
+      let filtered = rawUsers.filter(u => {
+        const matchesQuery = !query || (u.email && u.email.toLowerCase().includes(query)) || (u.full_name && u.full_name.toLowerCase().includes(query));
+        const matchesRole = role === 'ALL' || (role === 'ADMIN' && u.is_admin === 1) || (role === 'USER' && u.is_admin !== 1);
+        return matchesQuery && matchesRole;
+      });
+
+      renderUsers(filtered);
+    }
+
+    // 4. UPDATE TOP KPIS
+    function updateKPIs() {
+      // Total Products
+      const totalProds = rawProducts.length;
+      const kpiProds = document.getElementById('kpi-total-products');
+      if (kpiProds) kpiProds.textContent = totalProds;
+
+      // Orders & Revenue
+      const totalOrders = rawOrders.length;
+      let revenue = 0;
+      let successCount = 0;
+      rawOrders.forEach(o => {
+        if (o.status === 'SUCCESS' || o.status === 'Hoàn tất') {
+          revenue += parseFloat(o.total_amount || 0);
+          successCount++;
+        }
+      });
+
+      const kpiRev = document.getElementById('kpi-total-revenue');
+      if (kpiRev) kpiRev.textContent = revenue.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+
+      const kpiOrders = document.getElementById('kpi-total-orders');
+      if (kpiOrders) kpiOrders.textContent = totalOrders;
+
+      const kpiOrdersTag = document.getElementById('kpi-orders-success-tag');
+      if (kpiOrdersTag) {
+        kpiOrdersTag.textContent = `${successCount} thành công`;
+      }
+
+      // Users
+      const totalUsers = rawUsers.length;
+      const kpiUsers = document.getElementById('kpi-total-users');
+      if (kpiUsers) kpiUsers.textContent = totalUsers;
+    }
+
+    // 5. ASSET MODAL HANDLERS
+    function openAddAssetModal() {
+      document.getElementById('formAssetId').value = '';
+      document.getElementById('formTitle').value = '';
+      document.getElementById('formCategory').value = 'WEB TEMPLATE';
+      document.getElementById('formPrice').value = '49.00';
+      document.getElementById('formThumb').value = 'https://images.unsplash.com/photo-1498050108023-c5249f4df085';
+      document.getElementById('formDemoUrl').value = 'https://example.com';
+      updateThumbPreview('https://images.unsplash.com/photo-1498050108023-c5249f4df085');
+
+      document.getElementById('modalTitle').textContent = 'Thêm sản phẩm mới';
+      document.getElementById('modalIcon').textContent = 'add_box';
+      document.getElementById('formSubmitBtn').querySelector('span:last-child').textContent = 'Lưu sản phẩm';
+
+      document.getElementById('assetModalOverlay').classList.remove('hidden');
+    }
+
+    function openEditAssetModal(product) {
+      document.getElementById('formAssetId').value = product.id;
+      document.getElementById('formTitle').value = product.title || '';
+      document.getElementById('formCategory').value = product.category || 'WEB TEMPLATE';
+      document.getElementById('formPrice').value = product.base_price || 0;
+      document.getElementById('formThumb').value = product.thumbnail_url || '';
+      document.getElementById('formDemoUrl').value = product.demo_url || '';
+      updateThumbPreview(product.thumbnail_url || '');
+
+      document.getElementById('modalTitle').textContent = 'Chỉnh sửa sản phẩm';
+      document.getElementById('modalIcon').textContent = 'edit_note';
+      document.getElementById('formSubmitBtn').querySelector('span:last-child').textContent = 'Cập nhật thay đổi';
+
+      document.getElementById('assetModalOverlay').classList.remove('hidden');
+    }
+
+    function closeAssetModal() {
+      document.getElementById('assetModalOverlay').classList.add('hidden');
+    }
+
+    function updateThumbPreview(url) {
+      const img = document.getElementById('formThumbPreview');
+      const placeholder = document.getElementById('formThumbPlaceholder');
+      if (!img || !placeholder) return;
+
+      if (url && url.trim().length > 5) {
+        img.src = url;
+        img.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      } else {
+        img.src = '';
+        img.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      }
+    }
+
+    async function handleAssetFormSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('formAssetId').value;
+      const title = document.getElementById('formTitle').value.trim();
+      const category = document.getElementById('formCategory').value;
+      const price = parseFloat(document.getElementById('formPrice').value);
+      const thumbnail_url = document.getElementById('formThumb').value.trim();
+      const demo_url = document.getElementById('formDemoUrl').value.trim();
+
+      const submitBtn = document.getElementById('formSubmitBtn');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span> Đang xử lý...';
+
+      try {
+        let res;
+        if (id) {
+          // Update product
+          res = await fetch('/api/assets/' + id, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, category, base_price: price, thumbnail_url, demo_url })
+          });
+        } else {
+          // Create product
+          res = await fetch('/api/assets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, category, base_price: price, thumbnail_url, demo_url })
+          });
+        }
+
+        const data = await res.json();
+        if (data.success) {
+          closeAssetModal();
+          showToast(id ? 'Đã cập nhật sản phẩm thành công!' : 'Đã thêm sản phẩm mới thành công!');
+          await loadProducts();
+          updateKPIs();
+        } else {
+          alert('Lỗi: ' + (data.error || 'Không thể lưu sản phẩm'));
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Lỗi kết nối máy chủ!');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    }
+
+    // 6. DELETE CONFIRMATION HANDLERS
+    function promptDeleteAsset(id, title) {
+      pendingDeleteId = id;
+      document.getElementById('deleteConfirmMessage').innerHTML = `Bạn có chắc chắn muốn xóa sản phẩm <strong class="text-on-surface font-semibold">"${title}"</strong> (Mã: <code>${id}</code>) không?`;
+      document.getElementById('deleteModalOverlay').classList.remove('hidden');
+
+      document.getElementById('confirmDeleteBtn').onclick = executeDeleteAsset;
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModalOverlay').classList.add('hidden');
+      pendingDeleteId = null;
+    }
+
+    async function executeDeleteAsset() {
+      if (!pendingDeleteId) return;
+      const btn = document.getElementById('confirmDeleteBtn');
+      btn.disabled = true;
+      btn.textContent = 'Đang xóa...';
+
+      try {
+        const res = await fetch('/api/assets/' + pendingDeleteId, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          closeDeleteModal();
+          showToast('Đã xóa sản phẩm khỏi cơ sở dữ liệu!');
+          await loadProducts();
+          updateKPIs();
+        } else {
+          alert('Lỗi xóa sản phẩm: ' + (data.error || 'Thất bại'));
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Lỗi kết nối máy chủ!');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Xóa vĩnh viễn';
+      }
+    }
+  </script>
+
+  <!-- ==================== NAVIGATION (DOCK / SIDEBAR) ==================== -->
+  <div class="dock-wrapper" id="dockWrapper">
+    <!-- Dock collapse/expand button (Dock mode only) -->
+    <button class="dock-toggle-btn dock-only" id="dockToggleBtn" onclick="toggleDock()" type="button" title="Ẩn thanh điều hướng">
+      <span class="material-symbols-outlined toggle-icon">expand_more</span>
+    </button>
+    <nav class="bottom-dock" id="bottomDock" aria-label="Dashboard Navigation">
+      <!-- Sidebar Header (visible only in sidebar mode) -->
+      <div class="sidebar-only sidebar-header flex items-center justify-between w-full px-2 py-2 mb-2 border-b border-outline-variant/40 shrink-0">
+        <div class="sidebar-header-title flex items-center gap-2 overflow-hidden">
+          <span class="material-symbols-outlined text-primary text-[19px]">admin_panel_settings</span>
+          <span class="text-xs font-bold uppercase tracking-wider text-on-surface-variant truncate" data-i18n="Navigation">Điều hướng</span>
+        </div>
+        <button type="button" class="sidebar-collapse-trigger w-7 h-7 rounded-lg hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors shrink-0 cursor-pointer" onclick="toggleSidebarCollapse()" title="Thu gọn thanh bên">
+          <span class="material-symbols-outlined text-[18px] sidebar-collapse-icon">chevron_left</span>
+        </button>
+      </div>
+
+      <!-- Tab: Products -->
+      <button id="tab-nav-products" onclick="switchDashboardTab('products')" type="button"
+        class="dock-item dock-active" title="Sản phẩm">
+        <span class="material-symbols-outlined dock-icon">inventory_2</span>
+        <span class="dock-label" data-i18n="Products">Sản phẩm</span>
+        <span id="badge-count-products" class="dock-badge">0</span>
+      </button>
+
+      <div class="dock-divider"></div>
+
+      <!-- Tab: Orders -->
+      <button id="tab-nav-orders" onclick="switchDashboardTab('orders')" type="button"
+        class="dock-item" title="Đơn hàng">
+        <span class="material-symbols-outlined dock-icon">receipt_long</span>
+        <span class="dock-label" data-i18n="Orders">Đơn hàng</span>
+        <span id="badge-count-orders" class="dock-badge">0</span>
+      </button>
+
+      <div class="dock-divider"></div>
+
+      <!-- Tab: Users -->
+      <button id="tab-nav-users" onclick="switchDashboardTab('users')" type="button"
+        class="dock-item" title="Tài khoản">
+        <span class="material-symbols-outlined dock-icon">manage_accounts</span>
+        <span class="dock-label" data-i18n="Users">Tài khoản</span>
+        <span id="badge-count-users" class="dock-badge">0</span>
+      </button>
+
+      <!-- ==================== DOCK MODE LAYOUT SWITCHER ==================== -->
+      <div class="dock-divider dock-divider-accent dock-only"></div>
+      <button id="btnSwitchNavLayout" onclick="toggleNavLayout()" type="button"
+        class="dock-layout-btn dock-only group" title="Chuyển sang thanh bên (Sidebar)">
+        <span class="material-symbols-outlined dock-layout-icon" id="dockLayoutSwitchIcon">view_sidebar</span>
+        <span class="dock-layout-badge" title="Đổi bố cục">
+          <span class="material-symbols-outlined text-[10px]">sync_alt</span>
+        </span>
+      </button>
+
+      <!-- ==================== SIDEBAR MODE FOOTER ACTION CARD ==================== -->
+      <div class="sidebar-only sidebar-footer-card mt-auto pt-3 border-t border-outline-variant/40 w-full flex flex-col gap-1.5 shrink-0">
+        <div class="sidebar-footer-label px-2 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/70 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[14px] text-primary">tune</span>
+          <span data-i18n="Display Mode">Chế độ hiển thị</span>
+        </div>
+        <button id="btnSwitchNavLayoutSidebar" onclick="toggleNavLayout()" type="button"
+          class="sidebar-layout-btn w-full flex items-center justify-between p-2.5 rounded-xl border border-primary/35 bg-primary/5 hover:bg-primary/10 hover:border-primary transition-all text-on-surface-variant group shadow-2xs cursor-pointer"
+          title="Chuyển về thanh Dock đáy">
+          <div class="flex items-center gap-2.5 overflow-hidden">
+            <div class="w-8 h-8 rounded-lg bg-surface-container-high text-primary flex items-center justify-center shrink-0 border border-outline-variant group-hover:scale-105 transition-transform shadow-xs">
+              <span class="material-symbols-outlined text-[19px]">dock_to_bottom</span>
+            </div>
+            <div class="sidebar-footer-text flex flex-col text-left overflow-hidden">
+              <span class="text-xs font-bold text-on-surface group-hover:text-primary transition-colors truncate" data-i18n="Bottom Dock">Dạng Dock ngang</span>
+              <span class="text-[10px] text-on-surface-variant truncate" data-i18n="Switch to bottom bar">Chuyển sang thanh đáy</span>
+            </div>
+          </div>
+          <span class="sidebar-footer-text material-symbols-outlined text-[16px] text-primary group-hover:translate-y-0.5 transition-transform shrink-0">arrow_downward</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    // Navigation Layout Switching (Dock <-> Sidebar)
+    function toggleNavLayout(targetMode) {
+      const isSidebar = document.body.classList.contains('nav-mode-sidebar');
+      const newMode = targetMode || (isSidebar ? 'dock' : 'sidebar');
+      
+      if (newMode === 'sidebar') {
+        document.body.classList.add('nav-mode-sidebar');
+        // Reset dock hidden state so sidebar is visible
+        const dock = document.getElementById('bottomDock');
+        const btn = document.getElementById('dockToggleBtn');
+        const wrapper = document.getElementById('dockWrapper');
+        if (dock) dock.classList.remove('dock-hidden');
+        if (btn) btn.classList.remove('dock-is-hidden');
+        if (wrapper) wrapper.classList.remove('dock-collapsed');
+      } else {
+        document.body.classList.remove('nav-mode-sidebar');
+        document.body.classList.remove('sidebar-collapsed');
+        document.body.classList.remove('mobile-sidebar-open');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (overlay) {
+          overlay.classList.add('opacity-0', 'pointer-events-none');
+          overlay.classList.remove('opacity-100');
+        }
+        const dock = document.getElementById('bottomDock');
+        const btn = document.getElementById('dockToggleBtn');
+        const wrapper = document.getElementById('dockWrapper');
+        if (localStorage.getItem('dockHidden') === '1') {
+          if (dock) dock.classList.add('dock-hidden');
+          if (btn) btn.classList.add('dock-is-hidden');
+          if (wrapper) wrapper.classList.add('dock-collapsed');
+        } else {
+          if (dock) dock.classList.remove('dock-hidden');
+          if (btn) btn.classList.remove('dock-is-hidden');
+          if (wrapper) wrapper.classList.remove('dock-collapsed');
+        }
+      }
+
+      localStorage.setItem('dashboard_nav_mode', newMode);
+      updateNavLayoutControls(newMode);
+    }
+
+    function updateNavLayoutControls(mode) {
+      const headerBtn = document.getElementById('headerNavLayoutBtn');
+      const headerIcon = document.getElementById('headerNavLayoutIcon');
+      const headerLabel = document.getElementById('headerNavLayoutLabel');
+      const dockIcon = document.getElementById('dockLayoutSwitchIcon');
+      const dockBtn = document.getElementById('btnSwitchNavLayout');
+
+      const isSidebar = mode === 'sidebar';
+      const tooltip = isSidebar ? 'Chuyển về thanh Dock đáy' : 'Chuyển sang thanh bên (Sidebar)';
+
+      if (headerBtn) headerBtn.setAttribute('title', tooltip);
+      if (headerIcon) headerIcon.textContent = isSidebar ? 'dock_to_bottom' : 'view_sidebar';
+      if (headerLabel) {
+        headerLabel.textContent = isSidebar ? 'Dock' : 'Sidebar';
+        headerLabel.setAttribute('data-i18n', isSidebar ? 'Bottom Dock' : 'Sidebar');
+      }
+      if (dockBtn) dockBtn.setAttribute('title', tooltip);
+      if (dockIcon) dockIcon.textContent = 'view_sidebar';
+
+      if (typeof applyTranslation === 'function') {
+        applyTranslation();
+      }
+    }
+
+    function toggleSidebarCollapse() {
+      const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+      localStorage.setItem('dashboard_sidebar_collapsed', isCollapsed ? '1' : '0');
+      const trigger = document.querySelector('.sidebar-collapse-trigger');
+      if (trigger) {
+        trigger.setAttribute('title', isCollapsed ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên');
+      }
+    }
+
+    function toggleMobileSidebar() {
+      const isOpen = document.body.classList.toggle('mobile-sidebar-open');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (overlay) {
+        if (isOpen) {
+          overlay.classList.remove('opacity-0', 'pointer-events-none');
+          overlay.classList.add('opacity-100');
+        } else {
+          overlay.classList.add('opacity-0', 'pointer-events-none');
+          overlay.classList.remove('opacity-100');
+        }
+      }
+    }
+
+    function closeMobileSidebar() {
+      document.body.classList.remove('mobile-sidebar-open');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (overlay) {
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        overlay.classList.remove('opacity-100');
+      }
+    }
+
+    function toggleDock() {
+      const dock = document.getElementById('bottomDock');
+      const btn = document.getElementById('dockToggleBtn');
+      const wrapper = document.getElementById('dockWrapper');
+      const isHidden = dock.classList.toggle('dock-hidden');
+      btn.classList.toggle('dock-is-hidden', isHidden);
+      if (wrapper) wrapper.classList.toggle('dock-collapsed', isHidden);
+      btn.setAttribute('title', isHidden ? 'Hiện thanh điều hướng' : 'Ẩn thanh điều hướng');
+      localStorage.setItem('dockHidden', isHidden ? '1' : '0');
+    }
+
+    // Restore nav mode and state from localStorage
+    (function() {
+      const savedNavMode = localStorage.getItem('dashboard_nav_mode') || 'dock';
+      if (savedNavMode === 'sidebar') {
+        document.body.classList.add('nav-mode-sidebar');
+        if (localStorage.getItem('dashboard_sidebar_collapsed') === '1') {
+          document.body.classList.add('sidebar-collapsed');
+        }
+        updateNavLayoutControls('sidebar');
+      } else {
+        updateNavLayoutControls('dock');
+        if (localStorage.getItem('dockHidden') === '1') {
+          const dock = document.getElementById('bottomDock');
+          const btn = document.getElementById('dockToggleBtn');
+          const wrapper = document.getElementById('dockWrapper');
+          if (dock) dock.classList.add('dock-hidden');
+          if (btn) {
+            btn.classList.add('dock-is-hidden');
+            btn.setAttribute('title', 'Hiện thanh điều hướng');
+          }
+          if (wrapper) wrapper.classList.add('dock-collapsed');
+        }
+      }
+    })();
+  </script>
+  <script src="js/cursor-glitter.js"></script>
+</body>
+</html>

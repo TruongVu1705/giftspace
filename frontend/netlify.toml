@@ -1,0 +1,25 @@
+[build]
+  # Khi thư mục frontend được deploy độc lập lên Netlify, publish chính là thư mục hiện tại "."
+  publish = "."
+  command = ""
+
+# ==============================================================================
+# 1. API PROXY REWRITE: Chuyển tiếp toàn bộ yêu cầu /api/* sang Server Render
+# HƯỚNG DẪN: Sau khi tạo Web Service trên Render, hãy thay thế
+# "https://YOUR_BACKEND_URL.onrender.com" bằng URL của Render
+# Ví dụ: https://giftspace-backend.onrender.com/api/:splat
+# ==============================================================================
+[[redirects]]
+  from = "/api/*"
+  to = "https://YOUR_BACKEND_URL.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+# ==============================================================================
+# 2. SPA / Fallback routing
+# ==============================================================================
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 404
+

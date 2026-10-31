@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Admin - GiftSpace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f3f4f6; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+        tr:hover { background-color: #f9fafb; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans p-8">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-indigo-600">Trình xem Cơ sở dữ liệu</h1>
+        
+        <div class="mb-6 flex gap-2" id="table-tabs">
+            <!-- Tabs will be injected here -->
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
+            <table class="w-full whitespace-nowrap">
+                <thead id="table-head">
+                    <!-- Headings -->
+                </thead>
+                <tbody id="table-body">
+                    <!-- Data rows -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="loading" class="mt-4 text-gray-500 italic hidden">Đang tải dữ liệu...</div>
+    </div>
+
+    <script>
+        const tabsContainer = document.getElementById('table-tabs');
+        const thead = document.getElementById('table-head');
+        const tbody = document.getElementById('table-body');
+        const loading = document.getElementById('loading');
+
+        async function init() {
+            try {
+                const res = await fetch('/api/admin/tables');
+                const { data: tables } = await res.json();
+                
+                tables.forEach(table => {
+                    const btn = document.createElement('button');
+                    btn.className = 'px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 font-medium transition-colors';
+                    btn.textContent = table;
+                    btn.onclick = () => loadTableData(table, btn);
+                    tabsContainer.appendChild(btn);
+                });
+
+                if (tables.length > 0) {
+                    loadTableData(tables[0], tabsContainer.firstChild);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to load tables. Is the server running?');
+            }
+        }
+
+        async function loadTableData(table, activeBtn) {
+            // Update active tab styling
+            Array.from(tabsContainer.children).forEach(btn => {
+                btn.classList.remove('bg-indigo-50', 'border-indigo-300', 'text-indigo-700');
+            });
+            activeBtn.classList.add('bg-indigo-50', 'border-indigo-300', 'text-indigo-700');
+
+            loading.classList.remove('hidden');
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+            
+            // Remove any existing "Add Asset" button if we switch tabs
+            const existingAddBtn = document.getElementById('add-asset-btn');
+            if (existingAddBtn) existingAddBtn.remove();
+
+            if (table === 'assets') {
+                const addBtn = document.createElement('button');
+                addBtn.id = 'add-asset-btn';
+                addBtn.className = 'mb-4 px-4 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 font-medium transition-colors';
+                addBtn.textContent = '+ Thêm sản phẩm mới';
+                addBtn.onclick = () => addAssetPrompt();
+                tabsContainer.parentNode.insertBefore(addBtn, tabsContainer.nextSibling);
+            }
+
+            try {
+                const res = await fetch('/api/admin/tables/' + table);
+                const { data } = await res.json();
+                
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="100%" class="text-center py-8 text-gray-500">No data found in this table.</td></tr>';
+                } else {
+                    // Create headers
+                    const columns = Object.keys(data[0]);
+                    const trHead = document.createElement('tr');
+                    columns.forEach(col => {
+                        const th = document.createElement('th');
+                        th.textContent = col;
+                        trHead.appendChild(th);
+                    });
+                    if (table === 'assets') {
+                        const thAction = document.createElement('th');
+                        thAction.textContent = 'Hành động';
+                        trHead.appendChild(thAction);
+                    }
+                    thead.appendChild(trHead);
+
+                    // Create rows
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        columns.forEach(col => {
+                            const td = document.createElement('td');
+                            td.textContent = row[col];
+                            if (col === 'password_hash') td.textContent = '********'; // Hide hashes for safety
+                            tr.appendChild(td);
+                        });
+                        
+                        // Actions column for Assets
+                        if (table === 'assets') {
+                            const tdAction = document.createElement('td');
+                            tdAction.innerHTML = `
+                                <button onclick='editAsset(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="text-blue-600 hover:underline mr-3">Sửa</button>
+                                <button onclick="deleteAsset('${row.id}')" class="text-red-600 hover:underline">Xóa</button>
+                            `;
+                            tr.appendChild(tdAction);
+                        }
+                        
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to load data for table: ' + table);
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        async function addAssetPrompt() {
+            const title = prompt("Tên sản phẩm:");
+            if (!title) return;
+            const category = prompt("Danh mục (WEB TEMPLATE, UI KITS, DESIGN SYSTEM):", "WEB TEMPLATE");
+            const price = parseFloat(prompt("Giá sản phẩm (VNĐ):", "49"));
+            const thumb = prompt("URL Ảnh thu nhỏ:", "https://images.unsplash.com/photo-1498050108023-c5249f4df085");
+            const demo_url = prompt("Link Web Demo:", "https://example.com");
+            
+            if (title && !isNaN(price)) {
+                try {
+                    const res = await fetch('/api/assets', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title, category, base_price: price, thumbnail_url: thumb, demo_url })
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        alert("Thêm sản phẩm thành công!");
+                        // Reload the current tab
+                        const activeBtn = Array.from(tabsContainer.children).find(b => b.textContent === 'assets');
+                        if (activeBtn) loadTableData('assets', activeBtn);
+                    } else {
+                        alert("Lỗi: " + result.error);
+                    }
+                } catch(e) {
+                    alert("Lỗi kết nối");
+                }
+            }
+        }
+
+        async function editAsset(row) {
+            const title = prompt("Tên sản phẩm mới:", row.title);
+            if (!title) return;
+            const category = prompt("Danh mục mới:", row.category);
+            const price = parseFloat(prompt("Giá sản phẩm (VNĐ):", row.base_price));
+            const thumb = prompt("URL Ảnh thu nhỏ:", row.thumbnail_url);
+            const demo_url = prompt("Link Web Demo:", row.demo_url || "https://example.com");
+            
+            if (title && !isNaN(price)) {
+                try {
+                    const res = await fetch('/api/assets/' + row.id, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title, category, base_price: price, thumbnail_url: thumb, demo_url })
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        alert("Cập nhật thành công!");
+                        const activeBtn = Array.from(tabsContainer.children).find(b => b.textContent === 'assets');
+                        if (activeBtn) loadTableData('assets', activeBtn);
+                    } else {
+                        alert("Lỗi: " + result.error);
+                    }
+                } catch(e) {
+                    alert("Lỗi kết nối");
+                }
+            }
+        }
+
+        async function deleteAsset(id) {
+            if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) return;
+            try {
+                const res = await fetch('/api/assets/' + id, { method: 'DELETE' });
+                const result = await res.json();
+                if (result.success) {
+                    alert("Đã xóa sản phẩm!");
+                    const activeBtn = Array.from(tabsContainer.children).find(b => b.textContent === 'assets');
+                    if (activeBtn) loadTableData('assets', activeBtn);
+                } else {
+                    alert("Lỗi: " + result.error);
+                }
+            } catch(e) {
+                alert("Lỗi kết nối");
+            }
+        }
+
+        init();
+    </script>
+  <script src="js/i18n.js"></script>
+  <script src="js/cursor-glitter.js"></script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lumina Mobile Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    if (localStorage.getItem('darkMode') === 'true' || (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-serif {
+      font-family: 'Playfair Display', serif;
+    }
+    /* Hide scrollbars for clean mobile feel */
+    ::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+    html, body {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+  </style>
+</head>
+<body class="bg-[#faf6f7] dark:bg-[#130d10] text-[#1c1316] dark:text-[#f8ecf0] min-h-full flex flex-col selection:bg-rose-500 selection:text-white antialiased">
+
+  <!-- Mobile App Top Bar (fits under notch/status bar) -->
+  <header class="pt-12 pb-3 px-4 sticky top-0 z-40 bg-[#faf6f7]/85 dark:bg-[#130d10]/85 backdrop-blur-md border-b border-rose-500/10 dark:border-rose-500/15 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-rose-600 to-pink-500 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+      </div>
+      <div>
+        <span class="font-serif font-bold text-base tracking-tight block leading-tight">LUMINA</span>
+        <span class="text-[9px] uppercase tracking-wider text-rose-600 dark:text-rose-400 font-bold">Studio Hub</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-1.5">
+      <button onclick="document.documentElement.classList.toggle('dark')" class="w-8 h-8 rounded-full bg-white dark:bg-[#20151a] border border-rose-500/15 flex items-center justify-center text-xs shadow-xs" title="Đổi giao diện">
+        <span class="material-symbols-outlined text-[17px] text-rose-600 dark:text-rose-400">dark_mode</span>
+      </button>
+      <button class="w-8 h-8 rounded-full bg-white dark:bg-[#20151a] border border-rose-500/15 flex items-center justify-center shadow-xs">
+        <span class="material-symbols-outlined text-[18px] text-[#7a6068]">notifications</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Scrollable Mobile Feed -->
+  <main class="flex-1 px-4 py-4 flex flex-col gap-5 pb-20">
+    
+    <!-- Hero Banner Card -->
+    <section class="relative rounded-2xl overflow-hidden bg-gradient-to-br from-rose-600 via-rose-700 to-pink-800 text-white p-5 shadow-lg shadow-rose-900/20">
+      <div class="absolute -right-6 -bottom-6 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+      
+      <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold uppercase tracking-wider mb-3">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        Mobile Demo 2026
+      </div>
+
+      <h1 class="font-serif text-2xl font-bold leading-tight mb-2">
+        Trải nghiệm giao diện di động chuẩn Retina
+      </h1>
+      <p class="text-xs text-white/80 leading-relaxed mb-4">
+        Khung nhìn tràn viền tối ưu 100% tỉ lệ khung hình smartphone với thao tác vuốt chạm chân thực.
+      </p>
+
+      <div class="flex items-center gap-2">
+        <button class="px-4 py-2 rounded-xl bg-white text-rose-700 font-bold text-xs shadow-sm active:scale-95 transition-transform flex items-center gap-1">
+          <span>Khám phá ngay</span>
+          <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+        </button>
+        <button class="px-3 py-2 rounded-xl bg-white/15 backdrop-blur-md text-white font-semibold text-xs active:scale-95 transition-transform">
+          Tài liệu UI
+        </button>
+      </div>
+    </section>
+
+    <!-- Quick Filter Chips -->
+    <section class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+      <button class="px-3.5 py-1.5 rounded-full bg-rose-600 text-white text-xs font-bold shrink-0 shadow-xs">
+        Tất cả
+      </button>
+      <button class="px-3.5 py-1.5 rounded-full bg-white dark:bg-[#1f1418] border border-rose-500/15 text-[#5e474f] dark:text-[#d3bcc4] text-xs font-semibold shrink-0">
+        E-Commerce
+      </button>
+      <button class="px-3.5 py-1.5 rounded-full bg-white dark:bg-[#1f1418] border border-rose-500/15 text-[#5e474f] dark:text-[#d3bcc4] text-xs font-semibold shrink-0">
+        SaaS Dashboard
+      </button>
+      <button class="px-3.5 py-1.5 rounded-full bg-white dark:bg-[#1f1418] border border-rose-500/15 text-[#5e474f] dark:text-[#d3bcc4] text-xs font-semibold shrink-0">
+        Portfolio
+      </button>
+    </section>
+
+    <!-- Featured Product Card 1 -->
+    <article class="bg-white dark:bg-[#1b1216] rounded-2xl p-3.5 border border-rose-500/15 dark:border-rose-500/15 shadow-xs flex flex-col gap-3">
+      <div class="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-slate-200">
+        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&auto=format&fit=crop&q=80" alt="Lumina Template" class="w-full h-full object-cover">
+        <span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-lg bg-black/60 backdrop-blur-md text-white text-[10px] font-bold">
+          4.9 ⭐ (120+)
+        </span>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] uppercase font-bold text-rose-600 dark:text-rose-400 tracking-wider">Web Template</span>
+          <span class="font-bold text-sm text-rose-600 dark:text-rose-400">$49.00</span>
+        </div>
+        <h3 class="font-bold text-sm mb-1 text-on-surface">Lumina Agency & Portfolio Suite</h3>
+        <p class="text-[11px] text-[#7a6068] dark:text-[#a89098] line-clamp-2 leading-relaxed">
+          Bộ mã nguồn hoàn chỉnh hỗ trợ responsive chuẩn Pixel, thiết kế theo phong cách tối giản hiện đại.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 pt-1 border-t border-rose-500/10">
+        <button class="flex-1 py-2 rounded-xl bg-rose-600 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-xs active:scale-98">
+          <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+          <span>Chọn mua</span>
+        </button>
+        <button class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center active:scale-95">
+          <span class="material-symbols-outlined text-[18px]">favorite</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- Interactive Metrics -->
+    <section class="grid grid-cols-2 gap-3">
+      <div class="bg-white dark:bg-[#1b1216] rounded-2xl p-3.5 border border-rose-500/15">
+        <div class="flex items-center gap-1.5 text-emerald-600 text-xs font-bold mb-1">
+          <span class="material-symbols-outlined text-[16px]">bolt</span>
+          <span>0.4s</span>
+        </div>
+        <span class="text-[10px] text-[#7a6068] dark:text-[#a89098] block">Tốc độ tải di động</span>
+      </div>
+      <div class="bg-white dark:bg-[#1b1216] rounded-2xl p-3.5 border border-rose-500/15">
+        <div class="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 text-xs font-bold mb-1">
+          <span class="material-symbols-outlined text-[16px]">devices</span>
+          <span>100%</span>
+        </div>
+        <span class="text-[10px] text-[#7a6068] dark:text-[#a89098] block">Tương thích màn hình</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Floating Tab Bar -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-[#160e12]/90 backdrop-blur-md border-t border-rose-500/15 px-6 py-2 pb-5 flex items-center justify-between">
+    <button class="flex flex-col items-center gap-0.5 text-rose-600 dark:text-rose-400">
+      <span class="material-symbols-outlined text-[20px]">home</span>
+      <span class="text-[10px] font-bold">Khám phá</span>
+    </button>
+    <button class="flex flex-col items-center gap-0.5 text-[#7a6068] dark:text-[#a89098] hover:text-rose-600">
+      <span class="material-symbols-outlined text-[20px]">widgets</span>
+      <span class="text-[10px] font-medium">Gói UI</span>
+    </button>
+    <button class="flex flex-col items-center gap-0.5 text-[#7a6068] dark:text-[#a89098] hover:text-rose-600">
+      <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+      <span class="text-[10px] font-medium">Đơn hàng</span>
+    </button>
+    <button class="flex flex-col items-center gap-0.5 text-[#7a6068] dark:text-[#a89098] hover:text-rose-600">
+      <span class="material-symbols-outlined text-[20px]">account_circle</span>
+      <span class="text-[10px] font-medium">Cá nhân</span>
+    </button>
+  </nav>
+
+  <script src="js/cursor-glitter.js"></script>
+</body>
+</html>

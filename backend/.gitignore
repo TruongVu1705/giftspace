@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment
+.env
+.env.local
+
+# Database (optional: if you want clean database on fresh deploy)
+# database.sqlite
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+*.log
+

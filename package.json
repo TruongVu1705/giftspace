@@ -1,0 +1,9 @@
+{
+  "name": "giftspace-monorepo",
+  "version": "1.0.0",
+  "description": "GiftSpace - Digital Assets Hub",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev"
+  }
+}
