@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Ensure backend keep-alive & wake-up service is active across all pages
+    if (!window.wakeBackend && !document.getElementById('giftspace-wake-backend-script')) {
+        const script = document.createElement('script');
+        script.id = 'giftspace-wake-backend-script';
+        script.src = 'js/wake-backend.js';
+        script.async = true;
+        document.body.appendChild(script);
+    }
+
     // Ensure cursor glitter effect is active across all pages
     if (!window.__giftspace_glitter_initialized__ && !document.getElementById('giftspace-glitter-script')) {
         const script = document.createElement('script');
