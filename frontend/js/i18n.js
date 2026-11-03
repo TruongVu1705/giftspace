@@ -342,6 +342,10 @@ const en2vi = {
     "Mobile Apps": "Ứng dụng Di động",
     "E-commerce": "Thương mại Điện tử",
     "Branding": "Nhận diện Thương hiệu",
+    "Portfolio": "Portfolio",
+    "portfolio": "portfolio",
+    "SaaS": "SaaS",
+    "saas": "saas",
     "Showing": "Hiển thị",
     "assets": "sản phẩm",
     "by": "bởi",
@@ -930,6 +934,10 @@ const vi2en = {
     "Ứng dụng Di động": "Mobile Apps",
     "Thương mại Điện tử": "E-commerce",
     "Nhận diện Thương hiệu": "Branding",
+    "Portfolio": "Portfolio",
+    "portfolio": "portfolio",
+    "SaaS": "SaaS",
+    "saas": "saas",
     "Hiển thị": "Showing",
     "sản phẩm": "assets",
     "bởi": "by",
@@ -1179,9 +1187,29 @@ function escapeRegExp(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// Pre-compiled fast single-pass Regular Expressions (26x faster, zero GC allocations)
-const enRegex = new RegExp(sortedEnKeys.filter(k => k.length > 0).map(escapeRegExp).join('|'), 'g');
-const viRegex = new RegExp(sortedViKeys.filter(k => k.length > 0).map(escapeRegExp).join('|'), 'g');
+function buildEnPattern(key) {
+    const escaped = escapeRegExp(key);
+    // Boundary-aware for English words so short tokens (e.g. "or", "and", "of", "by", "Edit", "All")
+    // do not replace substrings inside longer words (e.g. "Portfolio" -> "Phoặctfolio", "Brand" -> "Brvà")
+    const startWord = /^\w/.test(key) ? '\\b' : '';
+    const endWord = /\w$/.test(key) ? '\\b' : '';
+    return startWord + escaped + endWord;
+}
+
+function buildViPattern(key) {
+    const escaped = escapeRegExp(key);
+    // For short Vietnamese words (length <= 6, single token), require Unicode word boundaries
+    if (key.length <= 6 && !/[\s.,!?:;()""'/\-]/.test(key)) {
+        const isStartWord = /^[\p{L}\p{N}]/u.test(key);
+        const isEndWord = /[\p{L}\p{N}]$/u.test(key);
+        return (isStartWord ? '(?<![\\p{L}\\p{N}])' : '') + escaped + (isEndWord ? '(?![\\p{L}\\p{N}])' : '');
+    }
+    return escaped;
+}
+
+// Pre-compiled fast single-pass Regular Expressions with boundary awareness (zero corruption, zero GC churn)
+const enRegex = new RegExp(sortedEnKeys.filter(k => k.length > 0).map(buildEnPattern).join('|'), 'g');
+const viRegex = new RegExp(sortedViKeys.filter(k => k.length > 0).map(buildViPattern).join('|'), 'gu');
 
 function translateText(text, lang) {
     if (!text || !text.trim()) return text;
