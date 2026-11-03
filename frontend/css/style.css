@@ -128,3 +128,68 @@ button[type="submit"], button {
   border-radius: inherit !important;
 }
 
+/* ==========================================================================
+   Mobile & iPhone (iOS Safari) Performance & Thermal Optimizations
+   ========================================================================== */
+
+/* 1. Safe Area Insets for iPhone X -> iPhone 16 Pro (Notch, Dynamic Island, Home Bar) */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+/* 2. Responsive Header Safe-Area Support */
+header.fixed, header.sticky {
+  padding-top: env(safe-area-inset-top, 0px);
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* 3. Fast Touch Responses (Eliminates 300ms tap delay & unwanted double-tap zoom) */
+a, button, input, select, textarea, .category-chip, .demo-chip {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 4. Prevent iOS Safari auto-zoom on form inputs */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  select,
+  textarea {
+    font-size: 16px !important; /* Prevents viewport zoom in iOS Safari */
+  }
+}
+
+/* 5. Smooth Native Momentum Scrolling on iOS */
+.overflow-y-auto, .overflow-x-auto, main, body {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 6. Hardware Acceleration & Thermal Protection on Mobile */
+@media (max-width: 768px) {
+  /* Optimize backdrop filters on mobile GPU */
+  .backdrop-blur-md, .backdrop-blur-lg {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  /* Responsive bottom safe-padding for modals & sheets */
+  .modal-card, #modals-container > div > div {
+    margin-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+  }
+
+  /* Responsive Mobile Demo Frame inside Mobile Viewports */
+  #phoneDeviceFrame {
+    max-height: calc(100vh - 180px);
+    height: auto !important;
+    aspect-ratio: 9 / 18.5;
+    width: min(315px, 86vw) !important;
+  }
+}
+
