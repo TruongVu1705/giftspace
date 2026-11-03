@@ -182,8 +182,16 @@
                         columns.forEach(col => {
                             const td = document.createElement('td');
                             td.className = 'py-3 px-4';
-                            td.textContent = row[col];
-                            if (col === 'password_hash') td.textContent = '••••••••'; // Mask hashes
+                            if (col === 'password_hash') {
+                                td.textContent = '••••••••';
+                            } else if ((col === 'base_price' || col === 'price' || col === 'total_amount') && typeof row[col] === 'number') {
+                                let val = row[col];
+                                if (val > 0 && val < 1000) val = Math.round((val * 24300) / 10000) * 10000;
+                                td.textContent = val.toLocaleString('vi-VN') + ' VNĐ';
+                                td.classList.add('font-mono', 'font-semibold', 'text-primary');
+                            } else {
+                                td.textContent = row[col];
+                            }
                             tr.appendChild(td);
                         });
                         
@@ -217,7 +225,7 @@
             const title = prompt(t("Tên sản phẩm:"));
             if (!title) return;
             const category = prompt(t("Danh mục (WEB TEMPLATE, UI KITS, DESIGN SYSTEM):"), "WEB TEMPLATE");
-            const price = parseFloat(prompt(t("Giá sản phẩm (USD $):"), "49"));
+            const price = parseFloat(prompt(t("Giá sản phẩm (VNĐ):"), "1190000"));
             const thumb = prompt(t("URL Ảnh thu nhỏ:"), "https://images.unsplash.com/photo-1498050108023-c5249f4df085");
             const demo_url = prompt(t("Link Web Demo:"), "https://example.com");
             
@@ -247,7 +255,9 @@
             const title = prompt(t("Tên sản phẩm mới:"), row.title);
             if (!title) return;
             const category = prompt(t("Danh mục mới:"), row.category);
-            const price = parseFloat(prompt(t("Giá sản phẩm (USD $):"), row.base_price));
+            let defaultPrice = row.base_price || 1190000;
+            if (defaultPrice > 0 && defaultPrice < 1000) defaultPrice = Math.round((defaultPrice * 24300) / 10000) * 10000;
+            const price = parseFloat(prompt(t("Giá sản phẩm (VNĐ):"), defaultPrice));
             const thumb = prompt(t("URL Ảnh thu nhỏ:"), row.thumbnail_url);
             const demo_url = prompt(t("Link Web Demo:"), row.demo_url || "https://example.com");
             

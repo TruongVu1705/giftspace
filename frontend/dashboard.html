@@ -1076,10 +1076,10 @@
             </div>
           </div>
           <div class="space-y-1">
-            <label class="block text-xs font-semibold text-on-surface uppercase tracking-wider">Giá bán (USD $) *</label>
+            <label class="block text-xs font-semibold text-on-surface uppercase tracking-wider">Giá bán (VNĐ) *</label>
             <div class="relative">
-              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">attach_money</span>
-              <input type="number" id="formPrice" required step="0.01" min="0" placeholder="49.00"
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">payments</span>
+              <input type="number" id="formPrice" required step="1000" min="0" placeholder="1190000"
                 class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-body-sm text-on-surface font-mono focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all">
             </div>
           </div>
@@ -1389,7 +1389,9 @@
 
       tbody.innerHTML = products.map(p => {
         const thumbUrl = p.thumbnail_url || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085';
-        const priceFormatted = (p.base_price || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        let rawPrice = p.base_price || 0;
+        if (rawPrice > 0 && rawPrice < 1000) rawPrice = Math.round((rawPrice * 24300) / 10000) * 10000;
+        const priceFormatted = rawPrice.toLocaleString('vi-VN') + ' VNĐ';
         const escapedProduct = JSON.stringify(p).replace(/'/g, "&apos;");
 
         // Category Badge Color
@@ -1512,7 +1514,9 @@
       }
 
       tbody.innerHTML = orders.map(o => {
-        const amountFormatted = (o.total_amount || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        let rawAmt = o.total_amount || 0;
+        if (rawAmt > 0 && rawAmt < 1000) rawAmt = Math.round((rawAmt * 24300) / 10000) * 10000;
+        const amountFormatted = rawAmt.toLocaleString('vi-VN') + ' VNĐ';
         const dateStr = o.created_at ? new Date(o.created_at).toLocaleString(isVi ? 'vi-VN' : 'en-US') : t('Vừa xong');
         const orderStatus = o.status || 'Nhận đơn';
         const customerEmail = o.customer_email || o.user_id || t('Khách vãng lai');
@@ -1783,13 +1787,15 @@
       let successCount = 0;
       rawOrders.forEach(o => {
         if (o.status === 'SUCCESS' || o.status === 'Hoàn tất') {
-          revenue += parseFloat(o.total_amount || 0);
+          let val = parseFloat(o.total_amount || 0);
+          if (val > 0 && val < 1000) val = Math.round((val * 24300) / 10000) * 10000;
+          revenue += val;
           successCount++;
         }
       });
 
       const kpiRev = document.getElementById('kpi-total-revenue');
-      if (kpiRev) kpiRev.textContent = revenue.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+      if (kpiRev) kpiRev.textContent = revenue.toLocaleString('vi-VN') + ' VNĐ';
 
       const kpiOrders = document.getElementById('kpi-total-orders');
       if (kpiOrders) kpiOrders.textContent = totalOrders;
@@ -1811,7 +1817,7 @@
       document.getElementById('formAssetId').value = '';
       document.getElementById('formTitle').value = '';
       document.getElementById('formCategory').value = 'WEB TEMPLATE';
-      document.getElementById('formPrice').value = '49.00';
+      document.getElementById('formPrice').value = '1190000';
       document.getElementById('formThumb').value = 'https://images.unsplash.com/photo-1498050108023-c5249f4df085';
       document.getElementById('formDemoUrl').value = 'https://example.com';
       updateThumbPreview('https://images.unsplash.com/photo-1498050108023-c5249f4df085');

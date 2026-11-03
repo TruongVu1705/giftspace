@@ -43,9 +43,11 @@ app.get('/api/assets/:id', (req, res) => {
 app.post('/api/assets', (req, res) => {
     const { title, category, thumbnail_url, base_price, creator_id, demo_url } = req.body;
     const assetId = 'a' + Date.now();
+    const rawPrice = typeof base_price === 'number' ? base_price : (parseFloat(base_price) || 1190000);
+    const finalPrice = rawPrice < 1000 ? Math.round(rawPrice * 24300 / 10000) * 10000 : rawPrice;
     db.run(
         `INSERT INTO assets (id, title, category, thumbnail_url, demo_url, base_price, creator_id, downloads_count, views_count) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)`,
-        [assetId, title, category, thumbnail_url, demo_url || '', base_price, creator_id || 'u1'],
+        [assetId, title, category, thumbnail_url, demo_url || '', finalPrice, creator_id || 'u1'],
         function(err) {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ success: true, id: assetId });
@@ -255,7 +257,8 @@ app.post('/api/orders', (req, res) => {
     const { order_id, user_id, customer_email, customer_phone, product_name, asset_id, total_amount, payment_method, status } = req.body;
     const orderId = order_id || ('ORD-' + Math.floor(100000 + Math.random() * 900000));
     const orderStatus = status || 'Nhận đơn'; // Default state is 'Nhận đơn' per user requirement
-    const amount = typeof total_amount === 'number' ? total_amount : (parseFloat(total_amount) || 49.0);
+    const rawAmount = typeof total_amount === 'number' ? total_amount : (parseFloat(total_amount) || 1190000);
+    const amount = rawAmount < 1000 ? Math.round(rawAmount * 24300 / 10000) * 10000 : rawAmount;
     const prodName = product_name || 'Lumina Agency & Portfolio Template';
     const email = customer_email || (user_id && user_id.includes('@') ? user_id : 'khachhang@example.com');
     const phone = customer_phone || '';

@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     title: assetInfo.title || 'Mẫu thiết kế cao cấp',
                     category: assetInfo.category || 'WEB TEMPLATE',
                     thumbnail_url: assetInfo.thumbnail_url || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085',
-                    base_price: assetInfo.base_price || 49.0,
+                    base_price: assetInfo.base_price || 1190000,
                     demo_url: assetInfo.demo_url || '#',
                     demo_types: [demoType],
                     viewed_at: now
@@ -236,6 +236,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     window.trackDemoView = trackDemoView;
 
+    function formatVND(amt) {
+        if (amt === null || amt === undefined || amt === '') return '0 VNĐ';
+        let num = typeof amt === 'number' ? amt : parseFloat(amt);
+        if (isNaN(num)) return '0 VNĐ';
+        if (num > 0 && num < 1000) {
+            num = Math.round((num * 24300) / 10000) * 10000;
+        }
+        return Math.round(num).toLocaleString('vi-VN') + ' VNĐ';
+    }
+    window.formatVND = formatVND;
+
     function extractCardAsset(btn) {
         const card = btn.closest('article, .asset-card');
         if (!card) return null;
@@ -246,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const thumbnail_url = imgEl ? imgEl.src : '';
         const catEl = card.querySelector('.uppercase, [data-category]');
         const category = catEl ? catEl.textContent.trim() : (card.dataset.category || 'TEMPLATE');
-        return { id, title, thumbnail_url, category, base_price: 49.0 };
+        return { id, title, thumbnail_url, category, base_price: 1190000 };
     }
 
     // Purchase & Demo buttons
@@ -275,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (iframe) {
                 iframe.src = demoUrl;
             }
-            const assetInfo = extractCardAsset(btn) || { title: 'Lumina Agency & Portfolio Template', demo_url: demoUrl, base_price: 49 };
+            const assetInfo = extractCardAsset(btn) || { title: 'Lumina Agency & Portfolio Template', demo_url: demoUrl, base_price: 1190000 };
             trackDemoView(assetInfo, 'mobile');
             
             // Dynamically update modal headers and product text if elements exist
@@ -286,7 +297,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const buyBtn = document.getElementById('mobile-modal-buy-btn');
             if (buyBtn) {
                 const ownText = window.t ? window.t('Sở hữu') : 'Sở hữu';
-                buyBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">shopping_bag</span><span>${ownText} ${assetInfo.title.slice(0, 15)}... — $${(assetInfo.base_price || 49).toFixed(0)}</span>`;
+                const formattedPrice = formatVND(assetInfo.base_price || 1190000);
+                buyBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">shopping_bag</span><span>${ownText} ${assetInfo.title.slice(0, 15)}... — ${formattedPrice}</span>`;
             }
             
             // Update clock
@@ -303,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Web Demo
         if (btn.textContent.includes('Web Demo') || btn.textContent.includes('Live Demo') || (btn.querySelector('.material-symbols-outlined')?.textContent === 'laptop_mac')) {
             const demoUrl = btn.getAttribute('data-demo-url') || btn.getAttribute('href') || '';
-            const assetInfo = extractCardAsset(btn) || { title: 'Lumina Agency & Portfolio Template', demo_url: demoUrl };
+            const assetInfo = extractCardAsset(btn) || { title: 'Lumina Agency & Portfolio Template', demo_url: demoUrl, base_price: 1190000 };
             trackDemoView(assetInfo, 'web');
             if (demoUrl && demoUrl !== '#') {
                 // allow normal navigation
@@ -321,13 +333,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 id: 'a1',
                 title: 'Lumina — Minimalist Portfolio & Agency Suite',
                 category: 'WEB TEMPLATE',
-                base_price: 49.0,
+                base_price: 1190000,
                 thumbnail_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8'
             };
             try {
                 localStorage.setItem('checkout_item', JSON.stringify(asset));
             } catch (e) {}
-            window.location.href = `payment.html?id=${encodeURIComponent(asset.id || 'a1')}&title=${encodeURIComponent(asset.title)}&price=${asset.base_price || 49.0}`;
+            window.location.href = `payment.html?id=${encodeURIComponent(asset.id || 'a1')}&title=${encodeURIComponent(asset.title)}&price=${asset.base_price || 1190000}`;
             return;
         }
 
