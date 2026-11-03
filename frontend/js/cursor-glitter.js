@@ -1,31 +1,49 @@
 /**
- * GiftSpace - Luxury Falling Glitter Cursor Effect (Hiệu ứng hạt kim tuyến rơi theo con trỏ chuột)
- * Lightweight, high-performance (60-120fps) canvas particle system.
- * Zero CPU overhead when idle. Non-blocking (pointer-events: none).
+ * GiftSpace - Luxury Rose & Ruby Glitter Cursor Effect
+ * (Hiệu ứng hạt kim tuyến Rose Gold, Ruby & Diamond rơi theo con trỏ chuột)
+ * 
+ * Thiết kế đồng bộ hoàn hảo với hệ thống màu Obsidian Rose của GiftSpace:
+ * - Ruby Red (#e11d48, #b80035, #ff2d55)
+ * - Rose Gold & Champagne Rose (#ffb2bb, #fda4af, #fbcfe8)
+ * - Diamond Starlight (#ffffff, #ffe4e6)
+ * 
+ * Tự động chuyển đổi bảng màu thông minh theo chế độ Dark / Light Mode.
+ * Hiệu năng cao 60-120fps trên canvas, zero CPU khi đứng yên, non-blocking.
  */
 (function () {
     if (typeof window === 'undefined') return;
 
-    // Respect user's reduced motion setting
+    // Tôn trọng cài đặt giảm chuyển động của người dùng
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         return;
     }
 
-    // Avoid duplicate initialization
+    // Tránh khởi tạo lặp lại
     if (window.__giftspace_glitter_initialized__) return;
     window.__giftspace_glitter_initialized__ = true;
 
-    // Glitter Palette (Brilliant Gold, Shimmering Champagne, Crystal White, GiftSpace Rose & Ruby)
-    const GLITTER_COLORS = [
-        '#ffd700', // Saturated Gold
-        '#ffea79', // Sparkling Champagne
-        '#ffffff', // Pure Crystal White
-        '#ff3b69', // GiftSpace Ruby Rose
-        '#fda4af', // Soft Blush Pink
-        '#fbcfe8', // Shimmering Pink
-        '#facc15', // Bright Amber Gold
-        '#fed7aa', // Peach Gold
-        '#e0e7ff'  // Crystal Starlight
+    // Bảng màu Kim Tuyến cho Dark Mode (Obsidian Rose: Luminous Ruby, Rose Gold & Diamond Glow)
+    const PALETTE_DARK = [
+        '#ff2d55', // Neon Ruby Rose (Tone màu chủ đạo rực rỡ)
+        '#ff5376', // Luminous Rose Pink
+        '#fb7185', // Radiant Rose
+        '#ff85a1', // Rose Quartz Shimmer
+        '#ffb2bb', // Lấp lánh Rose Gold
+        '#fbcfe8', // Champagne Pink Crystal
+        '#ffe4e6', // Diamond Pink Flare
+        '#ffffff'  // Pure Diamond Starlight (Ánh sao kim cương trắng sáng)
+    ];
+
+    // Bảng màu Kim Tuyến cho Light Mode (Velvet Ruby, Rose Quartz & Polished Rose Gold - Tương phản sắc nét trên nền sáng)
+    const PALETTE_LIGHT = [
+        '#b80035', // Deep GiftSpace Crimson
+        '#e11d48', // Vivid Rose Red
+        '#f43f5e', // Rose Quartz Gem
+        '#fb7185', // Coral Blossom
+        '#d03b68', // Sparkling Velvet Rose
+        '#e07a93', // Polished Rose Gold
+        '#fda4af', // Soft Rose Accent
+        '#ffffff'  // Diamond Sparkle Core
     ];
 
     let canvas, ctx;
@@ -36,51 +54,57 @@
     let lastX = null, lastY = null;
     let distAccumulator = 0;
 
+    function isDarkMode() {
+        return document.documentElement.classList.contains('dark') ||
+            (!('darkMode' in localStorage) && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+
     class GlitterParticle {
         constructor(x, y, vx, vy) {
-            // Slight natural scatter around cursor position
-            this.x = x + (Math.random() - 0.5) * 10;
-            this.y = y + (Math.random() - 0.5) * 10;
+            this.isDark = isDarkMode();
+            const palette = this.isDark ? PALETTE_DARK : PALETTE_LIGHT;
 
-            // Size: 2.8px to 7.5px for rich sparkle visibility
-            this.size = Math.random() * 4.6 + 2.8;
+            // Tán xạ tự nhiên nhẹ xung quanh đầu con trỏ chuột
+            this.x = x + (Math.random() - 0.5) * 8;
+            this.y = y + (Math.random() - 0.5) * 8;
+
+            // Kích thước hạt từ 2.6px đến 6.8px
+            this.size = Math.random() * 4.2 + 2.6;
             this.maxSize = this.size;
 
-            // Velocity: initial gentle burst, then gravity takes over
-            this.vx = (vx || 0) * 0.12 + (Math.random() - 0.5) * 2.4;
-            this.vy = (vy || 0) * 0.12 + (Math.random() * -2.0 + 0.3); // slight upward pop before floating down
+            // Vận tốc hạt: bay nhẹ lên trước khi rơi xuống theo trọng lực
+            this.vx = (vx || 0) * 0.10 + (Math.random() - 0.5) * 2.2;
+            this.vy = (vy || 0) * 0.10 + (Math.random() * -1.8 + 0.2);
 
-            // Falling physics: realistic falling glitter with gentle air resistance & side-to-side sway
-            this.gravity = 0.12 + Math.random() * 0.09; // Acceleration downwards
-            this.airResistance = 0.978;
+            // Vật lý rơi trọng lực kết hợp đung đưa nhẹ như kim tuyến trong không khí
+            this.gravity = 0.11 + Math.random() * 0.08;
+            this.airResistance = 0.98;
             this.driftFrequency = Math.random() * 3.5 + 2.0;
             this.driftPhase = Math.random() * Math.PI * 2;
-            this.driftAmplitude = Math.random() * 0.5 + 0.2;
+            this.driftAmplitude = Math.random() * 0.5 + 0.25;
 
-            // Rotation as it falls
+            // Hiệu ứng xoay tròn khi rơi
             this.rotation = Math.random() * Math.PI * 2;
-            this.rotSpeed = (Math.random() - 0.5) * 0.16;
+            this.rotSpeed = (Math.random() - 0.5) * 0.15;
 
-            // Lifespan: lasts ~0.7s to 1.4s
+            // Vòng đời của hạt (kéo dài ~0.8s đến 1.4s)
             this.life = 1.0;
-            this.decay = Math.random() * 0.015 + 0.012;
+            this.decay = Math.random() * 0.014 + 0.011;
 
-            // Twinkle fluctuation (nhấp nháy lấp lánh)
+            // Nhịp lấp lánh (Twinkle phase)
             this.twinklePhase = Math.random() * Math.PI * 2;
-            this.twinkleSpeed = Math.random() * 0.28 + 0.16;
+            this.twinkleSpeed = Math.random() * 0.26 + 0.18;
 
-            // Shape distribution: 50% 4-point star (✦), 30% diamond, 20% glowing circle
+            // Tỉ lệ hình dạng hạt: 50% Ngôi sao 4 cánh (✦ đặc trưng logo), 30% Kim cương (◆), 20% Bụi sao tròn
             const rand = Math.random();
             this.shape = rand < 0.5 ? 'star' : (rand < 0.8 ? 'diamond' : 'circle');
-            this.color = GLITTER_COLORS[Math.floor(Math.random() * GLITTER_COLORS.length)];
+            this.color = palette[Math.floor(Math.random() * palette.length)];
         }
 
         update(time) {
-            // Apply drag and gravity
             this.vx *= this.airResistance;
             this.vy = this.vy * this.airResistance + this.gravity;
 
-            // Gentle fluttering horizontal sway
             const sway = Math.sin(time * this.driftFrequency + this.driftPhase) * this.driftAmplitude;
             this.x += this.vx + sway;
             this.y += this.vy;
@@ -89,7 +113,7 @@
             this.life -= this.decay;
             this.twinklePhase += this.twinkleSpeed;
 
-            // Shrink slightly as it fades away
+            // Thu nhỏ dần khi sắp tan biến
             const progress = Math.max(0, this.life);
             this.size = this.maxSize * (0.35 + 0.65 * progress);
         }
@@ -97,8 +121,8 @@
         draw(ctx) {
             if (this.life <= 0 || this.size <= 0.1) return;
 
-            // Twinkle pulse factor
-            const twinkle = 0.78 + 0.22 * Math.sin(this.twinklePhase);
+            // Hiệu ứng nhấp nháy phát sáng
+            const twinkle = 0.8 + 0.2 * Math.sin(this.twinklePhase);
             const alpha = Math.max(0, Math.min(1, this.life * twinkle));
 
             ctx.save();
@@ -106,11 +130,13 @@
             ctx.rotate(this.rotation);
             ctx.globalAlpha = alpha;
 
+            const glowBlur = this.isDark ? 9 : 4;
+
             if (this.shape === 'star') {
-                // 4-pointed diamond sparkle star (✦)
+                // Ngôi sao 4 cánh kim cương (✦)
                 ctx.fillStyle = this.color;
                 ctx.shadowColor = this.color;
-                ctx.shadowBlur = 8;
+                ctx.shadowBlur = glowBlur;
 
                 ctx.beginPath();
                 const spikes = 4;
@@ -127,18 +153,19 @@
                 ctx.closePath();
                 ctx.fill();
 
-                // Ultra-bright crystal center core
+                // Điểm tâm kim cương trắng sáng lấp lánh ở giữa
                 ctx.beginPath();
-                ctx.arc(0, 0, Math.max(0.7, this.size * 0.22), 0, Math.PI * 2);
+                ctx.arc(0, 0, Math.max(0.7, this.size * 0.24), 0, Math.PI * 2);
                 ctx.fillStyle = '#ffffff';
-                ctx.shadowBlur = 3;
+                ctx.shadowBlur = this.isDark ? 5 : 2;
                 ctx.shadowColor = '#ffffff';
                 ctx.fill();
             } else if (this.shape === 'diamond') {
-                // Shimmering Diamond
+                // Kim cương đa giác Rose Gem (◆)
                 ctx.fillStyle = this.color;
                 ctx.shadowColor = this.color;
-                ctx.shadowBlur = 6;
+                ctx.shadowBlur = glowBlur;
+
                 ctx.beginPath();
                 ctx.moveTo(0, -this.size);
                 ctx.lineTo(this.size * 0.58, 0);
@@ -147,21 +174,22 @@
                 ctx.closePath();
                 ctx.fill();
 
-                // Sparkle core
+                // Tâm sáng lấp lánh
                 ctx.beginPath();
                 ctx.arc(0, 0, Math.max(0.6, this.size * 0.22), 0, Math.PI * 2);
                 ctx.fillStyle = '#ffffff';
                 ctx.fill();
             } else {
-                // Glowing Shimmer Dust Dot
+                // Bụi sao phát sáng tròn (●)
                 ctx.fillStyle = this.color;
                 ctx.shadowColor = this.color;
-                ctx.shadowBlur = 6;
+                ctx.shadowBlur = glowBlur;
+
                 ctx.beginPath();
                 ctx.arc(0, 0, this.size * 0.7, 0, Math.PI * 2);
                 ctx.fill();
 
-                // White twinkle dot
+                // Điểm sáng trung tâm
                 ctx.beginPath();
                 ctx.arc(0, 0, this.size * 0.3, 0, Math.PI * 2);
                 ctx.fillStyle = '#ffffff';
@@ -264,7 +292,7 @@
 
         distAccumulator += dist;
 
-        // Emit falling glitter particles smoothly along movement path
+        // Sinh hạt mịn màng theo quỹ đạo di chuyển chuột
         if (distAccumulator >= 7) {
             const count = Math.min(Math.floor(distAccumulator / 7), 5);
             for (let i = 1; i <= count; i++) {
@@ -280,12 +308,19 @@
         lastY = y;
     }
 
-    // Attach mouse listeners
+    // Sự kiện di chuyển chuột
     window.addEventListener('mousemove', (e) => {
         onPointerMove(e.clientX, e.clientY);
     }, { passive: true });
 
-    // Touch support for mobile / touch devices
+    // Hiệu ứng pháo hoa kim tuyến mini (burst) khi bấm chuột vào các nút/thẻ
+    window.addEventListener('click', (e) => {
+        if (e.button === 0) {
+            spawnGlitter(e.clientX, e.clientY, (Math.random() - 0.5) * 3.5, -2.2, 8);
+        }
+    }, { passive: true });
+
+    // Hỗ trợ cảm ứng trên thiết bị di động
     window.addEventListener('touchmove', (e) => {
         if (e.touches && e.touches[0]) {
             onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
@@ -299,7 +334,7 @@
 
     window.addEventListener('resize', resize, { passive: true });
 
-    // Initialize on load
+    // Khởi tạo ngay khi tải xong trang
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initCanvas);
     } else {
