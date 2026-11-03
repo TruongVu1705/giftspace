@@ -252,12 +252,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!card) return null;
         const id = card.dataset.id || '';
         const titleEl = card.querySelector('h2, h3, h4, h5');
-        const title = titleEl ? titleEl.textContent.trim() : 'Mẫu giao diện';
+        const title = card.dataset.title || (titleEl ? titleEl.textContent.trim() : 'Mẫu giao diện');
         const imgEl = card.querySelector('img');
         const thumbnail_url = imgEl ? imgEl.src : '';
         const catEl = card.querySelector('.uppercase, [data-category]');
-        const category = catEl ? catEl.textContent.trim() : (card.dataset.category || 'TEMPLATE');
-        return { id, title, thumbnail_url, category, base_price: 1190000 };
+        const category = card.dataset.category || (catEl ? catEl.textContent.trim() : 'TEMPLATE');
+        let price = card.dataset.price ? parseFloat(card.dataset.price) : 1190000;
+        if (price > 0 && price < 1000) price = Math.round((price * 24300) / 10000) * 10000;
+        const demo_url = card.dataset.demoUrl || '';
+        return { id, title, thumbnail_url, category, base_price: price, demo_url };
     }
 
     // Purchase & Demo buttons
@@ -1143,22 +1146,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const article = document.createElement('article');
             article.className = "asset-card group bg-surface-container-lowest border border-outline-variant rounded-2xl p-space-md flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-secondary-container";
             article.dataset.id = asset.id;
-            
+            article.dataset.price = asset.base_price;
+            article.dataset.title = asset.title;
+            article.dataset.category = asset.category || 'TEMPLATE';
+            article.dataset.demoUrl = asset.demo_url || '';
+
+            const formattedPrice = window.formatVND ? window.formatVND(asset.base_price) : (typeof asset.base_price === 'number' ? (asset.base_price < 1000 ? Math.round(asset.base_price * 24300) : asset.base_price).toLocaleString('vi-VN') + ' VNĐ' : '1.190.000 VNĐ');
+            const licenseText = isVi ? 'Bản quyền thương mại' : 'Commercial License';
+
             article.innerHTML = `
                 <div>
                   <div class="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/60 mb-space-md">
                     <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                       alt="${asset.title}" src="${asset.thumbnail_url}">
+                    <span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-surface-container-lowest/90 dark:bg-black/75 backdrop-blur-md text-primary font-bold text-xs font-mono shadow-xs border border-outline-variant/60">
+                      ${formattedPrice}
+                    </span>
                   </div>
                   <h2 class="font-title-lg text-title-lg text-on-surface font-semibold group-hover:text-primary-container transition-colors line-clamp-1 mb-1">
                     ${asset.title}
                   </h2>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                  <p class="font-body-sm text-body-sm text-on-surface-variant mb-2">
                     ${creatorLabel}
                   </p>
-                  <p class="font-body-sm text-body-sm text-on-surface mb-2 font-semibold">
-                     ${priceLabel} $${asset.base_price.toFixed(2)}
-                  </p>
+                  <div class="flex items-center justify-between py-2 border-t border-outline-variant/50 text-xs mb-3">
+                    <span class="text-on-surface-variant font-medium">${licenseText}</span>
+                    <span class="font-bold text-primary font-mono text-[14px]">${formattedPrice}</span>
+                  </div>
                 </div>
                 <div class="flex items-center gap-space-sm pt-space-xs">
                   <div class="w-full flex flex-col gap-2">
@@ -1170,8 +1184,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="material-symbols-outlined text-[16px] text-outline">smartphone</span><span data-i18n="Mobile Demo">Mobile Demo</span>
                       </button>
                     </div>
-                    <button class="purchase-btn w-full py-2 px-space-md rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md transition-colors text-center font-medium flex items-center justify-center gap-1.5 shadow-xs cursor-pointer" type="button">
-                      <span class="material-symbols-outlined text-[16px]">shopping_bag</span><span data-i18n="Purchase">${purchaseLabel}</span>
+                    <button class="purchase-btn w-full py-2.5 px-space-md rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md transition-colors text-center font-semibold flex items-center justify-center gap-1.5 shadow-xs cursor-pointer" type="button">
+                      <span class="material-symbols-outlined text-[16px]">shopping_bag</span><span>${purchaseLabel} — ${formattedPrice}</span>
                     </button>
                   </div>
                 </div>
