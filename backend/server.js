@@ -327,24 +327,41 @@ app.get('/api/admin/tables/:name', (req, res) => {
 
 
 // ==========================================
-// PURE BACKEND API MODE (No static frontend)
+// ENVIRONMENT-AWARE SERVING:
+// - Locally (Dev): Phục vụ frontend tại http://localhost:3000 để chạy test trực quan
+// - On Render (Production): Chế độ Pure Backend API thuần túy phục vụ cho Netlify
 // ==========================================
-app.get('/', (req, res) => {
-    res.json({
-        status: "online",
-        service: "GiftSpace Backend API",
-        message: "Backend API is running successfully. Frontend is hosted on Netlify.",
-        uptime: Math.round(process.uptime()),
-        timestamp: new Date().toISOString(),
-        endpoints: {
-            health: "/api/health",
-            assets: "/api/assets",
-            login: "/api/users/login"
-        }
-    });
-});
+const isProduction = process.env.NODE_ENV === 'production';
+const frontendPath = path.join(__dirname, '../frontend');
 
-// 404 handler for unmatched routes
+if (!isProduction && fs.existsSync(frontendPath)) {
+    app.use(express.static(frontendPath));
+    app.use((req, res, next) => {
+        if (req.path.startsWith('/api')) return next();
+        const targetFile = path.join(frontendPath, req.path.endsWith('.html') ? req.path : 'index.html');
+        if (fs.existsSync(targetFile)) {
+            return res.sendFile(targetFile);
+        }
+        res.sendFile(path.join(frontendPath, 'index.html'));
+    });
+} else {
+    app.get('/', (req, res) => {
+        res.json({
+            status: "online",
+            service: "GiftSpace Backend API",
+            message: "Backend API is running successfully. Frontend is hosted on Netlify.",
+            uptime: Math.round(process.uptime()),
+            timestamp: new Date().toISOString(),
+            endpoints: {
+                health: "/api/health",
+                assets: "/api/assets",
+                login: "/api/users/login"
+            }
+        });
+    });
+}
+
+// 404 handler for unmatched API routes
 app.use((req, res) => {
     res.status(404).json({
         error: "Not Found",
