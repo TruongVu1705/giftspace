@@ -285,7 +285,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (prodTitle) prodTitle.textContent = assetInfo.title;
             const buyBtn = document.getElementById('mobile-modal-buy-btn');
             if (buyBtn) {
-                buyBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">shopping_bag</span><span>Sở hữu ${assetInfo.title.slice(0, 15)}... — $${(assetInfo.base_price || 49).toFixed(0)}</span>`;
+                const ownText = window.t ? window.t('Sở hữu') : 'Sở hữu';
+                buyBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">shopping_bag</span><span>${ownText} ${assetInfo.title.slice(0, 15)}... — $${(assetInfo.base_price || 49).toFixed(0)}</span>`;
             }
             
             // Update clock
@@ -349,31 +350,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const toast = document.createElement('div');
+        const t = window.t || ((x) => x);
         let iconName = 'check_circle';
         let iconColor = 'text-emerald-500';
-        let titleText = 'Thành công';
+        let titleText = t('Thành công');
         let borderClass = 'border-emerald-500/30';
         let shadowClass = 'shadow-emerald-500/10';
 
         if (type === 'error') {
             iconName = 'error';
             iconColor = 'text-rose-500';
-            titleText = 'Lỗi xác thực';
+            titleText = t('Lỗi xác thực');
             borderClass = 'border-rose-500/30';
             shadowClass = 'shadow-rose-500/10';
         } else if (type === 'warning') {
             iconName = 'warning';
             iconColor = 'text-amber-500';
-            titleText = 'Cảnh báo';
+            titleText = t('Cảnh báo');
             borderClass = 'border-amber-500/30';
             shadowClass = 'shadow-amber-500/10';
         } else if (type === 'info') {
             iconName = 'info';
             iconColor = 'text-blue-500';
-            titleText = 'Thông báo';
+            titleText = t('Thông báo');
             borderClass = 'border-blue-500/30';
             shadowClass = 'shadow-blue-500/10';
         }
+
+        const translatedMsg = t(message);
+        const closeTitle = t('Đóng');
 
         toast.className = `pointer-events-auto flex items-start gap-3 p-4 rounded-2xl shadow-2xl border backdrop-blur-md transition-all duration-300 transform -translate-y-2 opacity-0 bg-surface-container-lowest/95 ${borderClass} text-on-surface ${shadowClass}`;
 
@@ -381,9 +386,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="material-symbols-outlined text-[22px] ${iconColor} shrink-0 mt-0.5">${iconName}</span>
             <div class="flex-1 min-w-0 pr-1">
                 <span class="block text-[11px] font-bold uppercase tracking-wider ${iconColor} leading-none mb-1">${titleText}</span>
-                <p class="text-body-sm text-[13px] text-on-surface leading-snug font-medium break-words">${message}</p>
+                <p class="text-body-sm text-[13px] text-on-surface leading-snug font-medium break-words">${translatedMsg}</p>
             </div>
-            <button type="button" class="text-on-surface-variant hover:text-on-surface p-0.5 rounded-lg transition-colors cursor-pointer shrink-0" title="Đóng">
+            <button type="button" class="text-on-surface-variant hover:text-on-surface p-0.5 rounded-lg transition-colors cursor-pointer shrink-0" title="${closeTitle}">
                 <span class="material-symbols-outlined text-[16px]">close</span>
             </button>
         `;
@@ -439,22 +444,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         alertBox.className = `modal-dynamic-alert mb-3 p-3.5 rounded-2xl border text-left text-[12px] leading-relaxed transition-all flex items-start gap-2.5 ${bgClasses}`;
 
+        const t = window.t || ((x) => x);
         let quickAction = '';
         if (message.includes('đã tồn tại') || message.includes('Email already exists')) {
-            quickAction = ` <button type="button" class="underline font-bold hover:opacity-80 cursor-pointer ml-1" onclick="openModal('login-modal')">Đăng nhập ngay</button>`;
+            quickAction = ` <button type="button" class="underline font-bold hover:opacity-80 cursor-pointer ml-1" onclick="openModal('login-modal')">${t('Đăng nhập ngay')}</button>`;
         } else if (message.includes('chưa được đăng ký') || message.includes('chưa có tài khoản') || message.includes('chưa đăng ký')) {
-            quickAction = ` <button type="button" class="underline font-bold hover:opacity-80 cursor-pointer ml-1" onclick="openModal('register-modal')">Đăng ký mới</button>`;
+            quickAction = ` <button type="button" class="underline font-bold hover:opacity-80 cursor-pointer ml-1" onclick="openModal('register-modal')">${t('Đăng ký mới')}</button>`;
         } else if (message.includes('Mật khẩu không chính xác') || message.includes('sai mật khẩu')) {
-            quickAction = ` <button type="button" class="underline font-bold hover:opacity-80 cursor-pointer ml-1" onclick="openModal('forgot-modal')">Quên mật khẩu?</button>`;
+            quickAction = ` <button type="button" class="underline font-bold hover:opacity-80 cursor-pointer ml-1" onclick="openModal('forgot-modal')">${t('Quên mật khẩu?')}</button>`;
         }
+
+        const alertTitle = isErr ? t('Lỗi xác thực:') : (isWarn ? t('Lưu ý:') : t('Thành công:'));
+        const closeTitle = t('Đóng');
 
         alertBox.innerHTML = `
             <span class="material-symbols-outlined text-[18px] shrink-0 mt-0.5 ${iconColor}">${iconName}</span>
             <div class="flex-1 min-w-0">
-                <span class="font-semibold block mb-0.5">${isErr ? 'Lỗi xác thực:' : (isWarn ? 'Lưu ý:' : 'Thành công:')}</span>
-                <span>${message}${quickAction}</span>
+                <span class="font-semibold block mb-0.5">${alertTitle}</span>
+                <span>${t(message)}${quickAction}</span>
             </div>
-            <button type="button" class="text-current opacity-70 hover:opacity-100 p-0.5 cursor-pointer shrink-0" onclick="this.parentElement.remove()" title="Đóng">
+            <button type="button" class="text-current opacity-70 hover:opacity-100 p-0.5 cursor-pointer shrink-0" onclick="this.parentElement.remove()" title="${closeTitle}">
                 <span class="material-symbols-outlined text-[15px]">close</span>
             </button>
         `;
@@ -500,13 +509,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const bars = barsContainer.querySelectorAll('div');
         if (bars.length < 3) return;
 
+        const t = window.t || ((x) => x);
         if (!password || password.length === 0) {
-            labelEl.textContent = 'Chưa nhập';
+            labelEl.textContent = t('Chưa nhập');
             labelEl.className = 'font-semibold text-on-surface-variant';
             bars[0].className = 'rounded-full bg-outline-variant/40 h-full transition-all duration-300';
             bars[1].className = 'rounded-full bg-outline-variant/40 h-full transition-all duration-300';
             bars[2].className = 'rounded-full bg-outline-variant/40 h-full transition-all duration-300';
-            if (hintEl) hintEl.textContent = 'Yêu cầu: Yếu (chữ & số ≤ 8 ký tự), Trung bình (> 8 ký tự), Mạnh (kí tự đặc biệt)';
+            if (hintEl) hintEl.textContent = t('Yêu cầu: Yếu (chữ & số ≤ 8 ký tự), Trung bình (> 8 ký tự), Mạnh (kí tự đặc biệt)');
             return;
         }
 
@@ -520,26 +530,26 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2. Trung bình: có chữ và số trên 8 kí tự
         // 3. Yếu: chỉ có chữ và số (<= 8 ký tự hoặc đơn giản)
         if (hasSpecial) {
-            labelEl.textContent = 'Mạnh';
+            labelEl.textContent = t('Mạnh');
             labelEl.className = 'font-semibold text-emerald-500';
             bars[0].className = 'rounded-full bg-emerald-500 h-full transition-all duration-300';
             bars[1].className = 'rounded-full bg-emerald-500 h-full transition-all duration-300';
             bars[2].className = 'rounded-full bg-emerald-500 h-full transition-all duration-300';
-            if (hintEl) hintEl.textContent = 'Mật khẩu mạnh: đã có ký tự đặc biệt bảo vệ tối ưu.';
+            if (hintEl) hintEl.textContent = t('Mật khẩu mạnh: đã có ký tự đặc biệt bảo vệ tối ưu.');
         } else if (hasLetters && hasNumbers && len > 8) {
-            labelEl.textContent = 'Trung bình';
+            labelEl.textContent = t('Trung bình');
             labelEl.className = 'font-semibold text-amber-500';
             bars[0].className = 'rounded-full bg-amber-500 h-full transition-all duration-300';
             bars[1].className = 'rounded-full bg-amber-500 h-full transition-all duration-300';
             bars[2].className = 'rounded-full bg-outline-variant/40 h-full transition-all duration-300';
-            if (hintEl) hintEl.textContent = 'Mật khẩu trung bình: có cả chữ và số trên 8 ký tự. Thêm ký tự đặc biệt (!@#$...) để đạt mức Mạnh.';
+            if (hintEl) hintEl.textContent = t('Mật khẩu trung bình: có cả chữ và số trên 8 ký tự. Thêm ký tự đặc biệt (!@#$...) để đạt mức Mạnh.');
         } else {
-            labelEl.textContent = 'Yếu';
+            labelEl.textContent = t('Yếu');
             labelEl.className = 'font-semibold text-rose-500';
             bars[0].className = 'rounded-full bg-rose-500 h-full transition-all duration-300';
             bars[1].className = 'rounded-full bg-outline-variant/40 h-full transition-all duration-300';
             bars[2].className = 'rounded-full bg-outline-variant/40 h-full transition-all duration-300';
-            if (hintEl) hintEl.textContent = 'Mật khẩu yếu: chỉ có chữ và số (dưới hoặc bằng 8 ký tự). Hãy nhập trên 8 ký tự hoặc thêm ký tự đặc biệt.';
+            if (hintEl) hintEl.textContent = t('Mật khẩu yếu: chỉ có chữ và số (dưới hoặc bằng 8 ký tự). Hãy nhập trên 8 ký tự hoặc thêm ký tự đặc biệt.');
         }
     }
 
@@ -637,7 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const oldBtnHtml = submitBtn ? submitBtn.innerHTML : '';
                         if (submitBtn) {
                             submitBtn.disabled = true;
-                            submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span><span>Đang xác thực...</span>';
+                            submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span><span>' + (window.t ? window.t('Đang xác thực...') : 'Đang xác thực...') + '</span>';
                         }
                         
                         try {
@@ -726,7 +736,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const oldBtnHtml = submitBtn ? submitBtn.innerHTML : '';
                         if (submitBtn) {
                             submitBtn.disabled = true;
-                            submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span><span>Đang tạo tài khoản...</span>';
+                            submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span><span>' + (window.t ? window.t('Đang tạo tài khoản...') : 'Đang tạo tài khoản...') + '</span>';
                         }
 
                         try {
@@ -789,7 +799,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const email = emailInput.value.trim();
 
                         if (submitBtn) submitBtn.disabled = true;
-                        if (btnText) btnText.textContent = 'Đang gửi mật khẩu reset...';
+                        if (btnText) btnText.textContent = window.t ? window.t('Đang gửi yêu cầu...') : 'Đang gửi yêu cầu...';
 
                         try {
                             const res = await fetch('/api/users/forgot-password', {
@@ -800,30 +810,31 @@ document.addEventListener('DOMContentLoaded', () => {
                             const data = await res.json();
 
                             if (data.success) {
-                                showToast(`Đã cấp lại mật khẩu mới cho ${data.email}!`, 'success');
+                                const t = window.t || ((x) => x);
+                                showToast(`${t('Đã cấp lại mật khẩu thành công!')} (${data.email})`, 'success');
                                 if (resultBox) {
                                     resultBox.className = 'p-4 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 text-left space-y-3 transition-all';
                                     resultBox.innerHTML = `
                                         <div class="flex items-start gap-2.5 text-emerald-600 dark:text-emerald-400">
                                             <span class="material-symbols-outlined text-[22px] shrink-0 mt-0.5">check_circle</span>
                                             <div>
-                                                <p class="font-semibold text-sm leading-tight">Đã cấp lại mật khẩu thành công!</p>
-                                                <p class="text-[12px] opacity-90 mt-0.5 leading-relaxed">Mật khẩu mới đã được gửi về hòm thư <strong class="underline">${data.email}</strong> và đã kích hoạt trực tiếp trên hệ thống:</p>
+                                                <p class="font-semibold text-sm leading-tight">${t('Đã cấp lại mật khẩu thành công!')}</p>
+                                                <p class="text-[12px] opacity-90 mt-0.5 leading-relaxed">${t('Mật khẩu mới đã được gửi về hòm thư')} <strong class="underline">${data.email}</strong> ${t('và đã kích hoạt trực tiếp trên hệ thống:')}</p>
                                             </div>
                                         </div>
                                         <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface border border-outline-variant">
                                             <div>
-                                                <span class="block text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">Mật khẩu tạm thời</span>
+                                                <span class="block text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">${t('Mật khẩu tạm thời')}</span>
                                                 <span class="font-mono text-base font-bold text-primary-container tracking-wider select-all" id="temp-new-pass">${data.new_password}</span>
                                             </div>
                                             <button type="button" id="copy-temp-pass-btn" class="px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-variant text-[12px] font-medium text-on-surface flex items-center gap-1.5 transition-colors cursor-pointer">
                                                 <span class="material-symbols-outlined text-[15px]">content_copy</span>
-                                                <span id="copy-btn-label">Sao chép</span>
+                                                <span id="copy-btn-label">${t('Sao chép')}</span>
                                             </button>
                                         </div>
                                         <button type="button" id="forgot-login-now-btn" class="w-full py-2.5 px-4 rounded-xl bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-sm font-semibold tracking-wide transition-all shadow flex items-center justify-center gap-2 cursor-pointer">
                                             <span class="material-symbols-outlined text-[18px]">login</span>
-                                            <span>Đăng nhập ngay với mật khẩu mới</span>
+                                            <span>${t('Đăng nhập ngay với mật khẩu mới')}</span>
                                         </button>
                                     `;
                                     resultBox.classList.remove('hidden');
@@ -835,10 +846,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                             navigator.clipboard.writeText(data.new_password);
                                             const label = resultBox.querySelector('#copy-btn-label');
                                             if (label) {
-                                                label.textContent = 'Đã chép!';
-                                                setTimeout(() => { label.textContent = 'Sao chép'; }, 2000);
+                                                label.textContent = t('Đã chép!');
+                                                setTimeout(() => { label.textContent = t('Sao chép'); }, 2000);
                                             }
-                                            showToast('Đã sao chép mật khẩu mới!', 'info');
+                                            showToast(t('Đã sao chép!'), 'info');
                                         };
                                     }
 
@@ -1111,6 +1122,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const endIndex = startIndex + window.ITEMS_PER_PAGE;
         const paginatedData = window.allAssets.slice(startIndex, endIndex);
         
+        const isVi = (window.getCurrentLang ? window.getCurrentLang() : localStorage.getItem('app_lang') || 'vi') === 'vi';
+        const priceLabel = isVi ? 'Giá:' : 'Price:';
+        const creatorLabel = isVi ? 'bởi <span class="font-medium text-on-surface">GiftSpace Creator</span> • Cập nhật gần đây' : 'by <span class="font-medium text-on-surface">GiftSpace Creator</span> • Updated recently';
+        const purchaseLabel = isVi ? 'Mua bản quyền' : 'Purchase';
+        
         paginatedData.forEach(asset => {
             const article = document.createElement('article');
             article.className = "asset-card group bg-surface-container-lowest border border-outline-variant rounded-2xl p-space-md flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-secondary-container";
@@ -1126,24 +1142,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${asset.title}
                   </h2>
                   <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
-                    by <span class="font-medium text-on-surface">GiftSpace Creator</span> • Updated recently
+                    ${creatorLabel}
                   </p>
                   <p class="font-body-sm text-body-sm text-on-surface mb-2 font-semibold">
-                     Giá: ${asset.base_price.toFixed(2)}
+                     ${priceLabel} $${asset.base_price.toFixed(2)}
                   </p>
                 </div>
                 <div class="flex items-center gap-space-sm pt-space-xs">
                   <div class="w-full flex flex-col gap-2">
                     <div class="grid grid-cols-2 gap-2">
                       <a href="${asset.demo_url || '#'}" target="_blank" class="web-demo-btn py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1 cursor-pointer">
-                        <span class="material-symbols-outlined text-[16px] text-outline">laptop_mac</span><span>Web Demo</span>
+                        <span class="material-symbols-outlined text-[16px] text-outline">laptop_mac</span><span data-i18n="Web Demo">Web Demo</span>
                       </a>
                       <button type="button" data-demo-url="${asset.demo_url || 'demo-lumina.html'}" class="mobile-demo-btn py-2 px-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors text-center font-medium flex items-center justify-center gap-1 cursor-pointer">
-                        <span class="material-symbols-outlined text-[16px] text-outline">smartphone</span><span>Mobile Demo</span>
+                        <span class="material-symbols-outlined text-[16px] text-outline">smartphone</span><span data-i18n="Mobile Demo">Mobile Demo</span>
                       </button>
                     </div>
-                    <button class="purchase-btn w-full py-2 px-space-md rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md transition-colors text-center font-medium flex items-center justify-center gap-1.5 shadow-xs" type="button">
-                      <span class="material-symbols-outlined text-[16px]">shopping_bag</span><span>Purchase</span>
+                    <button class="purchase-btn w-full py-2 px-space-md rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-label-md text-label-md transition-colors text-center font-medium flex items-center justify-center gap-1.5 shadow-xs cursor-pointer" type="button">
+                      <span class="material-symbols-outlined text-[16px]">shopping_bag</span><span data-i18n="Purchase">${purchaseLabel}</span>
                     </button>
                   </div>
                 </div>
@@ -1151,6 +1167,7 @@ document.addEventListener('DOMContentLoaded', () => {
             grid.appendChild(article);
         });
         
+        if (window.applyTranslation) window.applyTranslation();
         renderPaginationControls();
     }
 

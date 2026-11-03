@@ -1,43 +1,110 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Database Admin - GiftSpace</title>
+    <title>Database Explorer - GiftSpace</title>
+    <script>
+      if (localStorage.getItem('darkMode') === 'true' || (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f3f4f6; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
-        tr:hover { background-color: #f9fafb; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        th, td { padding: 12px 16px; text-align: left; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans p-8">
-    <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold mb-6 text-indigo-600">Trình xem Cơ sở dữ liệu</h1>
+<body class="bg-background text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container">
+
+    <!-- Top Navigation Bar -->
+    <header class="w-full bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-2 group">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary to-primary-container text-on-primary flex items-center justify-center font-bold text-base shadow-xs group-hover:scale-105 transition-transform">
+                        <span class="material-symbols-outlined text-[20px]">dataset</span>
+                    </div>
+                    <div>
+                        <span class="font-bold text-base tracking-tight text-on-surface block leading-tight">GiftSpace</span>
+                        <span class="text-[10px] uppercase font-bold text-primary tracking-wider" data-i18n="Raw Database Explorer">Trình xem Cơ sở dữ liệu</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <a href="dashboard.html" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-xs border border-outline-variant shadow-xs transition-all cursor-pointer">
+                    <span class="material-symbols-outlined text-[16px] text-primary">arrow_back</span>
+                    <span data-i18n="Back to Dashboard">Quay lại Dashboard</span>
+                </a>
+                <button onclick="toggleDarkMode()" type="button" class="w-9 h-9 rounded-xl border border-outline-variant bg-surface-container-low hover:bg-surface-container text-on-surface flex items-center justify-center transition-colors cursor-pointer" title="Đổi giao diện">
+                    <span class="material-symbols-outlined text-[18px]">dark_mode</span>
+                </button>
+                <button onclick="toggleLanguage()" type="button" class="px-2.5 py-1.5 rounded-xl border border-outline-variant bg-surface-container-low hover:bg-surface-container text-on-surface text-xs font-bold transition-colors cursor-pointer" title="Đổi ngôn ngữ">
+                    <span id="lang-toggle-text">VI</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 flex flex-col gap-5">
         
-        <div class="mb-6 flex gap-2" id="table-tabs">
-            <!-- Tabs will be injected here -->
+        <!-- Header Info -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-[28px]">database</span>
+                    <span data-i18n="Raw Database Explorer">Trình xem Cơ sở dữ liệu</span>
+                </h1>
+                <p class="text-xs text-on-surface-variant mt-0.5">Truy vấn trực tiếp các bảng dữ liệu SQLite trên máy chủ GiftSpace</p>
+            </div>
+            <div id="add-btn-slot"></div>
+        </div>
+        
+        <!-- Table Selection Tabs -->
+        <div class="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-surface-container-low border border-outline-variant" id="table-tabs">
+            <!-- Tabs injected dynamically -->
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
-            <table class="w-full whitespace-nowrap">
-                <thead id="table-head">
-                    <!-- Headings -->
-                </thead>
-                <tbody id="table-body">
-                    <!-- Data rows -->
-                </tbody>
-            </table>
+        <!-- Table Data Card -->
+        <div class="bg-surface-container-lowest rounded-2xl shadow-xs border border-outline-variant overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs whitespace-nowrap">
+                    <thead id="table-head" class="bg-surface-container text-on-surface-variant uppercase tracking-wider font-bold border-b border-outline-variant">
+                        <!-- Headings -->
+                    </thead>
+                    <tbody id="table-body" class="divide-y divide-outline-variant text-on-surface font-medium">
+                        <!-- Data rows -->
+                    </tbody>
+                </table>
+            </div>
         </div>
         
-        <div id="loading" class="mt-4 text-gray-500 italic hidden">Đang tải dữ liệu...</div>
-    </div>
+        <div id="loading" class="text-center py-8 text-on-surface-variant italic flex items-center justify-center gap-2 hidden">
+            <span class="material-symbols-outlined animate-spin text-[20px] text-primary">progress_activity</span>
+            <span data-i18n="Loading table data...">Đang tải dữ liệu...</span>
+        </div>
+    </main>
 
+    <script src="js/i18n.js"></script>
     <script>
         const tabsContainer = document.getElementById('table-tabs');
         const thead = document.getElementById('table-head');
         const tbody = document.getElementById('table-body');
         const loading = document.getElementById('loading');
+        const addBtnSlot = document.getElementById('add-btn-slot');
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', isDark);
+        }
 
         async function init() {
             try {
@@ -46,7 +113,7 @@
                 
                 tables.forEach(table => {
                     const btn = document.createElement('button');
-                    btn.className = 'px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 font-medium transition-colors';
+                    btn.className = 'px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-lowest text-on-surface border border-outline-variant shadow-xs hover:bg-surface-container transition-all cursor-pointer';
                     btn.textContent = table;
                     btn.onclick = () => loadTableData(table, btn);
                     tabsContainer.appendChild(btn);
@@ -57,52 +124,53 @@
                 }
             } catch (err) {
                 console.error(err);
-                alert('Failed to load tables. Is the server running?');
+                alert('Không thể kết nối máy chủ để tải bảng.');
             }
         }
 
         async function loadTableData(table, activeBtn) {
+            const t = window.t || ((x) => x);
             // Update active tab styling
             Array.from(tabsContainer.children).forEach(btn => {
-                btn.classList.remove('bg-indigo-50', 'border-indigo-300', 'text-indigo-700');
+                btn.className = 'px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider bg-surface-container-lowest text-on-surface border border-outline-variant shadow-xs hover:bg-surface-container transition-all cursor-pointer';
             });
-            activeBtn.classList.add('bg-indigo-50', 'border-indigo-300', 'text-indigo-700');
+            if (activeBtn) {
+                activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-primary-container text-on-primary-container border border-primary shadow-xs transition-all cursor-pointer';
+            }
 
             loading.classList.remove('hidden');
             thead.innerHTML = '';
             tbody.innerHTML = '';
-            
-            // Remove any existing "Add Asset" button if we switch tabs
-            const existingAddBtn = document.getElementById('add-asset-btn');
-            if (existingAddBtn) existingAddBtn.remove();
+            addBtnSlot.innerHTML = '';
 
             if (table === 'assets') {
                 const addBtn = document.createElement('button');
-                addBtn.id = 'add-asset-btn';
-                addBtn.className = 'mb-4 px-4 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 font-medium transition-colors';
-                addBtn.textContent = '+ Thêm sản phẩm mới';
+                addBtn.className = 'inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-bold text-xs shadow-xs transition-all cursor-pointer';
+                addBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">add_box</span><span>' + t('Thêm sản phẩm mới') + '</span>';
                 addBtn.onclick = () => addAssetPrompt();
-                tabsContainer.parentNode.insertBefore(addBtn, tabsContainer.nextSibling);
+                addBtnSlot.appendChild(addBtn);
             }
 
             try {
                 const res = await fetch('/api/admin/tables/' + table);
                 const { data } = await res.json();
                 
-                if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="100%" class="text-center py-8 text-gray-500">No data found in this table.</td></tr>';
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="100%" class="text-center py-12 text-on-surface-variant font-medium">${t('Không có dữ liệu trong bảng này.')}</td></tr>`;
                 } else {
                     // Create headers
                     const columns = Object.keys(data[0]);
                     const trHead = document.createElement('tr');
                     columns.forEach(col => {
                         const th = document.createElement('th');
+                        th.className = 'py-3.5 px-4 font-bold text-xs uppercase tracking-wider';
                         th.textContent = col;
                         trHead.appendChild(th);
                     });
                     if (table === 'assets') {
                         const thAction = document.createElement('th');
-                        thAction.textContent = 'Hành động';
+                        thAction.className = 'py-3.5 px-4 font-bold text-xs uppercase tracking-wider text-right';
+                        thAction.textContent = t('Hành động');
                         trHead.appendChild(thAction);
                     }
                     thead.appendChild(trHead);
@@ -110,19 +178,24 @@
                     // Create rows
                     data.forEach(row => {
                         const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-surface-container/50 transition-colors';
                         columns.forEach(col => {
                             const td = document.createElement('td');
+                            td.className = 'py-3 px-4';
                             td.textContent = row[col];
-                            if (col === 'password_hash') td.textContent = '********'; // Hide hashes for safety
+                            if (col === 'password_hash') td.textContent = '••••••••'; // Mask hashes
                             tr.appendChild(td);
                         });
                         
                         // Actions column for Assets
                         if (table === 'assets') {
                             const tdAction = document.createElement('td');
+                            tdAction.className = 'py-3 px-4 text-right';
                             tdAction.innerHTML = `
-                                <button onclick='editAsset(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="text-blue-600 hover:underline mr-3">Sửa</button>
-                                <button onclick="deleteAsset('${row.id}')" class="text-red-600 hover:underline">Xóa</button>
+                                <div class="inline-flex items-center gap-2">
+                                    <button onclick='editAsset(${JSON.stringify(row).replace(/'/g, "&apos;")})' class="px-2.5 py-1 rounded-lg bg-surface-container hover:bg-primary-container text-primary font-bold text-xs transition-all cursor-pointer">${t('Sửa')}</button>
+                                    <button onclick="deleteAsset('${row.id}')" class="px-2.5 py-1 rounded-lg bg-surface-container hover:bg-error hover:text-white text-error font-bold text-xs transition-all cursor-pointer">${t('Xóa')}</button>
+                                </div>
                             `;
                             tr.appendChild(tdAction);
                         }
@@ -132,19 +205,21 @@
                 }
             } catch (err) {
                 console.error(err);
-                alert('Failed to load data for table: ' + table);
+                tbody.innerHTML = `<tr><td colspan="100%" class="text-center py-8 text-error">Lỗi khi tải dữ liệu cho bảng: ${table}</td></tr>`;
             } finally {
                 loading.classList.add('hidden');
+                if (window.applyTranslation) window.applyTranslation();
             }
         }
 
         async function addAssetPrompt() {
-            const title = prompt("Tên sản phẩm:");
+            const t = window.t || ((x) => x);
+            const title = prompt(t("Tên sản phẩm:"));
             if (!title) return;
-            const category = prompt("Danh mục (WEB TEMPLATE, UI KITS, DESIGN SYSTEM):", "WEB TEMPLATE");
-            const price = parseFloat(prompt("Giá sản phẩm (VNĐ):", "49"));
-            const thumb = prompt("URL Ảnh thu nhỏ:", "https://images.unsplash.com/photo-1498050108023-c5249f4df085");
-            const demo_url = prompt("Link Web Demo:", "https://example.com");
+            const category = prompt(t("Danh mục (WEB TEMPLATE, UI KITS, DESIGN SYSTEM):"), "WEB TEMPLATE");
+            const price = parseFloat(prompt(t("Giá sản phẩm (USD $):"), "49"));
+            const thumb = prompt(t("URL Ảnh thu nhỏ:"), "https://images.unsplash.com/photo-1498050108023-c5249f4df085");
+            const demo_url = prompt(t("Link Web Demo:"), "https://example.com");
             
             if (title && !isNaN(price)) {
                 try {
@@ -155,26 +230,26 @@
                     });
                     const result = await res.json();
                     if (result.success) {
-                        alert("Thêm sản phẩm thành công!");
-                        // Reload the current tab
+                        alert(t("Thêm sản phẩm thành công!"));
                         const activeBtn = Array.from(tabsContainer.children).find(b => b.textContent === 'assets');
                         if (activeBtn) loadTableData('assets', activeBtn);
                     } else {
                         alert("Lỗi: " + result.error);
                     }
                 } catch(e) {
-                    alert("Lỗi kết nối");
+                    alert(t("Lỗi kết nối máy chủ!"));
                 }
             }
         }
 
         async function editAsset(row) {
-            const title = prompt("Tên sản phẩm mới:", row.title);
+            const t = window.t || ((x) => x);
+            const title = prompt(t("Tên sản phẩm mới:"), row.title);
             if (!title) return;
-            const category = prompt("Danh mục mới:", row.category);
-            const price = parseFloat(prompt("Giá sản phẩm (VNĐ):", row.base_price));
-            const thumb = prompt("URL Ảnh thu nhỏ:", row.thumbnail_url);
-            const demo_url = prompt("Link Web Demo:", row.demo_url || "https://example.com");
+            const category = prompt(t("Danh mục mới:"), row.category);
+            const price = parseFloat(prompt(t("Giá sản phẩm (USD $):"), row.base_price));
+            const thumb = prompt(t("URL Ảnh thu nhỏ:"), row.thumbnail_url);
+            const demo_url = prompt(t("Link Web Demo:"), row.demo_url || "https://example.com");
             
             if (title && !isNaN(price)) {
                 try {
@@ -185,39 +260,39 @@
                     });
                     const result = await res.json();
                     if (result.success) {
-                        alert("Cập nhật thành công!");
+                        alert(t("Cập nhật thành công!"));
                         const activeBtn = Array.from(tabsContainer.children).find(b => b.textContent === 'assets');
                         if (activeBtn) loadTableData('assets', activeBtn);
                     } else {
                         alert("Lỗi: " + result.error);
                     }
                 } catch(e) {
-                    alert("Lỗi kết nối");
+                    alert(t("Lỗi kết nối máy chủ!"));
                 }
             }
         }
 
         async function deleteAsset(id) {
-            if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) return;
+            const t = window.t || ((x) => x);
+            if (!confirm(t("Bạn có chắc chắn muốn xóa sản phẩm này?"))) return;
             try {
                 const res = await fetch('/api/assets/' + id, { method: 'DELETE' });
                 const result = await res.json();
                 if (result.success) {
-                    alert("Đã xóa sản phẩm!");
+                    alert(t("Đã xóa sản phẩm!"));
                     const activeBtn = Array.from(tabsContainer.children).find(b => b.textContent === 'assets');
                     if (activeBtn) loadTableData('assets', activeBtn);
                 } else {
                     alert("Lỗi: " + result.error);
                 }
             } catch(e) {
-                alert("Lỗi kết nối");
+                alert(t("Lỗi kết nối máy chủ!"));
             }
         }
 
         init();
     </script>
-  <script src="js/i18n.js"></script>
-  <script src="js/wake-backend.js"></script>
-  <script src="js/cursor-glitter.js"></script>
+    <script src="js/wake-backend.js"></script>
+    <script src="js/cursor-glitter.js"></script>
 </body>
 </html>

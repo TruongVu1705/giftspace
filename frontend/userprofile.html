@@ -583,7 +583,7 @@
         <div class="w-full lg:w-7/12 flex flex-col items-center justify-center py-2">
           <!-- Outer Phone Chassis with slim titanium bezel (100% Tràn Viền) -->
           <div id="phoneDeviceFrame"
-            class="relative w-[320px] sm:w-[335px] h-[670px] bg-[#120a0d] dark:bg-[#0c0709] rounded-[50px] p-[3.5px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.08)] border-[3px] border-[#382028] dark:border-[#2a161d] flex flex-col select-none transition-all duration-300 overflow-hidden"
+            class="relative w-[320px] sm:w-[335px] max-w-full h-[670px] bg-[#120a0d] dark:bg-[#0c0709] rounded-[50px] p-[3.5px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.08)] border-[3px] border-[#382028] dark:border-[#2a161d] flex flex-col select-none transition-all duration-300 overflow-hidden"
             style="overflow: hidden;">
             
             <!-- Screen Display Area (Edge-to-edge / Tràn Viền) -->
@@ -715,6 +715,7 @@
   </div>
 
   <!-- Scripts -->
+  <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
   <script>
     // State
@@ -729,7 +730,8 @@
       const msgEl = document.getElementById('toast-message');
       const iconEl = document.getElementById('toast-icon');
       if (!toast || !msgEl) return;
-      msgEl.textContent = msg;
+      const t = window.t || ((x) => x);
+      msgEl.textContent = t(msg);
       if (iconEl) iconEl.textContent = icon;
       toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
       toast.classList.add('opacity-100', 'translate-y-0');
@@ -762,7 +764,8 @@
 
       const breadcrumbEl = document.getElementById('breadcrumb-current-tab');
       if (breadcrumbEl && tabTitles[tabName]) {
-        breadcrumbEl.textContent = tabTitles[tabName];
+        const t = window.t || ((x) => x);
+        breadcrumbEl.textContent = t(tabTitles[tabName]);
       }
 
       // Toggle Panels
@@ -829,6 +832,7 @@
       if (!password) {
         return { level: 0, text: '', hint: '', colorClass: '' };
       }
+      const t = window.t || ((x) => x);
       const hasLetter = /[a-zA-Z]/.test(password);
       const hasNumber = /[0-9]/.test(password);
       const hasSpecial = /[^a-zA-Z0-9]/.test(password);
@@ -837,22 +841,22 @@
       if (hasSpecial) {
         return {
           level: 3,
-          text: 'Mạnh',
-          hint: 'Mật khẩu tối ưu bảo mật',
+          text: t('Mạnh'),
+          hint: t('Mật khẩu mạnh: đã có ký tự đặc biệt bảo vệ tối ưu.'),
           colorClass: 'text-emerald-500'
         };
       } else if (hasLetter && hasNumber && length > 8) {
         return {
           level: 2,
-          text: 'Trung bình',
-          hint: 'Chữ và số > 8 ký tự (thêm ký tự đặc biệt để đạt mức Mạnh)',
+          text: t('Trung bình'),
+          hint: t('Mật khẩu trung bình: có cả chữ và số trên 8 ký tự. Thêm ký tự đặc biệt (!@#$...) để đạt mức Mạnh.'),
           colorClass: 'text-amber-500'
         };
       } else {
         return {
           level: 1,
-          text: 'Yếu',
-          hint: 'Chỉ chữ và số (cần chữ và số trên 8 ký tự)',
+          text: t('Yếu'),
+          hint: t('Mật khẩu yếu: chỉ có chữ và số (dưới hoặc bằng 8 ký tự). Hãy nhập trên 8 ký tự hoặc thêm ký tự đặc biệt.'),
           colorClass: 'text-error'
         };
       }
@@ -896,6 +900,7 @@
 
     // Save Personal Profile
     async function saveUserProfile() {
+      const t = window.t || ((x) => x);
       const fullName = document.getElementById('profile-fullname').value.trim();
       const avatarUrl = document.getElementById('profile-avatar-url').value.trim();
       const newPass = document.getElementById('profile-newpass').value.trim();
@@ -903,19 +908,19 @@
       const saveBtn = document.getElementById('save-profile-btn');
 
       if (!fullName) {
-        showToast('Vui lòng nhập họ và tên!', 'warning');
+        showToast(t('Vui lòng nhập họ và tên!'), 'warning');
         document.getElementById('profile-fullname').focus();
         return;
       }
 
       if (newPass) {
         if (newPass.length < 6) {
-          showToast('Mật khẩu mới phải có ít nhất 6 ký tự!', 'warning');
+          showToast(t('Mật khẩu phải có ít nhất 6 ký tự!'), 'warning');
           document.getElementById('profile-newpass').focus();
           return;
         }
         if (newPass !== confirmPass) {
-          showToast('Xác nhận mật khẩu mới không khớp!', 'error');
+          showToast(t('Mật khẩu xác nhận không khớp!'), 'error');
           document.getElementById('profile-confirmpass').focus();
           return;
         }
@@ -925,7 +930,7 @@
 
       if (saveBtn) {
         saveBtn.disabled = true;
-        saveBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span><span>Đang lưu...</span>';
+        saveBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span><span>' + t('Đang lưu...') + '</span>';
       }
 
       try {
@@ -950,22 +955,22 @@
 
           // Update UI
           renderUserHeader();
-          showToast(newPass ? 'Đã lưu thông tin và cập nhật mật khẩu mới!' : 'Đã lưu thay đổi thông tin cá nhân!', 'success');
+          showToast(newPass ? t('Đã lưu thông tin và cập nhật mật khẩu mới!') : t('Đã lưu thay đổi thông tin cá nhân!'), 'success');
 
           // Clear password fields and hide strength meter
           document.getElementById('profile-newpass').value = '';
           document.getElementById('profile-confirmpass').value = '';
           updateProfilePasswordStrength('');
         } else {
-          showToast(data.message || 'Lỗi khi cập nhật thông tin.', 'error');
+          showToast(data.message || t('Lỗi khi cập nhật thông tin.'), 'error');
         }
       } catch (err) {
         console.error(err);
-        showToast('Đã cập nhật thông tin thành công!', 'success');
+        showToast(t('Đã cập nhật thông tin thành công!'), 'success');
       } finally {
         if (saveBtn) {
           saveBtn.disabled = false;
-          saveBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>Lưu thay đổi</span>';
+          saveBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>' + t('Lưu thay đổi') + '</span>';
         }
       }
     }
@@ -1009,7 +1014,8 @@
 
       const heroRole = document.getElementById('hero-role-text');
       if (heroRole) {
-        heroRole.textContent = currentUser.is_admin ? 'Quản trị viên' : (currentUser.is_pro_member ? 'Thành viên Pro' : 'Thành viên chính thức');
+        const t = window.t || ((x) => x);
+        heroRole.textContent = currentUser.is_admin ? t('Quản trị viên') : (currentUser.is_pro_member ? t('Thành viên Pro') : t('Thành viên chính thức'));
       }
 
       // Update header avatar & unified menu
@@ -1090,16 +1096,19 @@
     function renderOrdersList(orders) {
       const container = document.getElementById('orders-list-container');
       if (!container) return;
+      const t = window.t || ((x) => x);
+      const isVi = (window.getCurrentLang ? window.getCurrentLang() : 'vi') === 'vi';
+      const orderDateLabel = isVi ? 'Ngày đặt:' : 'Order date:';
 
       if (!orders || orders.length === 0) {
         container.innerHTML = `
           <div class="bg-surface-container-lowest rounded-2xl p-space-2xl text-center border border-outline-variant/40 py-16 shadow-xs">
             <span class="material-symbols-outlined text-[48px] text-outline-variant mb-2">shopping_bag</span>
-            <h3 class="font-headline-sm text-headline-sm text-on-surface">Chưa có đơn hàng nào</h3>
-            <p class="font-body-md text-body-md text-secondary max-w-md mx-auto mt-1 mb-4">Các sản phẩm bạn mua bản quyền sẽ hiển thị đầy đủ tại đây cùng trạng thái tiến độ xử lý và mã tải mã nguồn.</p>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">${t('Chưa có đơn hàng nào')}</h3>
+            <p class="font-body-md text-body-md text-secondary max-w-md mx-auto mt-1 mb-4">${t('Các sản phẩm bạn mua bản quyền sẽ hiển thị đầy đủ tại đây cùng trạng thái tiến độ xử lý và mã tải mã nguồn.')}</p>
             <a href="index.html" class="inline-flex items-center gap-2 px-space-lg py-2.5 rounded-xl bg-primary-container text-on-primary font-title-md text-title-md hover:bg-primary transition-all">
               <span class="material-symbols-outlined text-[18px]">explore</span>
-              <span>Khám phá sản phẩm ngay</span>
+              <span>${t('Khám phá sản phẩm ngay')}</span>
             </a>
           </div>
         `;
@@ -1108,7 +1117,7 @@
 
       container.innerHTML = orders.map(o => {
         const orderId = o.order_id || o.id || 'ORD-9999';
-        const dateStr = o.created_at ? new Date(o.created_at).toLocaleDateString('vi-VN') : '18/10/2024';
+        const dateStr = o.created_at ? new Date(o.created_at).toLocaleDateString(isVi ? 'vi-VN' : 'en-US') : '18/10/2024';
         const total = typeof o.total_amount === 'number' ? `$${o.total_amount.toFixed(2)}` : (o.total_amount || '$49.00');
         const title = o.product_name || o.asset_title || 'Mẫu thiết kế cao cấp GiftSpace';
         const category = o.asset_category || 'SẢN PHẨM SỐ';
@@ -1131,10 +1140,10 @@
           badgeHtml = `
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-label-sm text-[12px] font-bold uppercase tracking-wider mt-1">
               <span class="material-symbols-outlined text-[15px]">hourglass_top</span>
-              <span>Nhận đơn</span>
+              <span>${t('Nhận đơn')}</span>
             </span>
             <p class="text-[11px] text-amber-600 dark:text-amber-400 mt-1 font-medium flex items-center justify-end gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Chờ Admin kiểm tra thanh toán
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> ${t('Chờ Admin kiểm tra thanh toán')}
             </p>
           `;
           step1Class = 'bg-amber-500 text-white shadow-xs ring-4 ring-amber-500/20';
@@ -1149,10 +1158,10 @@
           badgeHtml = `
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-label-sm text-[12px] font-bold uppercase tracking-wider mt-1">
               <span class="material-symbols-outlined text-[15px]">local_shipping</span>
-              <span>Vận đơn</span>
+              <span>${t('Vận đơn')}</span>
             </span>
             <p class="text-[11px] text-blue-600 dark:text-blue-400 mt-1 font-medium flex items-center justify-end gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Đang chuẩn bị link gửi qua Zalo
+              <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> ${t('Đang chuẩn bị link gửi qua Zalo')}
             </p>
           `;
           step1Class = 'bg-emerald-500 text-white';
@@ -1170,10 +1179,10 @@
           badgeHtml = `
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-label-sm text-[12px] font-bold uppercase tracking-wider mt-1">
               <span class="material-symbols-outlined text-[15px]">check_circle</span>
-              <span>Hoàn tất</span>
+              <span>${t('Hoàn tất')}</span>
             </span>
             <p class="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium flex items-center justify-end gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã bàn giao link & mã nguồn
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${t('Đã bàn giao link & mã nguồn')}
             </p>
           `;
           step1Class = 'bg-emerald-500 text-white';
@@ -1204,7 +1213,7 @@
                   <div class="flex items-center gap-space-xs flex-wrap">
                     <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-surface-container text-secondary border border-outline-variant/60">${category}</span>
                     <span class="text-outline-variant">•</span>
-                    <span class="font-body-sm text-body-sm text-secondary">Ngày đặt: ${dateStr}</span>
+                    <span class="font-body-sm text-body-sm text-secondary">${orderDateLabel} ${dateStr}</span>
                   </div>
                   <h3 class="font-headline-sm text-headline-sm text-on-surface mt-1 tracking-tight font-semibold hover:text-primary transition-colors cursor-pointer">${title}</h3>
                   <div class="flex flex-wrap items-center gap-space-xs sm:gap-space-sm mt-1.5 text-on-surface-variant font-body-sm text-body-sm">
@@ -1236,7 +1245,7 @@
                   <div class="w-7 h-7 rounded-full flex items-center justify-center transition-all ${step1Class}">
                     <span class="material-symbols-outlined text-[15px]">${step1Icon}</span>
                   </div>
-                  <span class="text-[11px] font-medium ${step1Text}">Nhận đơn</span>
+                  <span class="text-[11px] font-medium ${step1Text}">${t('Nhận đơn')}</span>
                 </div>
 
                 <!-- Step 2: Vận đơn -->
@@ -1244,7 +1253,7 @@
                   <div class="w-7 h-7 rounded-full flex items-center justify-center transition-all ${step2Class}">
                     <span class="material-symbols-outlined text-[15px]">${step2Icon}</span>
                   </div>
-                  <span class="text-[11px] font-medium ${step2Text}">Vận đơn</span>
+                  <span class="text-[11px] font-medium ${step2Text}">${t('Vận đơn')}</span>
                 </div>
 
                 <!-- Step 3: Hoàn tất -->
@@ -1252,7 +1261,7 @@
                   <div class="w-7 h-7 rounded-full flex items-center justify-center transition-all ${step3Class}">
                     <span class="material-symbols-outlined text-[15px]">${step3Icon}</span>
                   </div>
-                  <span class="text-[11px] font-medium ${step3Text}">Hoàn tất</span>
+                  <span class="text-[11px] font-medium ${step3Text}">${t('Hoàn tất')}</span>
                 </div>
               </div>
             </div>
@@ -1261,13 +1270,13 @@
             <div class="mt-space-md pt-space-sm flex flex-wrap items-center justify-between gap-space-sm bg-surface-container-low -mx-space-lg -mb-space-lg px-space-lg py-space-sm rounded-b-2xl border-t border-outline-variant">
               <div class="flex items-center gap-space-xs text-body-sm font-body-sm text-secondary">
                 <span class="material-symbols-outlined text-[16px] text-primary">chat</span>
-                <span>Admin sẽ gửi lại đường link sản phẩm qua Zalo cho quý khách</span>
+                <span>${t('Admin sẽ gửi lại đường link sản phẩm qua Zalo cho quý khách')}</span>
               </div>
               <div class="flex items-center gap-space-sm flex-wrap">
                 <!-- Web Demo Button -->
                 <a href="${safeWebDemo}" target="_blank"
                   class="py-2 px-3.5 rounded-xl border border-outline-variant font-label-md text-xs text-on-surface hover:bg-surface-container font-medium flex items-center justify-center gap-1.5 bg-surface-container-lowest shadow-xs transition-colors"
-                  title="Mở bản Web Demo">
+                  title="${t('Mở trên tab mới')}">
                   <span class="material-symbols-outlined text-[16px] text-outline">laptop_mac</span>
                   <span>Web Demo</span>
                 </a>
@@ -1275,7 +1284,7 @@
                 <!-- Mobile Demo Button -->
                 <button type="button" onclick="openMobilePreview('${cleanTitle}', '${safeWebDemo}')"
                   class="py-2 px-3.5 rounded-xl border border-outline-variant font-label-md text-xs text-on-surface hover:bg-surface-container font-medium flex items-center justify-center gap-1.5 bg-surface-container-lowest shadow-xs transition-colors cursor-pointer"
-                  title="Mở bản Mobile Demo">
+                  title="${t('Mở trên tab mới')}">
                   <span class="material-symbols-outlined text-[16px] text-outline">smartphone</span>
                   <span>Mobile Demo</span>
                 </button>
@@ -1284,6 +1293,8 @@
           </article>
         `;
       }).join('');
+      
+      if (window.applyTranslation) window.applyTranslation();
     }
 
     function filterOrders(term) {
@@ -1360,16 +1371,17 @@
     function renderDemosGrid(demos) {
       const grid = document.getElementById('demos-grid-container');
       if (!grid) return;
+      const t = window.t || ((x) => x);
 
       if (!demos || demos.length === 0) {
         grid.innerHTML = `
           <div class="col-span-full bg-surface-container-lowest rounded-2xl p-space-2xl text-center border border-outline-variant/40 py-16 shadow-xs">
             <span class="material-symbols-outlined text-[48px] text-outline-variant mb-2">devices</span>
-            <h3 class="font-headline-sm text-headline-sm text-on-surface">Chưa có sản phẩm nào đã xem demo</h3>
-            <p class="font-body-md text-body-md text-secondary max-w-md mx-auto mt-1 mb-4">Mỗi khi bạn nhấn vào "Web Demo" hoặc "Mobile Demo" trên trang chủ, sản phẩm sẽ được tự động lưu vào danh sách này.</p>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">${t('Chưa có sản phẩm nào đã xem demo')}</h3>
+            <p class="font-body-md text-body-md text-secondary max-w-md mx-auto mt-1 mb-4">${t('Mỗi khi bạn nhấn vào "Web Demo" hoặc "Mobile Demo" trên trang chủ, sản phẩm sẽ được tự động lưu vào danh sách này.')}</p>
             <a href="index.html" class="inline-flex items-center gap-2 px-space-lg py-2.5 rounded-xl bg-primary-container text-on-primary font-title-md text-title-md hover:bg-primary transition-all">
               <span class="material-symbols-outlined text-[18px]">search</span>
-              <span>Khám phá sản phẩm ngay</span>
+              <span>${t('Khám phá sản phẩm ngay')}</span>
             </a>
           </div>
         `;
@@ -1406,7 +1418,7 @@
               </div>
 
               <!-- Delete Single Item at Top Right -->
-              <button onclick="removeDemoItem('${d.id}')" title="Xóa khỏi lịch sử"
+              <button onclick="removeDemoItem('${d.id}')" title="${t('Xóa khỏi lịch sử')}"
                 class="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
                 <span class="material-symbols-outlined text-[16px]">close</span>
               </button>
@@ -1424,7 +1436,7 @@
                 <h3 class="font-title-lg text-title-lg text-on-surface tracking-tight group-hover:text-primary transition-colors font-bold line-clamp-1 mb-1">${d.title}</h3>
                 <p class="font-body-sm text-body-sm text-secondary flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-[15px] text-primary">history</span>
-                  <span>Đã nhấn xem demo gần đây</span>
+                  <span>${t('Đã nhấn xem demo gần đây')}</span>
                 </p>
               </div>
 
@@ -1446,13 +1458,15 @@
                 <a href="payment.html"
                   class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-primary text-on-primary font-title-md text-[13px] font-semibold shadow-xs hover:bg-primary/90 active:scale-95 transition-all text-center">
                   <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
-                  <span>Mua bản quyền</span>
+                  <span>${t('Mua bản quyền')}</span>
                 </a>
               </div>
             </div>
           </article>
         `;
       }).join('');
+      
+      if (window.applyTranslation) window.applyTranslation();
     }
 
     function filterDemosBy(type) {
@@ -1478,18 +1492,20 @@
     }
 
     function removeDemoItem(id) {
+      const t = window.t || ((x) => x);
       viewedDemos = viewedDemos.filter(d => d.id !== id);
       localStorage.setItem('viewed_demos', JSON.stringify(viewedDemos));
       loadViewedDemos();
-      showToast('Đã xóa sản phẩm khỏi danh sách demo!');
+      showToast(t('Đã xóa sản phẩm khỏi danh sách demo!'));
     }
 
     function confirmClearDemoHistory() {
-      if (confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử các sản phẩm đã xem Web Demo và Mobile Demo không?')) {
+      const t = window.t || ((x) => x);
+      if (confirm(t('Bạn có chắc chắn muốn xóa toàn bộ lịch sử các sản phẩm đã xem Web Demo và Mobile Demo không?'))) {
         viewedDemos = [];
         localStorage.setItem('viewed_demos', JSON.stringify(viewedDemos));
         loadViewedDemos();
-        showToast('Đã xóa sạch lịch sử xem demo!');
+        showToast(t('Đã xóa sạch lịch sử xem demo!'));
       }
     }
 
@@ -1531,10 +1547,11 @@
       const sub = document.getElementById('modal-order-subtitle');
       const keyEl = document.getElementById('modal-license-key-text');
       const copyStatus = document.getElementById('modal-copy-status');
+      const t = window.t || ((x) => x);
 
-      if (sub) sub.textContent = `Mã đơn: #${orderId} • ${prodTitle}`;
+      if (sub) sub.textContent = `${t('Mã đơn:')} #${orderId} • ${prodTitle}`;
       if (keyEl) keyEl.textContent = `GS-COMM-2026-${orderId.replace(/[^0-9]/g, '') || '9241'}-${Math.floor(1000 + Math.random() * 9000)}`;
-      if (copyStatus) copyStatus.textContent = 'Sao chép';
+      if (copyStatus) copyStatus.textContent = t('Sao chép');
 
       if (modal) modal.classList.remove('hidden');
     }
@@ -1547,15 +1564,17 @@
     function copyLicenseKey() {
       const keyEl = document.getElementById('modal-license-key-text');
       const copyStatus = document.getElementById('modal-copy-status');
+      const t = window.t || ((x) => x);
       if (keyEl && navigator.clipboard) {
         navigator.clipboard.writeText(keyEl.textContent.trim());
-        if (copyStatus) copyStatus.textContent = 'Đã chép!';
-        showToast('Đã sao chép License Key vào bộ nhớ tạm!');
+        if (copyStatus) copyStatus.textContent = t('Đã chép!');
+        showToast(t('Đã sao chép!'));
       }
     }
 
     function logoutUser() {
-      if (confirm('Bạn có chắc chắn muốn đăng xuất không?')) {
+      const t = window.t || ((x) => x);
+      if (confirm(t('Bạn có chắc chắn muốn đăng xuất không?'))) {
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('user');
         localStorage.removeItem('token');
@@ -1599,8 +1618,6 @@
       }
     });
   </script>
-  <script src="js/app.js"></script>
-  <script src="js/i18n.js"></script>
   <script src="js/wake-backend.js"></script>
   <script src="js/cursor-glitter.js"></script>
 </body>

@@ -228,6 +228,7 @@
       </div>
 
       <!-- Logic for payment flow -->
+      <script src="js/i18n.js"></script>
       <script>
         // Generate random unique Order Code e.g. ORD-849201
         let orderCode = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
@@ -326,22 +327,23 @@
               const emailVal = emailInput ? emailInput.value.trim() : '';
               const phoneVal = phoneInput ? phoneInput.value.trim() : '';
 
+              const t = window.t || ((x) => x);
               if (!emailVal) {
-                if (window.showToast) window.showToast('Vui lòng nhập Email để nhận sản phẩm số!', 'warning');
+                if (window.showToast) window.showToast(t('Vui lòng nhập Email để nhận sản phẩm số!'), 'warning');
                 emailInput?.focus();
                 emailInput?.classList.add('ring-2', 'ring-rose-500');
                 return;
               }
 
               if (!emailVal.includes('@') || !emailVal.includes('.')) {
-                if (window.showToast) window.showToast('Địa chỉ Email không hợp lệ. Vui lòng kiểm tra lại!', 'warning');
+                if (window.showToast) window.showToast(t('Địa chỉ Email không hợp lệ. Vui lòng kiểm tra lại!'), 'warning');
                 emailInput?.focus();
                 emailInput?.classList.add('ring-2', 'ring-rose-500');
                 return;
               }
 
               if (!phoneVal || phoneVal.length < 8) {
-                if (window.showToast) window.showToast('Vui lòng nhập Số điện thoại hợp lệ (tối thiểu 8 số)!', 'warning');
+                if (window.showToast) window.showToast(t('Vui lòng nhập Số điện thoại hợp lệ (tối thiểu 8 số)!'), 'warning');
                 phoneInput?.focus();
                 phoneInput?.classList.add('ring-2', 'ring-rose-500');
                 return;
@@ -350,7 +352,7 @@
               // Loading State
               confirmBtn.disabled = true;
               const originalBtnContent = confirmBtn.innerHTML;
-              confirmBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span><span>Đang ghi nhận đơn hàng...</span>';
+              confirmBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span><span>' + t('Đang ghi nhận đơn hàng...') + '</span>';
 
               const userId = currentUser ? (currentUser.id || currentUser.email) : emailVal;
 
@@ -374,7 +376,7 @@
                 const data = await res.json();
                 if (data.success) {
                   if (window.showToast) {
-                    window.showToast(`Đã nhận đơn #${orderCode}! Đơn hàng đang ở trạng thái 'Nhận đơn'.`, 'success', 3000);
+                    window.showToast(`${t('Đã nhận đơn')} #${orderCode}!`, 'success', 3000);
                   }
                   
                   // Redirect to userprofile tab orders after 800ms
@@ -383,14 +385,14 @@
                   }, 800);
                 } else {
                   if (window.showToast) {
-                    window.showToast(data.message || 'Có lỗi xảy ra khi tạo đơn hàng!', 'error');
+                    window.showToast(data.message || t('Lỗi khi tạo đơn hàng!'), 'error');
                   }
                   confirmBtn.disabled = false;
                   confirmBtn.innerHTML = originalBtnContent;
                 }
               } catch (err) {
                 if (window.showToast) {
-                  window.showToast('Lỗi kết nối máy chủ: ' + err.message, 'error');
+                  window.showToast(t('Lỗi kết nối máy chủ: ') + err.message, 'error');
                 }
                 confirmBtn.disabled = false;
                 confirmBtn.innerHTML = originalBtnContent;
@@ -411,7 +413,7 @@
   <footer class="w-full bg-surface-container-lowest border-t border-outline-variant">
     <div
       class="max-w-[1360px] mx-auto px-margin-mobile md:px-margin py-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md text-center md:text-left">
-      <div class="font-body-sm text-body-sm text-on-surface-variant">© 2025 by John Doe.</div>
+      <div class="font-body-sm text-body-sm text-on-surface-variant">© 2026 GiftSpace Hub.</div>
       <div class="flex flex-wrap justify-center items-center gap-space-md"><a
           class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary-container transition-colors"
           data-path="privacy-policy" href="#">Privacy Policy</a><a
@@ -952,7 +954,6 @@
 
   </div>
 
-  <script src="js/i18n.js"></script>
   <script src="js/wake-backend.js"></script>
   <script src="js/cursor-glitter.js"></script>
 </body>
