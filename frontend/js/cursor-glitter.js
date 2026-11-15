@@ -57,8 +57,8 @@
     let lastX = null, lastY = null;
     let distAccumulator = 0;
 
-    // Giới hạn số lượng hạt tối đa để đảm bảo GPU luôn mát lạnh
-    const MAX_PARTICLES = isTouchDevice ? 15 : 42;
+    // Giới hạn số lượng hạt tối đa để đảm bảo GPU luôn mát lạnh nhưng hiệu ứng vẫn dày dặn, lộng lẫy
+    const MAX_PARTICLES = isTouchDevice ? 20 : 95;
 
     function isDarkMode() {
         return document.documentElement.classList.contains('dark') ||
@@ -73,28 +73,29 @@
             this.x = x + (Math.random() - 0.5) * 6;
             this.y = y + (Math.random() - 0.5) * 6;
 
-            // Kích thước hạt từ 2.4px đến 5.2px
-            this.size = Math.random() * 2.8 + 2.4;
+            // Đa dạng kích thước hạt: 65% là bụi sao mịn (2.0 - 3.8px), 35% là ngôi sao pha lê tỏa sáng (3.8 - 6.5px)
+            const isMajorStar = Math.random() < 0.35;
+            this.size = isMajorStar ? (Math.random() * 2.7 + 3.8) : (Math.random() * 1.8 + 2.0);
             this.maxSize = this.size;
 
-            this.vx = (vx || 0) * 0.08 + (Math.random() - 0.5) * 1.8;
-            this.vy = (vy || 0) * 0.08 + (Math.random() * -1.6 + 0.2);
+            this.vx = (vx || 0) * 0.12 + (Math.random() - 0.5) * 1.6;
+            this.vy = (vy || 0) * 0.12 + (Math.random() * -1.8 + 0.3);
 
-            this.gravity = 0.12 + Math.random() * 0.07;
-            this.airResistance = 0.97;
-            this.driftFrequency = Math.random() * 3.0 + 2.0;
+            this.gravity = 0.08 + Math.random() * 0.06;
+            this.airResistance = 0.96;
+            this.driftFrequency = Math.random() * 3.5 + 2.0;
             this.driftPhase = Math.random() * Math.PI * 2;
-            this.driftAmplitude = Math.random() * 0.4 + 0.2;
+            this.driftAmplitude = Math.random() * 0.45 + 0.25;
 
             this.rotation = Math.random() * Math.PI * 2;
-            this.rotSpeed = (Math.random() - 0.5) * 0.12;
+            this.rotSpeed = (Math.random() - 0.5) * 0.15;
 
-            // Vòng đời ngắn hơn trên mobile để giải phóng bộ nhớ tức thì
+            // Vòng đời kéo dài hơn trên desktop để tạo vệt sao đuôi mềm mại, lấp lánh
             this.life = 1.0;
-            this.decay = isTouchDevice ? (Math.random() * 0.035 + 0.03) : (Math.random() * 0.02 + 0.016);
+            this.decay = isTouchDevice ? (Math.random() * 0.035 + 0.025) : (Math.random() * 0.012 + 0.009);
 
             this.twinklePhase = Math.random() * Math.PI * 2;
-            this.twinkleSpeed = Math.random() * 0.25 + 0.15;
+            this.twinkleSpeed = Math.random() * 0.28 + 0.16;
 
             const rand = Math.random();
             this.shape = rand < 0.55 ? 'star' : (rand < 0.85 ? 'diamond' : 'circle');
@@ -304,7 +305,7 @@
         if (lastX === null || lastY === null) {
             lastX = x;
             lastY = y;
-            spawnGlitter(x, y, 0, 0, 2);
+            spawnGlitter(x, y, 0, 0, 3);
             return;
         }
 
@@ -314,9 +315,10 @@
 
         distAccumulator += dist;
 
-        // Sinh hạt mịn màng theo khoảng cách di chuyển chuột trên Desktop
-        if (distAccumulator >= 12) {
-            spawnGlitter(x, y, dx * 0.5, dy * 0.5, 1);
+        // Sinh hạt đều đặn mỗi 7px di chuyển; khi di chuyển nhanh sinh 3 hạt để tạo dải kim tuyến liên tục, dày dặn
+        if (distAccumulator >= 7) {
+            const count = dist > 22 ? 3 : 2;
+            spawnGlitter(x, y, dx * 0.35, dy * 0.35, count);
             distAccumulator = 0;
         }
 
@@ -324,17 +326,20 @@
         lastY = y;
     }
 
-    // CHỈ lắng nghe mousemove trên thiết bị có chuột (Desktop / Laptop)
-    if (!isTouchDevice) {
-        window.addEventListener('mousemove', (e) => {
-            onPointerMove(e.clientX, e.clientY);
-        }, { passive: true });
-    }
+    // Luôn lắng nghe mousemove (sự kiện phát sinh từ chuột vật lý / trackpad)
+    window.addEventListener('mousemove', (e) => {
+        onPointerMove(e.clientX, e.clientY);
+    }, { passive: true });
 
-    // Khi người dùng Click / Tap: Sinh 3-4 hạt nhẹ nhàng rồi tự tắt
+    // Khi người dùng Click: Sinh chùm pháo hoa kim cương lộng lẫy (12 hạt trên desktop)
     window.addEventListener('click', (e) => {
         if (e.button === 0) {
-            spawnGlitter(e.clientX, e.clientY, (Math.random() - 0.5) * 2.0, -1.5, isTouchDevice ? 3 : 5);
+            const burstCount = isTouchDevice ? 5 : 12;
+            for (let i = 0; i < burstCount; i++) {
+                const angle = (Math.PI * 2 * i) / burstCount + (Math.random() - 0.5) * 0.4;
+                const speed = Math.random() * 2.2 + 1.0;
+                spawnGlitter(e.clientX, e.clientY, Math.cos(angle) * speed, Math.sin(angle) * speed - 1.2, 1);
+            }
         }
     }, { passive: true });
 
