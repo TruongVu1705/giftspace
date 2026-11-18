@@ -1423,5 +1423,103 @@ document.addEventListener('DOMContentLoaded', () => {
         container.appendChild(nextBtn);
     }
     
+    // 6. Setup Floating Contact FAB & Popover Widget (Zalo / Email)
+    function setupContactWidget() {
+        const fab = document.getElementById('chatFab');
+        const popover = document.getElementById('contactPopover');
+        const closeBtn = document.getElementById('closeContactPopover');
+        const fabIcon = document.getElementById('chatFabIcon');
+        if (!fab || !popover) return;
+
+        function togglePopover(show) {
+            const isCurrentlyOpen = !popover.classList.contains('hidden');
+            const shouldOpen = (show !== undefined) ? show : !isCurrentlyOpen;
+
+            if (shouldOpen) {
+                popover.classList.remove('hidden');
+                if (fabIcon) {
+                    fabIcon.style.transform = 'rotate(90deg)';
+                    setTimeout(() => {
+                        fabIcon.textContent = 'close';
+                        fabIcon.style.transform = 'rotate(0deg)';
+                    }, 100);
+                }
+                fab.setAttribute('aria-expanded', 'true');
+            } else {
+                popover.classList.add('hidden');
+                if (fabIcon) {
+                    fabIcon.style.transform = 'rotate(-90deg)';
+                    setTimeout(() => {
+                        fabIcon.textContent = 'forum';
+                        fabIcon.style.transform = 'rotate(0deg)';
+                    }, 100);
+                }
+                fab.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        fab.onclick = (e) => {
+            e.stopPropagation();
+            togglePopover();
+        };
+
+        if (closeBtn) {
+            closeBtn.onclick = (e) => {
+                e.stopPropagation();
+                togglePopover(false);
+            };
+        }
+
+        // Close on click outside
+        document.addEventListener('click', (e) => {
+            if (!popover.classList.contains('hidden')) {
+                if (!popover.contains(e.target) && !fab.contains(e.target)) {
+                    togglePopover(false);
+                }
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !popover.classList.contains('hidden')) {
+                togglePopover(false);
+            }
+        });
+    }
+
+    function copyContactInfo(text, label) {
+        if (!text) return;
+        const t = window.t || ((x) => x);
+        const successMsg = t(`Đã sao chép ${label}: ${text}`);
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                if (window.showToast) window.showToast(successMsg, 'success', 2500);
+            }).catch(() => {
+                fallbackCopy(text, successMsg);
+            });
+        } else {
+            fallbackCopy(text, successMsg);
+        }
+    }
+
+    function fallbackCopy(text, msg) {
+        try {
+            const temp = document.createElement('textarea');
+            temp.value = text;
+            temp.style.position = 'fixed';
+            temp.style.opacity = '0';
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            if (window.showToast) window.showToast(msg, 'success', 2500);
+        } catch (e) {
+            if (window.showToast) window.showToast(`${text}`, 'info', 3000);
+        }
+    }
+
+    window.copyContactInfo = copyContactInfo;
+    setupContactWidget();
+
     loadAssets();
 });
