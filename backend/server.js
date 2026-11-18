@@ -130,6 +130,49 @@ app.post('/api/users/login', (req, res) => {
     });
 });
 
+// 4a. POST /api/users/social-login - Login or Register with Google or Facebook
+app.post('/api/users/social-login', (req, res) => {
+    const { provider, email, full_name, avatar_url } = req.body;
+    const prov = provider || 'Google';
+    const isGoogle = prov.toLowerCase() === 'google';
+    const cleanEmail = (email && email.trim()) ? email.trim().toLowerCase() : (isGoogle ? 'truongvu.design@gmail.com' : 'truongvu.facebook@gmail.com');
+    const name = full_name || (isGoogle ? 'Nguyễn Trường Vũ' : 'Trường Vũ');
+    const avatar = avatar_url || (isGoogle
+        ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8'
+        : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80');
+
+    db.get("SELECT id, email, full_name, avatar_url, is_pro_member, is_admin FROM users WHERE LOWER(email) = LOWER(?)", [cleanEmail], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (row) {
+            // Existing user
+            res.json({
+                success: true,
+                user: row,
+                token: "mock_jwt_token_" + row.id,
+                message: `Đăng nhập thành công với ${prov}!`
+            });
+        } else {
+            // New user, register automatically
+            const userId = uuidv4();
+            const dummyHash = bcrypt.hashSync(uuidv4(), 8);
+            db.run(
+                "INSERT INTO users (id, email, password_hash, full_name, avatar_url) VALUES (?, ?, ?, ?, ?)",
+                [userId, cleanEmail, dummyHash, name, avatar],
+                function(insertErr) {
+                    if (insertErr) return res.status(500).json({ error: insertErr.message });
+                    const newUser = { id: userId, email: cleanEmail, full_name: name, avatar_url: avatar, is_pro_member: 0, is_admin: 0 };
+                    res.json({
+                        success: true,
+                        user: newUser,
+                        token: "mock_jwt_token_" + userId,
+                        message: `Đăng ký & đăng nhập thành công với ${prov}!`
+                    });
+                }
+            );
+        }
+    });
+});
+
 // 4b. POST /api/users/forgot-password - Reset password & send to email
 app.post('/api/users/forgot-password', (req, res) => {
     const { email } = req.body;

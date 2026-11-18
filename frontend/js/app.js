@@ -732,6 +732,92 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
 
+        // 2b. Setup Social Login Buttons (Google & Facebook)
+        const socialBtns = modal.querySelectorAll('.social-login-btn, button[data-provider]');
+        socialBtns.forEach(btn => {
+            if (btn.dataset.socialBound) return;
+            btn.dataset.socialBound = 'true';
+            btn.onclick = async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const provider = btn.getAttribute('data-provider') || (btn.textContent.includes('Facebook') ? 'facebook' : 'google');
+                const isGoogle = provider.toLowerCase() === 'google';
+                const providerLabel = isGoogle ? 'Google' : 'Facebook';
+                const originalHtml = btn.innerHTML;
+                
+                btn.disabled = true;
+                btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span><span>${window.t ? window.t('Đang kết nối ' + providerLabel + '...') : ('Đang kết nối ' + providerLabel + '...')}</span>`;
+
+                try {
+                    const res = await fetch('/api/users/social-login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            provider: providerLabel,
+                            email: isGoogle ? 'truongvu.design@gmail.com' : 'truongvu.facebook@gmail.com',
+                            full_name: isGoogle ? 'Nguyễn Trường Vũ' : 'Trường Vũ',
+                            avatar_url: isGoogle
+                                ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8'
+                                : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80'
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        clearModalAlert(modal);
+                        localStorage.setItem('isLoggedIn', 'true');
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        localStorage.setItem('token', data.token);
+
+                        const isOnPaymentPage = window.location.pathname.toLowerCase().includes('payment');
+                        const pending = localStorage.getItem('pending_checkout');
+
+                        if (isOnPaymentPage) {
+                            showToast(`Đăng nhập thành công với ${providerLabel}! Chào mừng ${data.user.full_name || data.user.email}!`, 'success', 2500);
+                            modal.style.setProperty('display', 'none', 'important');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 600);
+                            return;
+                        }
+
+                        if (pending) {
+                            localStorage.removeItem('pending_checkout');
+                            try {
+                                const item = JSON.parse(pending);
+                                showToast(`Đăng nhập thành công với ${providerLabel}! Đang chuyển đến thanh toán...`, 'success', 3000);
+                                modal.style.setProperty('display', 'none', 'important');
+                                setTimeout(() => {
+                                    const priceVal = item.base_price || 1190000;
+                                    const targetUrl = `payment.html?id=${encodeURIComponent(item.id || 'a1')}&title=${encodeURIComponent(item.title || '')}&price=${priceVal}`;
+                                    window.location.href = targetUrl;
+                                }, 600);
+                                return;
+                            } catch (parseErr) {}
+                        }
+
+                        showToast(`Đăng nhập thành công với ${providerLabel}! Chào mừng ${data.user.full_name || data.user.email}!`, 'success');
+                        modal.style.setProperty('display', 'none', 'important');
+
+                        if (typeof setupUserMenu === 'function') setupUserMenu();
+                        if (typeof renderUserHeader === 'function') renderUserHeader();
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 700);
+                    } else {
+                        showModalAlert(modal, data.message || 'Đăng nhập mạng xã hội không thành công!', 'error');
+                        showToast(data.message || 'Đăng nhập không thành công!', 'error');
+                    }
+                } catch (err) {
+                    showModalAlert(modal, 'Lỗi kết nối máy chủ: ' + err.message, 'error');
+                    showToast('Lỗi kết nối máy chủ!', 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
+            };
+        });
+
         // 3. Setup Register Password Strength Evaluator Realtime Listener
         if (modal.id === 'register-modal') {
             const regPwdInput = modal.querySelector('#register-password') || modal.querySelectorAll('input[data-is-pwd="true"]')[0];
