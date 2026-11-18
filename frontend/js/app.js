@@ -1423,12 +1423,140 @@ document.addEventListener('DOMContentLoaded', () => {
         container.appendChild(nextBtn);
     }
     
-    // 6. Setup Floating Contact FAB & Popover Widget (Zalo / Email)
+    // 6. Setup Floating Contact FAB & Popover Widget (Zalo / Email) - Across ALL pages
     function setupContactWidget() {
-        const fab = document.getElementById('chatFab');
-        const popover = document.getElementById('contactPopover');
-        const closeBtn = document.getElementById('closeContactPopover');
-        const fabIcon = document.getElementById('chatFabIcon');
+        // If inside an iframe (e.g. mobile preview inside index.html), do not render floating widget
+        try {
+            if (window.self !== window.top) {
+                return;
+            }
+        } catch (e) {
+            return;
+        }
+
+        let container = document.getElementById('contactWidgetContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'contactWidgetContainer';
+            const isDemoPage = window.location.pathname.includes('demo-lumina');
+            container.className = isDemoPage ? 'fixed bottom-20 right-5 z-50 select-none' : 'fixed bottom-6 right-6 z-50 select-none';
+            container.innerHTML = `
+                <!-- Contact Options Popover Card -->
+                <div id="contactPopover"
+                  class="hidden absolute bottom-16 right-0 mb-2 w-[320px] sm:w-[350px] max-w-[calc(100vw-2rem)] bg-surface-container-lowest dark:bg-zinc-900 border border-outline-variant/80 dark:border-zinc-800 rounded-3xl shadow-2xl p-4 text-on-surface transition-all duration-200 transform origin-bottom-right">
+                  
+                  <!-- Popover Header -->
+                  <div class="flex items-center justify-between pb-3 mb-3 border-b border-outline-variant/50">
+                    <div class="flex items-center gap-2.5">
+                      <div class="relative w-9 h-9 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shadow-xs">
+                        <span class="material-symbols-outlined text-[20px]">support_agent</span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-surface absolute -top-0.5 -right-0.5"></span>
+                      </div>
+                      <div>
+                        <h4 class="font-title-md text-[14px] font-bold text-on-surface leading-tight" data-i18n="Liên hệ hỗ trợ">Liên hệ hỗ trợ</h4>
+                        <p class="font-body-sm text-[11px] text-on-surface-variant flex items-center gap-1 mt-0.5">
+                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                          <span data-i18n="Trực tuyến 24/7 — Phản hồi ngay">Trực tuyến 24/7 — Phản hồi ngay</span>
+                        </p>
+                      </div>
+                    </div>
+                    <button id="closeContactPopover" type="button"
+                      class="w-7 h-7 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-colors cursor-pointer"
+                      title="Đóng">
+                      <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                  </div>
+
+                  <!-- Popover Body: Contact Channels -->
+                  <div class="space-y-2.5">
+                    <!-- Zalo Channel -->
+                    <div class="p-3 rounded-2xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 transition-all flex items-center justify-between gap-2.5 group">
+                      <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-xl bg-[#0068FF] text-white flex items-center justify-center font-bold text-[13px] tracking-wide shrink-0 shadow-xs">
+                          Zalo
+                        </div>
+                        <div class="min-w-0">
+                          <span class="block text-[11px] font-medium text-on-surface-variant leading-none mb-1">Zalo Hotline / Chat</span>
+                          <a href="https://zalo.me/0865849960" target="_blank" rel="noopener noreferrer"
+                            class="font-mono text-[14px] font-bold text-on-surface hover:text-[#0068FF] transition-colors truncate block">
+                            0865849960
+                          </a>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" onclick="copyContactInfo('0865849960', 'số Zalo')"
+                          class="w-8 h-8 rounded-lg bg-surface-container-high/80 hover:bg-primary-container hover:text-on-primary-container text-on-surface-variant flex items-center justify-center transition-colors cursor-pointer"
+                          title="Sao chép số Zalo">
+                          <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                        </button>
+                        <a href="https://zalo.me/0865849960" target="_blank" rel="noopener noreferrer"
+                          class="px-2.5 py-1.5 rounded-lg bg-[#0068FF] hover:bg-[#0057d9] text-white text-[12px] font-semibold flex items-center gap-1 transition-all shadow-xs cursor-pointer">
+                          <span data-i18n="Mở Zalo">Mở</span>
+                          <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    <!-- Email Channel -->
+                    <div class="p-3 rounded-2xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 transition-all flex items-center justify-between gap-2.5 group">
+                      <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-rose-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <span class="material-symbols-outlined text-[20px]">mail</span>
+                        </div>
+                        <div class="min-w-0">
+                          <span class="block text-[11px] font-medium text-on-surface-variant leading-none mb-1" data-i18n="Email Hỗ trợ kỹ thuật">Email Hỗ trợ kỹ thuật</span>
+                          <a href="mailto:nguyenvuhmc@gmail.com"
+                            class="font-mono text-[12.5px] font-bold text-on-surface hover:text-primary transition-colors truncate block"
+                            title="nguyenvuhmc@gmail.com">
+                            nguyenvuhmc@gmail.com
+                          </a>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" onclick="copyContactInfo('nguyenvuhmc@gmail.com', 'Email')"
+                          class="w-8 h-8 rounded-lg bg-surface-container-high/80 hover:bg-primary-container hover:text-on-primary-container text-on-surface-variant flex items-center justify-center transition-colors cursor-pointer"
+                          title="Sao chép Email">
+                          <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                        </button>
+                        <a href="mailto:nguyenvuhmc@gmail.com"
+                          class="px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-[12px] font-semibold flex items-center gap-1 transition-all shadow-xs cursor-pointer">
+                          <span data-i18n="Gửi Email">Gửi</span>
+                          <span class="material-symbols-outlined text-[14px]">send</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Popover Footer Note -->
+                  <div class="mt-3 pt-2.5 border-t border-outline-variant/40 flex items-center justify-between text-[11px] text-on-surface-variant">
+                    <span>GiftSpace Support</span>
+                    <span class="text-emerald-500 font-medium flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      <span data-i18n="Sẵn sàng tư vấn">Sẵn sàng tư vấn</span>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Shrunk Floating Action Button (FAB) - Icon only with pulsing status ring -->
+                <button id="chatFab" type="button" aria-label="Liên hệ hỗ trợ Admin (Zalo / Email)" title="Liên hệ hỗ trợ Admin (Zalo / Email)"
+                  class="relative w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-primary to-rose-600 hover:from-primary-container hover:to-primary text-on-primary shadow-xl shadow-primary/30 hover:shadow-primary/45 border border-white/20 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer">
+                  <span id="chatFabIcon" class="material-symbols-outlined text-[24px] sm:text-[26px] text-white transition-transform duration-200">forum</span>
+                  <span class="absolute -top-0.5 -right-0.5 flex h-3.5 w-3.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white dark:border-zinc-900"></span>
+                  </span>
+                </button>
+            `;
+            document.body.appendChild(container);
+            if (window.applyTranslation) {
+                try { window.applyTranslation(container); } catch (e) {}
+            }
+        }
+
+        const fab = container.querySelector('#chatFab') || document.getElementById('chatFab');
+        const popover = container.querySelector('#contactPopover') || document.getElementById('contactPopover');
+        const closeBtn = container.querySelector('#closeContactPopover') || document.getElementById('closeContactPopover');
+        const fabIcon = container.querySelector('#chatFabIcon') || document.getElementById('chatFabIcon');
         if (!fab || !popover) return;
 
         function togglePopover(show) {
