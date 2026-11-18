@@ -615,6 +615,82 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     window.hideAllModals = hideAllModals;
 
+    // Commercial Social OAuth Flow (Google & Facebook)
+    function openSocialAuthPopup(rawProvider) {
+        const isGoogle = String(rawProvider || '').toLowerCase().includes('google');
+        const providerLabel = isGoogle ? 'Google' : 'Facebook';
+        const targetUrl = isGoogle ? 'oauth-google.html' : 'oauth-facebook.html';
+
+        const width = isGoogle ? 480 : 520;
+        const height = isGoogle ? 640 : 680;
+        const left = Math.round(window.screenX + Math.max(0, (window.outerWidth - width) / 2));
+        const top = Math.round(window.screenY + Math.max(0, (window.outerHeight - height) / 2));
+
+        const windowFeatures = `toolbar=no,menubar=no,location=no,directories=no,status=no,resizable=yes,scrollbars=yes,width=${width},height=${height},top=${top},left=${left}`;
+
+        try {
+            const popup = window.open(targetUrl, `GiftSpace_${providerLabel}_Auth`, windowFeatures);
+            if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+                // Popup blocker triggered: graceful redirect fallback
+                window.location.href = targetUrl;
+            } else {
+                popup.focus();
+            }
+        } catch (err) {
+            window.location.href = targetUrl;
+        }
+    }
+    window.openSocialAuthPopup = openSocialAuthPopup;
+
+    function handleSocialAuthSuccess(provider, user, token) {
+        if (!user || !token) return;
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('token', token);
+
+        hideAllModals();
+        if (typeof setupUserMenu === 'function') setupUserMenu();
+
+        const isOnPaymentPage = window.location.pathname.toLowerCase().includes('payment');
+        const pending = localStorage.getItem('pending_checkout');
+
+        if (isOnPaymentPage) {
+            showToast(`Đăng nhập thành công với ${provider}! Chào mừng ${user.full_name || user.email}!`, 'success', 2500);
+            setTimeout(() => {
+                window.location.reload();
+            }, 600);
+            return;
+        }
+
+        if (pending) {
+            localStorage.removeItem('pending_checkout');
+            try {
+                const item = JSON.parse(pending);
+                showToast(`Đăng nhập thành công với ${provider}! Đang chuyển đến thanh toán...`, 'success', 3000);
+                setTimeout(() => {
+                    const priceVal = item.base_price || 1190000;
+                    const targetUrl = `payment.html?id=${encodeURIComponent(item.id || 'a1')}&title=${encodeURIComponent(item.title || '')}&price=${priceVal}`;
+                    window.location.href = targetUrl;
+                }, 600);
+                return;
+            } catch (parseErr) {}
+        }
+
+        showToast(`Đăng nhập thành công với ${provider}! Chào mừng ${user.full_name || user.email}!`, 'success');
+        setTimeout(() => {
+            window.location.reload();
+        }, 700);
+    }
+    window.handleSocialAuthSuccess = handleSocialAuthSuccess;
+
+    // Listen for OAuth messages from child popup window
+    window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'OAUTH_AUTH_SUCCESS') {
+            const { provider, user, token } = event.data;
+            handleSocialAuthSuccess(provider, user, token);
+        }
+    });
+
     function openModal(modalId) {
         hideAllModals();
         const modal = document.getElementById(modalId);
@@ -737,84 +813,11 @@ document.addEventListener('DOMContentLoaded', () => {
         socialBtns.forEach(btn => {
             if (btn.dataset.socialBound) return;
             btn.dataset.socialBound = 'true';
-            btn.onclick = async (e) => {
+            btn.onclick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 const provider = btn.getAttribute('data-provider') || (btn.textContent.includes('Facebook') ? 'facebook' : 'google');
-                const isGoogle = provider.toLowerCase() === 'google';
-                const providerLabel = isGoogle ? 'Google' : 'Facebook';
-                const originalHtml = btn.innerHTML;
-                
-                btn.disabled = true;
-                btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span><span>${window.t ? window.t('Đang kết nối ' + providerLabel + '...') : ('Đang kết nối ' + providerLabel + '...')}</span>`;
-
-                try {
-                    const res = await fetch('/api/users/social-login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            provider: providerLabel,
-                            email: isGoogle ? 'truongvu.design@gmail.com' : 'truongvu.facebook@gmail.com',
-                            full_name: isGoogle ? 'Nguyễn Trường Vũ' : 'Trường Vũ',
-                            avatar_url: isGoogle
-                                ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8'
-                                : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80'
-                        })
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        clearModalAlert(modal);
-                        localStorage.setItem('isLoggedIn', 'true');
-                        localStorage.setItem('user', JSON.stringify(data.user));
-                        localStorage.setItem('token', data.token);
-
-                        const isOnPaymentPage = window.location.pathname.toLowerCase().includes('payment');
-                        const pending = localStorage.getItem('pending_checkout');
-
-                        if (isOnPaymentPage) {
-                            showToast(`Đăng nhập thành công với ${providerLabel}! Chào mừng ${data.user.full_name || data.user.email}!`, 'success', 2500);
-                            modal.style.setProperty('display', 'none', 'important');
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 600);
-                            return;
-                        }
-
-                        if (pending) {
-                            localStorage.removeItem('pending_checkout');
-                            try {
-                                const item = JSON.parse(pending);
-                                showToast(`Đăng nhập thành công với ${providerLabel}! Đang chuyển đến thanh toán...`, 'success', 3000);
-                                modal.style.setProperty('display', 'none', 'important');
-                                setTimeout(() => {
-                                    const priceVal = item.base_price || 1190000;
-                                    const targetUrl = `payment.html?id=${encodeURIComponent(item.id || 'a1')}&title=${encodeURIComponent(item.title || '')}&price=${priceVal}`;
-                                    window.location.href = targetUrl;
-                                }, 600);
-                                return;
-                            } catch (parseErr) {}
-                        }
-
-                        showToast(`Đăng nhập thành công với ${providerLabel}! Chào mừng ${data.user.full_name || data.user.email}!`, 'success');
-                        modal.style.setProperty('display', 'none', 'important');
-
-                        if (typeof setupUserMenu === 'function') setupUserMenu();
-                        if (typeof renderUserHeader === 'function') renderUserHeader();
-
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 700);
-                    } else {
-                        showModalAlert(modal, data.message || 'Đăng nhập mạng xã hội không thành công!', 'error');
-                        showToast(data.message || 'Đăng nhập không thành công!', 'error');
-                    }
-                } catch (err) {
-                    showModalAlert(modal, 'Lỗi kết nối máy chủ: ' + err.message, 'error');
-                    showToast('Lỗi kết nối máy chủ!', 'error');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = originalHtml;
-                }
+                openSocialAuthPopup(provider);
             };
         });
 
@@ -1734,6 +1737,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.copyContactInfo = copyContactInfo;
     setupContactWidget();
+
+    // Global bind for social login buttons on static or modal markup
+    function bindAllSocialButtons() {
+        document.querySelectorAll('.social-login-btn, button[data-provider]').forEach(btn => {
+            if (btn.dataset.socialBound) return;
+            btn.dataset.socialBound = 'true';
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const provider = btn.getAttribute('data-provider') || (btn.textContent.includes('Facebook') ? 'facebook' : 'google');
+                openSocialAuthPopup(provider);
+            });
+        });
+    }
+    window.bindAllSocialButtons = bindAllSocialButtons;
+    bindAllSocialButtons();
 
     loadAssets();
 });

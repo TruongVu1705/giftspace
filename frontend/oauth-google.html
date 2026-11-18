@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập bằng Google - GiftSpace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    if (localStorage.getItem('darkMode') === 'true' || (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+  <style>
+    body { font-family: 'Roboto', 'Plus Jakarta Sans', sans-serif; }
+    .google-btn-hover:hover { background-color: rgba(66, 133, 244, 0.08); }
+    .dark .google-btn-hover:hover { background-color: rgba(255, 255, 255, 0.08); }
+  </style>
+</head>
+<body class="bg-[#f0f4f9] dark:bg-[#131314] text-[#1f1f1f] dark:text-[#e3e3e3] min-h-screen flex flex-col items-center justify-between p-4 sm:p-6 antialiased selection:bg-[#c2e7ff] selection:text-[#001d35]">
+
+  <!-- Top bar (minimal) -->
+  <div class="w-full max-w-[450px] flex items-center justify-between text-xs text-gray-500 mb-2">
+    <span>accounts.google.com</span>
+    <div class="flex items-center gap-3">
+      <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+        <span class="material-symbols-outlined text-[14px]">lock</span> Kết nối bảo mật
+      </span>
+      <button onclick="cancelGoogleLogin()" type="button" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors p-0.5" title="Đóng cửa sổ">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Google Auth Card -->
+  <div class="w-full max-w-[450px] bg-white dark:bg-[#1e1f20] border border-[#dadce0] dark:border-[#444746] rounded-[28px] p-6 sm:p-8 shadow-sm transition-all duration-300">
+    
+    <!-- Google Logo Header -->
+    <div class="flex flex-col items-center text-center mb-6">
+      <svg class="w-10 h-10 mb-3" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      <h1 class="text-[22px] font-medium tracking-tight text-[#1f1f1f] dark:text-[#e3e3e3] mb-1.5">Đăng nhập bằng Google</h1>
+      <p class="text-[14px] text-[#444746] dark:text-[#c4c7c5]">
+        để tiếp tục tới <span class="font-semibold text-rose-600 dark:text-rose-400">GiftSpace</span>
+      </p>
+    </div>
+
+    <!-- Active Account List -->
+    <div id="accountsList" class="space-y-2 mb-4">
+      
+      <!-- Account Item 1 -->
+      <div onclick="selectGoogleAccount('Nguyễn Trường Vũ', 'truongvu.design@gmail.com', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8')"
+        class="w-full flex items-center justify-between p-3 rounded-2xl border border-transparent hover:border-[#dadce0] dark:hover:border-[#444746] google-btn-hover transition-all cursor-pointer group">
+        <div class="flex items-center gap-3.5 min-w-0">
+          <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-black/10 dark:border-white/10 shadow-xs">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8" alt="Avatar" class="w-full h-full object-cover">
+          </div>
+          <div class="min-w-0 text-left">
+            <div class="text-[14px] font-medium text-[#1f1f1f] dark:text-[#e3e3e3] truncate">Nguyễn Trường Vũ</div>
+            <div class="text-[12px] text-[#444746] dark:text-[#c4c7c5] truncate font-mono">truongvu.design@gmail.com</div>
+          </div>
+        </div>
+        <span class="text-[11px] px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">Đã đăng nhập</span>
+      </div>
+
+      <!-- Account Item 2 -->
+      <div onclick="selectGoogleAccount('Vũ Nguyễn', 'vu.nguyen@example.com', '')"
+        class="w-full flex items-center justify-between p-3 rounded-2xl border border-transparent hover:border-[#dadce0] dark:hover:border-[#444746] google-btn-hover transition-all cursor-pointer group">
+        <div class="flex items-center gap-3.5 min-w-0">
+          <div class="w-10 h-10 rounded-full bg-[#e8710a] text-white flex items-center justify-center font-bold text-base shrink-0 shadow-xs">
+            V
+          </div>
+          <div class="min-w-0 text-left">
+            <div class="text-[14px] font-medium text-[#1f1f1f] dark:text-[#e3e3e3] truncate">Vũ Nguyễn (Công việc)</div>
+            <div class="text-[12px] text-[#444746] dark:text-[#c4c7c5] truncate font-mono">vu.nguyen@example.com</div>
+          </div>
+        </div>
+        <span class="text-[11px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium">Tài khoản</span>
+      </div>
+
+      <!-- Use another account button -->
+      <div id="useAnotherBtn" onclick="toggleCustomForm()"
+        class="w-full flex items-center gap-3.5 p-3 rounded-2xl border border-transparent hover:border-[#dadce0] dark:hover:border-[#444746] google-btn-hover transition-all cursor-pointer">
+        <div class="w-10 h-10 rounded-full bg-transparent border border-dashed border-[#747775] text-[#444746] dark:text-[#c4c7c5] flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[20px]">person_add</span>
+        </div>
+        <div class="text-[14px] font-medium text-[#1f1f1f] dark:text-[#e3e3e3]">Sử dụng một tài khoản khác</div>
+      </div>
+
+    </div>
+
+    <!-- Custom Account Input Form (Hidden by default) -->
+    <form id="customAccountForm" class="hidden space-y-3 mb-4 pt-2 border-t border-[#dadce0] dark:border-[#444746]" onsubmit="submitCustomGoogleAccount(event)">
+      <div class="text-left">
+        <label class="block text-xs font-medium text-[#444746] dark:text-[#c4c7c5] mb-1">Họ và tên của bạn</label>
+        <input id="customName" type="text" required placeholder="Ví dụ: Nguyễn Văn A"
+          class="w-full px-3.5 py-2 text-sm rounded-xl border border-[#dadce0] dark:border-[#444746] bg-white dark:bg-[#1e1f20] text-[#1f1f1f] dark:text-[#e3e3e3] focus:outline-none focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8]">
+      </div>
+      <div class="text-left">
+        <label class="block text-xs font-medium text-[#444746] dark:text-[#c4c7c5] mb-1">Email hoặc số điện thoại Gmail</label>
+        <input id="customEmail" type="email" required placeholder="name@gmail.com"
+          class="w-full px-3.5 py-2 text-sm rounded-xl border border-[#dadce0] dark:border-[#444746] bg-white dark:bg-[#1e1f20] text-[#1f1f1f] dark:text-[#e3e3e3] focus:outline-none focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8]">
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button type="button" onclick="toggleCustomForm()"
+          class="px-4 py-2 text-xs font-medium text-[#1a73e8] hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-xl transition-colors">
+          Hủy
+        </button>
+        <button type="submit"
+          class="px-5 py-2 text-xs font-semibold bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-xl shadow-xs transition-colors">
+          Tiếp theo
+        </button>
+      </div>
+    </form>
+
+    <!-- Status Loading State (Hidden until clicked) -->
+    <div id="authStatusBox" class="hidden p-4 rounded-2xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/60 dark:border-blue-800/40 text-center space-y-2 mb-4">
+      <div class="flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400">
+        <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+        <span class="text-sm font-semibold" id="authStatusMsg">Đang xác thực thông tin tài khoản Google...</span>
+      </div>
+      <p class="text-[11px] text-gray-500">Cửa sổ này sẽ tự động đóng sau khi hoàn tất xác thực.</p>
+    </div>
+
+    <!-- Security & Permissions Disclaimer -->
+    <p class="text-[12px] leading-relaxed text-[#747775] dark:text-[#8e918f] text-left pt-2 border-t border-[#dadce0]/60 dark:border-[#444746]/60">
+      Để tiếp tục, Google sẽ chia sẻ tên, địa chỉ email, tùy chọn ngôn ngữ và ảnh hồ sơ của bạn với <strong>GiftSpace</strong>. Trước khi sử dụng, bạn có thể xem lại <a href="#" class="text-[#0b57d0] dark:text-[#a8c7fa] hover:underline">Chính sách quyền riêng tư</a> và <a href="#" class="text-[#0b57d0] dark:text-[#a8c7fa] hover:underline">Điều khoản dịch vụ</a>.
+    </p>
+
+  </div>
+
+  <!-- Bottom Google Language & Links Bar -->
+  <div class="w-full max-w-[450px] flex items-center justify-between text-xs text-[#747775] dark:text-[#8e918f] mt-4 px-2">
+    <div class="flex items-center gap-1 cursor-pointer hover:text-black dark:hover:text-white">
+      <span>Tiếng Việt</span>
+      <span class="material-symbols-outlined text-[14px]">arrow_drop_down</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="#" class="hover:underline">Trợ giúp</a>
+      <a href="#" class="hover:underline">Bảo mật</a>
+      <a href="#" class="hover:underline">Điều khoản</a>
+    </div>
+  </div>
+
+  <script>
+    function toggleCustomForm() {
+      const form = document.getElementById('customAccountForm');
+      form.classList.toggle('hidden');
+      if (!form.classList.contains('hidden')) {
+        document.getElementById('customName').focus();
+      }
+    }
+
+    function submitCustomGoogleAccount(e) {
+      e.preventDefault();
+      const name = document.getElementById('customName').value.trim();
+      const email = document.getElementById('customEmail').value.trim();
+      if (!email) return;
+      selectGoogleAccount(name || email.split('@')[0], email, '');
+    }
+
+    async function selectGoogleAccount(fullName, email, avatarUrl) {
+      const list = document.getElementById('accountsList');
+      const form = document.getElementById('customAccountForm');
+      const statusBox = document.getElementById('authStatusBox');
+      const statusMsg = document.getElementById('authStatusMsg');
+
+      list.classList.add('opacity-40', 'pointer-events-none');
+      form.classList.add('hidden');
+      statusBox.classList.remove('hidden');
+      statusMsg.textContent = `Đang đăng nhập với ${fullName}...`;
+
+      try {
+        const res = await fetch('/api/users/social-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            provider: 'Google',
+            email: email,
+            full_name: fullName,
+            avatar_url: avatarUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8'
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          statusBox.className = 'p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-center space-y-1 mb-4';
+          statusBox.innerHTML = `
+            <div class="flex items-center justify-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold text-sm">
+              <span class="material-symbols-outlined text-[20px]">check_circle</span>
+              <span>Đăng nhập Google thành công!</span>
+            </div>
+            <p class="text-xs text-gray-500">Đang quay lại GiftSpace...</p>
+          `;
+
+          // Post message to parent window (opener)
+          if (window.opener && !window.opener.closed) {
+            window.opener.postMessage({
+              type: 'OAUTH_AUTH_SUCCESS',
+              provider: 'Google',
+              user: data.user,
+              token: data.token
+            }, '*');
+            setTimeout(() => {
+              window.close();
+            }, 600);
+          } else {
+            // Standalone mode: set localStorage and redirect
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', data.token);
+            setTimeout(() => {
+              const pending = localStorage.getItem('pending_checkout');
+              if (pending) {
+                try {
+                  const item = JSON.parse(pending);
+                  const priceVal = item.base_price || 1190000;
+                  window.location.href = `payment.html?id=${encodeURIComponent(item.id || 'a1')}&title=${encodeURIComponent(item.title || '')}&price=${priceVal}`;
+                  return;
+                } catch (e) {}
+              }
+              const returnUrl = new URLSearchParams(window.location.search).get('return') || 'index.html';
+              window.location.href = returnUrl;
+            }, 600);
+          }
+        } else {
+          statusBox.className = 'p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-center text-rose-600 text-sm mb-4';
+          statusBox.textContent = data.message || 'Lỗi xác thực với Google!';
+          list.classList.remove('opacity-40', 'pointer-events-none');
+        }
+      } catch (err) {
+        statusBox.className = 'p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-center text-rose-600 text-sm mb-4';
+        statusBox.textContent = 'Lỗi kết nối máy chủ: ' + err.message;
+        list.classList.remove('opacity-40', 'pointer-events-none');
+      }
+    }
+
+    function cancelGoogleLogin() {
+      if (window.opener && !window.opener.closed) {
+        window.close();
+      } else {
+        const returnUrl = new URLSearchParams(window.location.search).get('return') || 'index.html';
+        window.location.href = returnUrl;
+      }
+    }
+  </script>
+</body>
+</html>
