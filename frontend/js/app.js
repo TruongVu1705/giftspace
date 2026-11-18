@@ -1,3 +1,22 @@
+// Global User Authentication Status Helper
+function isUserLoggedIn() {
+    try {
+        const flag = localStorage.getItem('isLoggedIn') === 'true';
+        const userStr = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+        if (flag && userStr) {
+            const u = JSON.parse(userStr);
+            if (u && (u.id || u.email)) return true;
+        }
+        if (token && userStr) {
+            const u = JSON.parse(userStr);
+            if (u && (u.id || u.email)) return true;
+        }
+    } catch (e) {}
+    return false;
+}
+window.isUserLoggedIn = isUserLoggedIn;
+
 document.addEventListener('DOMContentLoaded', () => {
     // Ensure backend keep-alive & wake-up service is active across all pages
     if (!window.wakeBackend && !document.getElementById('giftspace-wake-backend-script')) {
@@ -148,8 +167,10 @@ document.addEventListener('DOMContentLoaded', () => {
             userBtn.onclick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const loggedIn = localStorage.getItem('isLoggedIn') === 'true' || (isProfilePage && user);
+                const loggedIn = isUserLoggedIn();
                 if (!loggedIn) {
+                    try { localStorage.removeItem('pending_checkout'); } catch (err) {}
+                    if (typeof updateLoginModalPreview === 'function') updateLoginModalPreview(null);
                     if (typeof openModal === 'function' && document.getElementById('login-modal')) {
                         openModal('login-modal');
                     } else {
@@ -248,6 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.formatVND = formatVND;
 
     function extractCardAsset(btn) {
+        if (!btn) return null;
+        if (btn.id === 'mobile-modal-buy-btn' || btn.closest('#mobile-modal-buy-btn')) {
+            return window.currentDemoAsset || null;
+        }
         const card = btn.closest('article, .asset-card');
         if (!card) return null;
         const id = card.dataset.id || '';
@@ -262,6 +287,46 @@ document.addEventListener('DOMContentLoaded', () => {
         const demo_url = card.dataset.demoUrl || '';
         return { id, title, thumbnail_url, category, base_price: price, demo_url };
     }
+    window.extractCardAsset = extractCardAsset;
+
+    function updateLoginModalPreview(asset) {
+        const previewBox = document.getElementById('login-modal-product-preview');
+        const heading = document.getElementById('login-modal-heading');
+        const subheading = document.getElementById('login-modal-subheading');
+        const submitBtnSpan = document.querySelector('#login-submit-btn span:last-child');
+        const t = window.t || ((x) => x);
+
+        if (asset) {
+            if (previewBox) {
+                previewBox.style.removeProperty('display');
+                previewBox.classList.remove('hidden');
+            }
+            const thumb = document.getElementById('login-modal-thumb');
+            if (thumb && asset.thumbnail_url) {
+                thumb.src = asset.thumbnail_url;
+                thumb.alt = asset.title || 'Product';
+            }
+            const titleEl = document.getElementById('login-modal-title');
+            if (titleEl && asset.title) {
+                titleEl.textContent = asset.title;
+            }
+            const priceEl = document.getElementById('login-modal-price');
+            if (priceEl && asset.base_price) {
+                priceEl.textContent = formatVND(asset.base_price);
+            }
+            if (heading) heading.textContent = t('Đăng nhập để thanh toán');
+            if (subheading) subheading.textContent = t('Vui lòng đăng nhập hoặc tạo tài khoản GiftSpace để tiến hành thanh toán và nhận bàn giao sản phẩm.');
+            if (submitBtnSpan) submitBtnSpan.textContent = t('Đăng nhập & Tiếp tục thanh toán');
+        } else {
+            if (previewBox) {
+                previewBox.classList.add('hidden');
+            }
+            if (heading) heading.textContent = t('Đăng nhập tài khoản');
+            if (subheading) subheading.textContent = t('Vui lòng đăng nhập hoặc tạo tài khoản GiftSpace để quản lý đơn hàng và mã nguồn của bạn.');
+            if (submitBtnSpan) submitBtnSpan.textContent = t('Đăng nhập');
+        }
+    }
+    window.updateLoginModalPreview = updateLoginModalPreview;
 
     // Purchase & Demo buttons
     document.addEventListener('click', (e) => {
@@ -289,7 +354,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (iframe) {
                 iframe.src = demoUrl;
             }
-            const assetInfo = extractCardAsset(btn) || { title: 'Lumina Agency & Portfolio Template', demo_url: demoUrl, base_price: 1190000 };
+            const assetInfo = extractCardAsset(btn) || { 
+                id: 'a1',
+                title: 'Lumina Agency & Portfolio Template', 
+                demo_url: demoUrl, 
+                base_price: 1190000,
+                thumbnail_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8'
+            };
+            window.currentDemoAsset = assetInfo;
             trackDemoView(assetInfo, 'mobile');
             
             // Dynamically update modal headers and product text if elements exist
@@ -318,7 +390,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Web Demo
         if (btn.textContent.includes('Web Demo') || btn.textContent.includes('Live Demo') || (btn.querySelector('.material-symbols-outlined')?.textContent === 'laptop_mac')) {
             const demoUrl = btn.getAttribute('data-demo-url') || btn.getAttribute('href') || '';
-            const assetInfo = extractCardAsset(btn) || { title: 'Lumina Agency & Portfolio Template', demo_url: demoUrl, base_price: 1190000 };
+            const assetInfo = extractCardAsset(btn) || { 
+                id: 'a1',
+                title: 'Lumina Agency & Portfolio Template', 
+                demo_url: demoUrl, 
+                base_price: 1190000,
+                thumbnail_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8'
+            };
+            window.currentDemoAsset = assetInfo;
             trackDemoView(assetInfo, 'web');
             if (demoUrl && demoUrl !== '#') {
                 // allow normal navigation
@@ -329,16 +408,49 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // Purchase
-        if (btn.classList.contains('purchase-btn') || btn.textContent.includes('Purchase') || btn.textContent.includes('Get Template') || btn.textContent.includes('Mua ngay')) {
+        // Purchase (Requires Login)
+        const isPurchase = btn.classList.contains('purchase-btn') || 
+            btn.id === 'mobile-modal-buy-btn' ||
+            btn.closest('#mobile-modal-buy-btn') ||
+            btn.textContent.includes('Purchase') || 
+            btn.textContent.includes('Get Template') || 
+            btn.textContent.includes('Mua ngay') ||
+            btn.textContent.includes('Chọn mua') ||
+            btn.textContent.includes('Sở hữu Lumina');
+
+        if (isPurchase) {
             e.preventDefault();
-            const asset = extractCardAsset(btn) || {
+            const asset = extractCardAsset(btn) || window.currentDemoAsset || {
                 id: 'a1',
                 title: 'Lumina — Minimalist Portfolio & Agency Suite',
                 category: 'WEB TEMPLATE',
                 base_price: 1190000,
                 thumbnail_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8'
             };
+
+            // Gate: verify user is logged in
+            if (!isUserLoggedIn()) {
+                try {
+                    localStorage.setItem('pending_checkout', JSON.stringify(asset));
+                    localStorage.setItem('checkout_item', JSON.stringify(asset));
+                } catch (err) {}
+
+                updateLoginModalPreview(asset);
+
+                if (typeof closeMobileDemoModal === 'function') {
+                    closeMobileDemoModal();
+                } else {
+                    const mobileModal = document.getElementById('mobile-modal');
+                    if (mobileModal) mobileModal.style.setProperty('display', 'none', 'important');
+                }
+
+                const t = window.t || ((x) => x);
+                showToast(t('Vui lòng đăng nhập để tiếp tục thanh toán!'), 'warning', 4000);
+                openModal('login-modal');
+                return;
+            }
+
+            // User is logged in, proceed to checkout
             try {
                 localStorage.setItem('checkout_item', JSON.stringify(asset));
             } catch (e) {}
@@ -679,6 +791,33 @@ document.addEventListener('DOMContentLoaded', () => {
                                 localStorage.setItem('user', JSON.stringify(data.user));
                                 localStorage.setItem('token', data.token);
                                 
+                                const isOnPaymentPage = window.location.pathname.toLowerCase().includes('payment');
+                                const pending = localStorage.getItem('pending_checkout');
+
+                                if (isOnPaymentPage) {
+                                    showToast(`Đăng nhập thành công! Chào mừng ${data.user.full_name || data.user.email}!`, 'success', 2500);
+                                    modal.style.setProperty('display', 'none', 'important');
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 600);
+                                    return;
+                                }
+
+                                if (pending) {
+                                    localStorage.removeItem('pending_checkout');
+                                    try {
+                                        const item = JSON.parse(pending);
+                                        showToast(`Đăng nhập thành công! Đang chuyển đến thanh toán ${item.title || ''}...`, 'success', 3000);
+                                        modal.style.setProperty('display', 'none', 'important');
+                                        setTimeout(() => {
+                                            const priceVal = item.base_price || 1190000;
+                                            const targetUrl = `payment.html?id=${encodeURIComponent(item.id || 'a1')}&title=${encodeURIComponent(item.title || '')}&price=${priceVal}`;
+                                            window.location.href = targetUrl;
+                                        }, 600);
+                                        return;
+                                    } catch (parseErr) {}
+                                }
+
                                 showToast(`Đăng nhập thành công! Chào mừng ${data.user.full_name || data.user.email}!`, 'success');
                                 modal.style.setProperty('display', 'none', 'important');
                                 
@@ -768,6 +907,33 @@ document.addEventListener('DOMContentLoaded', () => {
                                 localStorage.setItem('user', JSON.stringify(data.user));
                                 localStorage.setItem('token', data.token);
                                 
+                                const isOnPaymentPage = window.location.pathname.toLowerCase().includes('payment');
+                                const pending = localStorage.getItem('pending_checkout');
+
+                                if (isOnPaymentPage) {
+                                    showToast(`Đăng ký tài khoản thành công! Chào mừng ${data.user.full_name || data.user.email}!`, 'success', 2500);
+                                    modal.style.setProperty('display', 'none', 'important');
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 600);
+                                    return;
+                                }
+
+                                if (pending) {
+                                    localStorage.removeItem('pending_checkout');
+                                    try {
+                                        const item = JSON.parse(pending);
+                                        showToast(`Đăng ký thành công! Đang chuyển đến thanh toán ${item.title || ''}...`, 'success', 3000);
+                                        modal.style.setProperty('display', 'none', 'important');
+                                        setTimeout(() => {
+                                            const priceVal = item.base_price || 1190000;
+                                            const targetUrl = `payment.html?id=${encodeURIComponent(item.id || 'a1')}&title=${encodeURIComponent(item.title || '')}&price=${priceVal}`;
+                                            window.location.href = targetUrl;
+                                        }, 600);
+                                        return;
+                                    } catch (parseErr) {}
+                                }
+
                                 showToast(`Đăng ký tài khoản thành công! Chào mừng ${data.user.full_name || data.user.email}!`, 'success');
                                 modal.style.setProperty('display', 'none', 'important');
                                 

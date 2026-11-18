@@ -310,7 +310,38 @@
             vietqrImg.src = `https://api.vietqr.io/image/970422-988012899999-compact2.jpg?amount=${amountVnd}&addInfo=${encodeURIComponent(orderCode)}&accountName=NGUYEN%20TRUONG%20VU`;
           }
 
-          // 4. Pre-fill customer email if logged in
+          // 4. Verify user login status on payment screen
+          function verifyPaymentAuth() {
+            let loggedIn = false;
+            try {
+              if (typeof isUserLoggedIn === 'function') {
+                loggedIn = isUserLoggedIn();
+              } else {
+                const flag = localStorage.getItem('isLoggedIn') === 'true';
+                const uStr = localStorage.getItem('user');
+                loggedIn = flag && !!uStr;
+              }
+            } catch (e) {}
+
+            if (!loggedIn) {
+              const t = window.t || ((x) => x);
+              if (window.showToast) {
+                window.showToast(t('Vui lòng đăng nhập để tiếp tục thanh toán đơn hàng!'), 'warning', 4500);
+              }
+              try {
+                localStorage.setItem('pending_checkout', JSON.stringify(currentItem));
+              } catch (e) {}
+              if (typeof updateLoginModalPreview === 'function') {
+                updateLoginModalPreview(currentItem);
+              }
+              if (typeof openModal === 'function') {
+                setTimeout(() => openModal('login-modal'), 350);
+              }
+            }
+          }
+          verifyPaymentAuth();
+
+          // 5. Pre-fill customer email if logged in
           const emailInput = document.getElementById('customer-email');
           const phoneInput = document.getElementById('customer-phone');
           let currentUser = null;
@@ -322,11 +353,19 @@
             emailInput.value = currentUser.email;
           }
 
-          // 5. Confirm Order Action
+          // 6. Confirm Order Action
           const confirmBtn = document.getElementById('confirmPaymentBtn');
           if (confirmBtn) {
             confirmBtn.addEventListener('click', async (e) => {
               e.preventDefault();
+              
+              const isAuthed = typeof isUserLoggedIn === 'function' ? isUserLoggedIn() : (localStorage.getItem('isLoggedIn') === 'true' && !!localStorage.getItem('user'));
+              if (!isAuthed) {
+                const t = window.t || ((x) => x);
+                if (window.showToast) window.showToast(t('Vui lòng đăng nhập trước khi xác nhận đơn hàng!'), 'warning', 4000);
+                if (typeof openModal === 'function') openModal('login-modal');
+                return;
+              }
               
               const emailVal = emailInput ? emailInput.value.trim() : '';
               const phoneVal = phoneInput ? phoneInput.value.trim() : '';
@@ -456,22 +495,23 @@
         <div class="flex flex-col items-center text-center">
           <div
             class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high/70 border border-outline-variant text-primary-container text-label-sm font-semibold tracking-wide mb-3">
-            <span class="material-symbols-outlined text-[14px]">lock</span><span class="">Account Verification</span>
+            <span class="material-symbols-outlined text-[14px]">lock</span><span id="login-modal-badge" class="">Account Verification</span>
           </div>
-          <h2 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-2 tracking-tight">Đăng nhập để tiếp tục</h2>
-          <p class="font-body-sm text-body-sm text-on-surface-variant max-w-sm mb-4 leading-relaxed">Please log in or create a GiftSpace account to activate your license, receive the source code, and get a VAT invoice.</p>
+          <h2 id="login-modal-heading" class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-2 tracking-tight">Đăng nhập để tiếp tục</h2>
+          <p id="login-modal-subheading" class="font-body-sm text-body-sm text-on-surface-variant max-w-sm mb-4 leading-relaxed">Please log in or create a GiftSpace account to activate your license, receive the source code, and get a VAT invoice.</p>
           <div
+            id="login-modal-product-preview"
             class="w-full flex items-center gap-3 p-3 rounded-xl bg-surface-container-low border border-outline-variant mb-6 text-left">
             <div
               class="w-11 h-11 rounded-lg bg-surface-container-high overflow-hidden shrink-0 flex items-center justify-center">
-              <img alt="Lumina Template" class="w-full h-full object-cover"
+              <img id="login-modal-thumb" alt="Lumina Template" class="w-full h-full object-cover"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgf-lKA_EJfDrlTOl-7jnOx2TU53x8UHUJKR0OJj-CjlswaLYIqeqUFibvZi-mYiVBvciXhmXL5gHnojYtDDXIIih4daYr2pijZpU-JHGO0KUyNgVUM1TfTgK4RE-MG2jkgegTnvsvDHA4VnTjV8ppovoIuJjYsL0_CBJ1nQFjywrexvK4EyHj3-lG6MSWsFvdBZnua48P71i6vS6Hv6ua2jU2FVv2Z9WISe3_xdVnzAFxAnEpshV8">
             </div>
             <div class="flex-1 min-w-0">
-              <p class="font-label-md text-label-md font-semibold text-on-surface truncate">Lumina — Agency Portfolio
+              <p id="login-modal-title" class="font-label-md text-label-md font-semibold text-on-surface truncate">Lumina — Agency Portfolio
                 Template</p>
               <p class="font-body-sm text-[12px] text-on-surface-variant flex items-center gap-2"><span class="">Bản
-                  quyền thương mại</span><span class="font-semibold text-primary-container">1.190.000 VNĐ</span></p>
+                  quyền thương mại</span><span id="login-modal-price" class="font-semibold text-primary-container">1.190.000 VNĐ</span></p>
             </div><span
               class="material-symbols-outlined text-[18px] text-primary-container shrink-0">shopping_bag</span>
           </div>
